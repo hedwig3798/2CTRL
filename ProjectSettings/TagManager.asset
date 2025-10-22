@@ -11,12 +11,12 @@ TagManager:
   - 
   - Water
   - UI
-  - 
-  - 
-  - 
-  - 
-  - 
-  - 
+  - RBG
+  - LBG
+  - RPlayer
+  - LPlayer
+  - RMonster
+  - LMonster
   - 
   - 
   - 
@@ -41,10 +41,10 @@ TagManager:
   - name: Default
     uniqueID: 0
     locked: 0
-  - name: Layer 1
+  - name: BG
     uniqueID: 2425651459
     locked: 0
-  - name: Layer 2
+  - name: Player
     uniqueID: 4250941897
     locked: 0
   - name: Layer 3
