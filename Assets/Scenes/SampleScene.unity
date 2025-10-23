@@ -119,6 +119,37 @@ NavMeshSettings:
     debug:
       m_Flags: 0
   m_NavMeshData: {fileID: 0}
+--- !u!1 &62534419
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 62534420}
+  m_Layer: 0
+  m_Name: ======Manager======
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &62534420
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 62534419}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: -8.19408, y: 13.73754, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &245722634
 GameObject:
   m_ObjectHideFlags: 0
@@ -324,6 +355,37 @@ CircleCollider2D:
   m_CompositeOrder: 0
   m_Offset: {x: 0, y: 0}
   m_Radius: 0.5
+--- !u!1 &1075380941
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1075380942}
+  m_Layer: 0
+  m_Name: DataLoader
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1075380942
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1075380941}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: -8.19408, y: 13.73754, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1551234701
 GameObject:
   m_ObjectHideFlags: 0
@@ -520,6 +582,14 @@ MonoBehaviour:
   tileSize: {x: 1, y: 1}
   backgroundSprite:
   - {fileID: 1261424500, guid: 0f6a44d76fe665944897ab6d0b95b978, type: 3}
+  - {fileID: 92592869, guid: 0f6a44d76fe665944897ab6d0b95b978, type: 3}
+  - {fileID: 1344652856, guid: 0f6a44d76fe665944897ab6d0b95b978, type: 3}
+  - {fileID: -1725408118, guid: 0f6a44d76fe665944897ab6d0b95b978, type: 3}
+  - {fileID: 1044184179, guid: 0f6a44d76fe665944897ab6d0b95b978, type: 3}
+  - {fileID: -170759605, guid: 0f6a44d76fe665944897ab6d0b95b978, type: 3}
+  - {fileID: -4586099, guid: 0f6a44d76fe665944897ab6d0b95b978, type: 3}
+  - {fileID: -604841167, guid: 0f6a44d76fe665944897ab6d0b95b978, type: 3}
+  - {fileID: -1978189275, guid: 0f6a44d76fe665944897ab6d0b95b978, type: 3}
   sortingLayerName: BG
   objectLayerName: RBG
 --- !u!4 &1773442153
@@ -789,3 +859,5 @@ SceneRoots:
   - {fileID: 1551234704}
   - {fileID: 1953033878}
   - {fileID: 1773442153}
+  - {fileID: 62534420}
+  - {fileID: 1075380942}
