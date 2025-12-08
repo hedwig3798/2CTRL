@@ -4,7 +4,7 @@ using UnityEngine.InputSystem;
 using UnityEngine.InputSystem.Controls;
 
 public class ArrowMovemnt
-    : MonoBehaviour
+    : DirectionalObject
 {
     private enum Direction
     {
@@ -24,17 +24,17 @@ public class ArrowMovemnt
         KeyCode.DownArrow
     };
 
-
-
     void Update()
     {
         if (Input.GetKey(moveKeys[(int)Direction.Right]))
         {
+            isRight = true;
             transform.Translate(Vector2.right * speed * Time.deltaTime);
         }
 
         if (Input.GetKey(moveKeys[(int)Direction.Left]))
         {
+            isRight = false;
             transform.Translate(Vector2.left * speed * Time.deltaTime);
         }
 
@@ -47,5 +47,7 @@ public class ArrowMovemnt
         {
             transform.Translate(Vector2.down * speed * Time.deltaTime);
         }
+
+        CheckRight();
     }
 }
