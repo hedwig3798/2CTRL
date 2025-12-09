@@ -275,7 +275,7 @@ MonoBehaviour:
   sortingOder: 0
   layermask:
     serializedVersion: 2
-    m_Bits: 512
+    m_Bits: 0
 --- !u!95 &1344147593
 Animator:
   serializedVersion: 7
