@@ -33,6 +33,7 @@ public class MonsterGenerator
 
     public Queue<Monster> monsterPool = new Queue<Monster>();
 
+    public LayerMask layermask;
     private void Awake()
     {
         PreloadMonster(preLoadCount);
@@ -92,7 +93,7 @@ public class MonsterGenerator
                     monster.SetStats(monsterData.stats);
                     monster.SetExcuteAction(() => monsterData.ai.Excute(monster));
                     monster.SetReadyAction(() => monsterData.ai.Ready(monster));
-
+                    monster.SetLayerMask(layermask);
                     // monsterData.ai.CaclulateDirection(monster);
 
                     if (null != monsterData.runClip)
@@ -102,6 +103,7 @@ public class MonsterGenerator
 
                     Vector2 dir = UnityEngine.Random.insideUnitCircle.normalized;
                     monster.gameObject.transform.position = (Vector2)target.position + (dir * UnityEngine.Random.Range(waves[i].minSpawnRange, waves[i].maxSpawnRange));
+                    monster.gameObject.layer = gameObject.layer;
                     monster.gameObject.SetActive(true);
                 }
             }

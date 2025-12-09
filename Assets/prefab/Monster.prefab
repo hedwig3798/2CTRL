@@ -16,6 +16,7 @@ GameObject:
   - component: {fileID: -5753857147422419415}
   - component: {fileID: 3232795480560990490}
   - component: {fileID: 6787761776197059164}
+  - component: {fileID: -6735804244791988405}
   m_Layer: 0
   m_Name: Monster
   m_TagString: Untagged
@@ -221,3 +222,30 @@ MonoBehaviour:
     exp: 0
     level: 1
     isDead: 0
+--- !u!50 &-6735804244791988405
+Rigidbody2D:
+  serializedVersion: 5
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3892769670665353481}
+  m_BodyType: 0
+  m_Simulated: 1
+  m_UseFullKinematicContacts: 0
+  m_UseAutoMass: 0
+  m_Mass: 1
+  m_LinearDamping: 0
+  m_AngularDamping: 0.05
+  m_GravityScale: 0
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_Interpolate: 0
+  m_SleepingMode: 1
+  m_CollisionDetection: 0
+  m_Constraints: 0

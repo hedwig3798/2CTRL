@@ -273,6 +273,9 @@ MonoBehaviour:
   renderOrder: Player
   preLoadCount: 100
   sortingOder: 0
+  layermask:
+    serializedVersion: 2
+    m_Bits: 512
 --- !u!95 &1344147593
 Animator:
   serializedVersion: 7
@@ -464,6 +467,11 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 165730050843869877, guid: 1b63a417b90c738488480daeb57ab8ef,
+        type: 3}
+      propertyPath: dmgLayer.m_Bits
+      value: 1024
+      objectReference: {fileID: 0}
     - target: {fileID: 1480788223855499669, guid: 1b63a417b90c738488480daeb57ab8ef,
         type: 3}
       propertyPath: 'moveKeys.Array.data[0]'
@@ -720,6 +728,11 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 165730050843869877, guid: 1b63a417b90c738488480daeb57ab8ef,
+        type: 3}
+      propertyPath: dmgLayer.m_Bits
+      value: 2048
+      objectReference: {fileID: 0}
     - target: {fileID: 5126351119243299318, guid: 1b63a417b90c738488480daeb57ab8ef,
         type: 3}
       propertyPath: m_Name

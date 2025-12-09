@@ -36,7 +36,7 @@ public class Monster : MonoBehaviour
             || null == combatObject
             )
         {
-            Debug.LogError("a required component is missing.");
+            Debug.LogError("some required component is missing.");
             gameObject.SetActive(false);
         }
     }
@@ -88,5 +88,15 @@ public class Monster : MonoBehaviour
     public Vector3 GetDirection()
     {
         return movement.direction;
+    }
+
+    public void SetIsRight(bool _isRight)
+    {
+        movement.isRight = _isRight;
+    }
+
+    public void SetLayerMask(LayerMask _mask)
+    {
+        combatObject.dmgLayer = _mask;
     }
 }

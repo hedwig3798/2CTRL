@@ -13,6 +13,7 @@ public class DirectionalObject
     {
         if (null == spriteRenderer)
         {
+            Debug.LogError("no sprite renderer in monster");
             return;
         }
 

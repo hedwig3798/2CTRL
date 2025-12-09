@@ -10,7 +10,17 @@ public abstract class AIBehavior
     {
         Vector3 monsterPositoin = monster.transform.position;
         Vector3 playerPosition = monster.GetTartgetTransform().position;
-        monster.SetDirection((playerPosition - monsterPositoin).normalized);
+        Vector3 direction = (playerPosition - monsterPositoin).normalized;
+        monster.SetDirection(direction);
+
+        if (0 >= direction.x)
+        {
+            monster.SetIsRight(false);
+        }
+        else
+        {
+            monster.SetIsRight(true);
+        }
     }
 
     // Update 에서 실행 할 함수

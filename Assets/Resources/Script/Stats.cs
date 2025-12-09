@@ -12,6 +12,10 @@ public class Stats
     public float coolTimeReduce = 0;
     public float exp = 0;
     public float level = 1;
+    public float lifeSteal = 0;
+    public float criticalRate = 0;
+    public float criticalDMG = 1.5f;
+    public float reflectRate = 0.0f;
 
     public bool isDead = false;
 }

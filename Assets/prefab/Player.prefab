@@ -14,6 +14,9 @@ GameObject:
   - component: {fileID: 1928591136714962967}
   - component: {fileID: 1761728140299321562}
   - component: {fileID: 6793152794397976486}
+  - component: {fileID: 7198503661107207765}
+  - component: {fileID: 165730050843869877}
+  - component: {fileID: -6400168061881871538}
   m_Layer: 9
   m_Name: Player
   m_TagString: Untagged
@@ -195,3 +198,49 @@ Rigidbody2D:
   m_SleepingMode: 1
   m_CollisionDetection: 0
   m_Constraints: 0
+--- !u!114 &7198503661107207765
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5126351119243299318}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 88423cf808f56204989c1358f8ee1629, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::AnimationClipSetter
+--- !u!114 &165730050843869877
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5126351119243299318}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0612ca215a8dfb240864fdb3814214d2, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::CombatObject
+  stats:
+    hp: 1
+    atk: 1
+    dmg: 1
+    atkDelay: 0.5
+    speed: 1
+    coolTimeReduce: 0
+    exp: 0
+    level: 1
+    isDead: 0
+--- !u!114 &-6400168061881871538
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5126351119243299318}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7f2e5e89aa8dbcd48a764fdf6ad6efaf, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::Player
