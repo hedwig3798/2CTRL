@@ -23,6 +23,8 @@ public class Monster : MonoBehaviour
     [SerializeField] 
     private CombatObject combatObject;
 
+    private MonsterGenerator monsterGenerator;
+
     private void Awake()
     {
         movement = GetComponent<MonsterMovement>();
@@ -39,6 +41,14 @@ public class Monster : MonoBehaviour
             Debug.LogError("some required component is missing.");
             gameObject.SetActive(false);
         }
+
+        combatObject.DeadCallback = () => DeadCallback();
+    }
+
+    public void DeadCallback()
+    {
+        Debug.Log($"{gameObject.name} dead");
+        monsterGenerator.ReturnMonster(this);
     }
 
     public Stats GetStats()

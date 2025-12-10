@@ -241,11 +241,4 @@ public class ChunkedBackground : MonoBehaviour
         _chunkPool[key] = chunk;
         return chunk;
     }
-
-#if UNITY_EDITOR
-    private void OnValidate()
-    {
-
-    }
-#endif
 }

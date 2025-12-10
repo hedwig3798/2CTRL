@@ -130,4 +130,10 @@ public class MonsterGenerator
             m.gameObject.transform.SetParent(transform, false);
         }
     }
+
+    public void ReturnMonster(Monster _monster)
+    {
+        monsterPool.Enqueue(_monster);
+        _monster.gameObject.SetActive(false);
+    }
 }

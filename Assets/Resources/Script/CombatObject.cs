@@ -19,6 +19,8 @@ public class CombatObject
     private List<CombatObject> deadCombat = new List<CombatObject>();
     public Stats stats;
 
+    public Action DeadCallback;
+
     // 데미지 처리
     void Damaged(CombatObject attaker)
     {
@@ -43,7 +45,7 @@ public class CombatObject
         // 타격자 데미지 반사
         atkStats.hp -= finalDmg * stats.reflectRate;
 
-        Debug.Log($"Damged {finalDmg}");
+        // Debug.Log($"Damged {finalDmg}");
     }
 
     private void Update()
@@ -51,13 +53,13 @@ public class CombatObject
         float dt = Time.deltaTime;
         deadCombat.Clear();
 
-
         foreach (var pair in hitInfoDict)
         {
             CombatObject k = pair.Key;
 
             if (null == k
-                || false == k.isActiveAndEnabled)
+                || false == k.isActiveAndEnabled
+                || true == k.stats.isDead)
             {
                 deadCombat.Add(k);
                 continue;
@@ -69,7 +71,7 @@ public class CombatObject
                 && true == hitInfoDict[k].isColliding)
             {
                 Damaged(k);
-                hitInfoDict[k].coolTime += k.stats.atkDelay;
+                hitInfoDict[k].coolTime += k.stats.atkSpeed;
 
                 if (0 >= hitInfoDict[k].coolTime)
                 {
@@ -81,6 +83,19 @@ public class CombatObject
         foreach (CombatObject k in deadCombat)
         {
             hitInfoDict.Remove(k);
+        }
+    }
+
+    private void LateUpdate()
+    {
+        if (0 >= stats.hp)
+        {
+            stats.isDead = true;
+
+            if(null != DeadCallback)
+            {
+                DeadCallback();
+            }
         }
     }
 
@@ -111,7 +126,7 @@ public class CombatObject
         HitInfo hitinfo = new()
         {
             isColliding = true,
-            coolTime = combat.stats.atkDelay
+            coolTime = combat.stats.atkSpeed
         };
 
         hitInfoDict.Add(combat, hitinfo);

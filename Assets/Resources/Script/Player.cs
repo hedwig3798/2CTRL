@@ -22,6 +22,8 @@ public class Player : MonoBehaviour
     [SerializeField]
     private CombatObject combatObject;
 
+    private bool deadBool = false;
+
     private void Awake()
     {
         movement = GetComponent<ArrowMovemnt>();
@@ -37,6 +39,17 @@ public class Player : MonoBehaviour
         {
             Debug.LogError("some required component is missing.");
             gameObject.SetActive(false);
+        }
+
+        combatObject.DeadCallback = () => DeadCallback();
+    }
+
+    public void DeadCallback()
+    {
+        if (false == deadBool)
+        {
+            Debug.Log($"{gameObject.name} dead");
+            deadBool = true;
         }
     }
 }
