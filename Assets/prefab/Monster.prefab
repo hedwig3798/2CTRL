@@ -17,6 +17,8 @@ GameObject:
   - component: {fileID: 3232795480560990490}
   - component: {fileID: 6787761776197059164}
   - component: {fileID: -6735804244791988405}
+  - component: {fileID: 7829878704672428821}
+  - component: {fileID: 7021441500080485552}
   m_Layer: 0
   m_Name: Monster
   m_TagString: Untagged
@@ -187,7 +189,8 @@ MonoBehaviour:
   movement: {fileID: 0}
   directionalObject: {fileID: 0}
   animationClipSetter: {fileID: 0}
-  combatObject: {fileID: 0}
+  damagable: {fileID: 0}
+  stats: {fileID: 0}
 --- !u!114 &3232795480560990490
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -212,16 +215,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0612ca215a8dfb240864fdb3814214d2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::CombatObject
-  stats:
-    hp: 1
-    atk: 1
-    dmg: 1
-    atkDelay: 0.5
-    speed: 1
-    coolTimeReduce: 0
-    exp: 0
-    level: 1
-    isDead: 0
+  dmgLayer:
+    serializedVersion: 2
+    m_Bits: 0
+  stats: {fileID: 0}
 --- !u!50 &-6735804244791988405
 Rigidbody2D:
   serializedVersion: 5
@@ -249,3 +246,44 @@ Rigidbody2D:
   m_SleepingMode: 1
   m_CollisionDetection: 0
   m_Constraints: 0
+--- !u!114 &7829878704672428821
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3892769670665353481}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 302088e0a24ffb4488e6539807497393, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::Stats
+  maxHP: 1
+  hp: 1
+  hpRegen: 0.1
+  hpRegenTick: 1
+  atkSpeed: 0.5
+  dmgIncreasePercent: 1
+  coolTimeReduce: 0
+  speed: 1
+  exp: 0
+  level: 1
+  lifeSteal: 0
+  criticalRate: 0
+  criticalDMG: 1.5
+  reflectRate: 0
+  isDead: 0
+--- !u!114 &7021441500080485552
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3892769670665353481}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e129585ba7639c4418a1fa248ee4133d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::Attackable
+  stats: {fileID: 7829878704672428821}
+  baseAtk: 1

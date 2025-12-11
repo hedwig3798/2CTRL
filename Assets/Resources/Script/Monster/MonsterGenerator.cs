@@ -28,10 +28,10 @@ public class MonsterGenerator
     public int sortingOder;
 
     private float time = 0;
-    private List<float> interval = new List<float>();
+    private List<float> interval = new();
     private int waveNumber = 0;
 
-    public Queue<Monster> monsterPool = new Queue<Monster>();
+    public Queue<Monster> monsterPool = new();
 
     public LayerMask layermask;
     private void Awake()

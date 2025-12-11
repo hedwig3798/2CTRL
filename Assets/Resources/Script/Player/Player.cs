@@ -1,9 +1,13 @@
+using NUnit.Framework.Constraints;
+using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Rendering;
 
 [RequireComponent(typeof(ArrowMovemnt))]
 [RequireComponent(typeof(DirectionalObject))]
 [RequireComponent(typeof(AnimationClipSetter))]
-[RequireComponent(typeof(CombatObject))]
+[RequireComponent(typeof(Damagable))]
+[RequireComponent(typeof(Stats))]
 
 public class Player : MonoBehaviour
 {
@@ -20,28 +24,35 @@ public class Player : MonoBehaviour
     private AnimationClipSetter animationClipSetter;
 
     [SerializeField]
-    private CombatObject combatObject;
+    private Damagable damagable;
+
+    [SerializeField]
+    private Stats stats;
 
     private bool deadBool = false;
+
+    // public List<AttackComponent> attacks = new();
 
     private void Awake()
     {
         movement = GetComponent<ArrowMovemnt>();
         directionalObject = GetComponent<DirectionalObject>();
         animationClipSetter = GetComponent<AnimationClipSetter>();
-        combatObject = GetComponent<CombatObject>();
+        damagable = GetComponent<Damagable>();
+        stats = GetComponent<Stats>();
 
         if (null == movement
             || null == directionalObject
             || null == animationClipSetter
-            || null == combatObject
+            || null == damagable
+            || null == stats
             )
         {
             Debug.LogError("some required component is missing.");
             gameObject.SetActive(false);
         }
 
-        combatObject.DeadCallback = () => DeadCallback();
+        damagable.DeadCallback = () => DeadCallback();
     }
 
     public void DeadCallback()

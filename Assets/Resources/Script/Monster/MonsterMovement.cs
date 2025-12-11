@@ -16,10 +16,7 @@ public class MonsterMovement
 
     void OnEnable()
     {
-        if(null != ready)
-        {
-            ready();
-        }
+        ready?.Invoke();
     }
 
     void Update()

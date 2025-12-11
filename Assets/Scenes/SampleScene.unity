@@ -817,6 +817,21 @@ PrefabInstance:
       propertyPath: renderCamera
       value: 
       objectReference: {fileID: 2083139459}
+    - target: {fileID: 3644353676449604615, guid: dfbc18bc829b28e43ade99fa866b1ee7,
+        type: 3}
+      propertyPath: stats.hp
+      value: 10
+      objectReference: {fileID: 0}
+    - target: {fileID: 3644353676449604615, guid: dfbc18bc829b28e43ade99fa866b1ee7,
+        type: 3}
+      propertyPath: stats.maxHP
+      value: 10
+      objectReference: {fileID: 0}
+    - target: {fileID: 3644353676449604615, guid: dfbc18bc829b28e43ade99fa866b1ee7,
+        type: 3}
+      propertyPath: stats.hpRegen
+      value: 0.1
+      objectReference: {fileID: 0}
     - target: {fileID: 4182912616005393255, guid: dfbc18bc829b28e43ade99fa866b1ee7,
         type: 3}
       propertyPath: m_LocalScale.x

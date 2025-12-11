@@ -7,7 +7,7 @@ public class FollowUI : MonoBehaviour
     public Transform target;
     public Vector2 offset;
     public Vector2 scale;
-    public CombatObject combat;
+    public Stats stats;
     public Camera renderCamera;
 
     private Slider slider;
@@ -27,9 +27,20 @@ public class FollowUI : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        UpdatePositionAndScale();
+        if (null == slider)
+        {
+            Debug.LogError($"{gameObject.name} has no slider component");
+            return;
+        }
 
-        slider.value = combat.stats.hp / combat.stats.maxHP;
+        if (null == stats)
+        {
+            Debug.LogError($"{gameObject.name} has no stats component");
+            return;
+        }
+
+        UpdatePositionAndScale();
+        slider.value = stats.hp / stats.maxHP;
     }
 
     private void OnValidate()

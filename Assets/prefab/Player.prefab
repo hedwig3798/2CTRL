@@ -53,6 +53,7 @@ GameObject:
   - component: {fileID: 3877397437166974082}
   - component: {fileID: 3644353676449604615}
   - component: {fileID: 9216975450913194445}
+  - component: {fileID: 8258775729630652618}
   m_Layer: 9
   m_Name: Player
   m_TagString: Untagged
@@ -72,7 +73,8 @@ Transform:
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
-  m_Children: []
+  m_Children:
+  - {fileID: 3850047820266980606}
   m_Father: {fileID: 4403417677050532586}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &2772335421136931876
@@ -261,20 +263,7 @@ MonoBehaviour:
   dmgLayer:
     serializedVersion: 2
     m_Bits: 2048
-  stats:
-    maxHP: 1
-    hp: 1
-    atk: 1
-    atkSpeed: 0.5
-    coolTimeReduce: 0
-    speed: 1
-    exp: 0
-    level: 1
-    lifeSteal: 0
-    criticalRate: 0
-    criticalDMG: 1.5
-    reflectRate: 0
-    isDead: 0
+  stats: {fileID: 0}
 --- !u!114 &9216975450913194445
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -291,7 +280,35 @@ MonoBehaviour:
   movement: {fileID: 0}
   directionalObject: {fileID: 0}
   animationClipSetter: {fileID: 0}
-  combatObject: {fileID: 0}
+  damagable: {fileID: 0}
+  stats: {fileID: 0}
+--- !u!114 &8258775729630652618
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2464469347432241410}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 302088e0a24ffb4488e6539807497393, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::Stats
+  maxHP: 1
+  hp: 1
+  hpRegen: 0.1
+  hpRegenTick: 1
+  atkSpeed: 0.5
+  dmgIncreasePercent: 1
+  coolTimeReduce: 0
+  speed: 1
+  exp: 0
+  level: 1
+  lifeSteal: 0
+  criticalRate: 0
+  criticalDMG: 1.5
+  reflectRate: 0
+  isDead: 0
 --- !u!1 &2906195366204773362
 GameObject:
   m_ObjectHideFlags: 0
@@ -472,8 +489,39 @@ MonoBehaviour:
   target: {fileID: 3521909237227328446}
   offset: {x: 0, y: 0}
   scale: {x: 0, y: 0}
-  combat: {fileID: 3644353676449604615}
+  stats: {fileID: 8258775729630652618}
   renderCamera: {fileID: 0}
+--- !u!1 &7303194499572045601
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 3850047820266980606}
+  m_Layer: 9
+  m_Name: Weapones
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &3850047820266980606
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7303194499572045601}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 3521909237227328446}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &8032580599193173473
 GameObject:
   m_ObjectHideFlags: 0

@@ -4,7 +4,8 @@ using UnityEngine;
 [RequireComponent(typeof(MonsterMovement))]
 [RequireComponent(typeof(DirectionalObject))]
 [RequireComponent(typeof(AnimationClipSetter))]
-[RequireComponent(typeof(CombatObject))]
+[RequireComponent(typeof(Damagable))]
+[RequireComponent(typeof(Stats))]
 
 public class Monster : MonoBehaviour
 {
@@ -21,7 +22,10 @@ public class Monster : MonoBehaviour
     private AnimationClipSetter animationClipSetter;
 
     [SerializeField] 
-    private CombatObject combatObject;
+    private Damagable damagable;
+
+    [SerializeField]
+    private Stats stats;
 
     private MonsterGenerator monsterGenerator;
 
@@ -30,19 +34,25 @@ public class Monster : MonoBehaviour
         movement = GetComponent<MonsterMovement>();
         directionalObject = GetComponent<DirectionalObject>();  
         animationClipSetter = GetComponent<AnimationClipSetter>();
-        combatObject = GetComponent<CombatObject>();
+        damagable = GetComponent<Damagable>();
+        stats = GetComponent<Stats>();
 
         if (null == movement 
             || null == directionalObject
             || null == animationClipSetter
-            || null == combatObject
+            || null == damagable
+            || null == stats
             )
         {
             Debug.LogError("some required component is missing.");
             gameObject.SetActive(false);
         }
 
-        combatObject.DeadCallback = () => DeadCallback();
+        damagable.DeadCallback = () => DeadCallback();
+    }
+
+    private void Update()
+    {
     }
 
     public void DeadCallback()
@@ -53,11 +63,11 @@ public class Monster : MonoBehaviour
 
     public Stats GetStats()
     {
-        return combatObject.stats;
+        return damagable.stats;
     }
     public void SetStats(Stats _stats)
     {
-        combatObject.stats = _stats;
+        stats = _stats;
     }
 
     public Transform GetTartgetTransform()
@@ -107,6 +117,6 @@ public class Monster : MonoBehaviour
 
     public void SetLayerMask(LayerMask _mask)
     {
-        combatObject.dmgLayer = _mask;
+        damagable.dmgLayer = _mask;
     }
 }
