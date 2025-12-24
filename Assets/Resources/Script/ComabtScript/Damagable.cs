@@ -142,8 +142,8 @@ public class Damagable
         // 데미지 레이어가 없다면 무시한다.
         if (0 == ((1 << other.gameObject.layer) & dmgLayer.value))
         {
-            // Debug.Log($"{other.gameObject.layer}, {dmgLayer.value}");
-            // Debug.Log($"{other.gameObject.name}, {gameObject.name}");
+            Debug.Log($"{other.gameObject.layer}, {dmgLayer.value}");
+            Debug.Log($"{other.gameObject.name}, {gameObject.name}");
             return;
         }
 

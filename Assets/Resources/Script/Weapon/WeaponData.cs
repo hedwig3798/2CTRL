@@ -1,14 +1,16 @@
 using System;
 using UnityEngine;
 
-[System.Serializable]
-public class WeaponData
+[CreateAssetMenu(fileName = "Weapon", menuName = "Scriptable Object/Weapon Data")]
+public class WeaponData : ScriptableObject
 {
-    public string name;
+    public string id;
     public float baseDamage;
     public float baseCooltime;
     public float baseSize;
     public int baseCount;
+    public float baseSpeed;
 
-    public GameObject weaponObject;
+    // 이 무기의 발사체
+    public WeaponInstance weaponObject;
 }

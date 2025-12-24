@@ -7,31 +7,37 @@ using UnityEngine;
 public class Stats
     : MonoBehaviour
 {
+    [Header("HP stats")]
     public float maxHP = 1.0f;
     public float hp = 1;
     public float hpRegen = 0.1f;
     public float hpRegenTick = 1.0f;
+    private float hpRegenTimer = 0.0f;
 
+    [Header("atk stats")]
     public float atkSpeed = 0.5f;
     public float dmgIncreasePercent = 1.0f;
-    public float coolTimeReduce = 0;
-
-    public float speed = 1;
-
-    public float exp = 0;
-
-    public float level = 1;
-
-    public float lifeSteal = 0;
-
     public float criticalRate = 0;
     public float criticalDMG = 1.5f;
 
-    public float reflectRate = 0.0f;
+    [Header("speed stats")]
+    public float coolTimeReduce = 1.0f;
+    public float speed = 1;
 
+    [Header("exp stats")]
+    public float exp = 0;
+    public float level = 1;
+
+
+    [Header("special stats")]
+    public float reflectRate = 0.0f;
+    public float lifeSteal = 0;
+    public float sizeRate = 1.0f;
+    public int addCount = 0;
+
+    [Header("dead stats")]
     public bool isDead = false;
 
-    private float hpRegenTimer = 0.0f;
 
     // 나중에 Attack 정보를 받아와야됨
     public float GetFinalDamage()

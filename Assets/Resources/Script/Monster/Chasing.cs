@@ -17,6 +17,6 @@ public class Chasing
         CalculateDirection(monster);
 
         float movement = monster.GetStats().speed * Time.deltaTime;
-        monster.transform.position = monster.transform.position + (monster.GetDirection() * movement);
+        monster.transform.Translate(monster.GetDirection() * movement);
     }
 }

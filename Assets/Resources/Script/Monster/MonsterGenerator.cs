@@ -105,6 +105,8 @@ public class MonsterGenerator
                     monster.gameObject.transform.position = (Vector2)target.position + (dir * UnityEngine.Random.Range(waves[i].minSpawnRange, waves[i].maxSpawnRange));
                     monster.gameObject.layer = gameObject.layer;
                     monster.gameObject.SetActive(true);
+
+                    monster.monsterGenerator = this;
                 }
             }
         }

@@ -27,7 +27,8 @@ public class Monster : MonoBehaviour
     [SerializeField]
     private Stats stats;
 
-    private MonsterGenerator monsterGenerator;
+    [HideInInspector]
+    public MonsterGenerator monsterGenerator;
 
     private void Awake()
     {

@@ -21,6 +21,8 @@ public abstract class AIBehavior
         {
             monster.SetIsRight(true);
         }
+
+
     }
 
     // Update 에서 실행 할 함수
