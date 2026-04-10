@@ -29,6 +29,8 @@ public abstract class Weapon : MonoBehaviour
 
     protected void Awake()
     {
+        enabled = false;
+        return;
         if (null == ownerStats)
         {
             enabled = false;
