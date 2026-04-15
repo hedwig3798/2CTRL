@@ -2,7 +2,6 @@ using System.Threading;
 using UnityEngine;
 using static UnityEngine.GraphicsBuffer;
 
-[RequireComponent(typeof(Attackable))]
 
 public abstract class WeaponInstance : MonoBehaviour
 {
@@ -11,7 +10,6 @@ public abstract class WeaponInstance : MonoBehaviour
     public Stats ownerStats;
 
     protected Vector3 direction;
-    protected Attackable attackable;
 
     public void Initialize(Transform _target, Weapon _weapon)
     {
@@ -27,17 +25,6 @@ public abstract class WeaponInstance : MonoBehaviour
         direction = direction.normalized;
 
         transform.up = direction;
-
-        attackable.stats = ownerStats;
-        attackable.baseAtk = weapon.weaponData.baseDamage;
     }
 
-    private void Awake()
-    {
-        attackable = GetComponent<Attackable>();
-        if(null == attackable)
-        {
-            Debug.LogError($"has no attackable but weapon instance");
-        }
-    }
 }

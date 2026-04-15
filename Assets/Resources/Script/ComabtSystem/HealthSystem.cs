@@ -1,18 +1,34 @@
 using System.Runtime.CompilerServices;
 using Unity.VisualScripting;
 using UnityEngine;
+using UnityEngine.Events;
 
-public class HealthSystem : MonoBehaviour
+public class HealthSystem 
+    : MonoBehaviour
+    , IDamageable
 {
     public float maxHP;
     public float currHP;
-    bool isDead;
+
+    public bool isDead { get; private set; }
 
     private Spawnable spawnable;
 
-    public void AddCurrentHP(float _val)
+    public UnityEvent<float, float> OnValueChanged;
+
+    public void ProcessDamage(ref DamageMassage _msg)
     {
-        currHP += _val;
+        if (true == isDead)
+        {
+            return;
+        }
+
+        currHP -= _msg.damage;
+        if (currHP < 0)
+        {
+            currHP = 0;
+            isDead = true;
+        }
     }
 
     private void Awake()
@@ -29,13 +45,5 @@ public class HealthSystem : MonoBehaviour
     {
         currHP = maxHP;
         isDead = false;
-    }
-
-    private void Update()
-    {
-        if (currHP <= 0)
-        {
-            isDead = true;
-        }
     }
 }
