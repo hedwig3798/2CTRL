@@ -7,7 +7,6 @@ public abstract class WeaponInstance : MonoBehaviour
 {
     public Transform target;
     public Weapon weapon;
-    public Stats ownerStats;
 
     protected Vector3 direction;
 
@@ -15,7 +14,6 @@ public abstract class WeaponInstance : MonoBehaviour
     {
         target = _target;
         weapon = _weapon;
-        ownerStats = weapon.ownerStats;
 
         transform.position = _weapon.gameObject.transform.position;
 

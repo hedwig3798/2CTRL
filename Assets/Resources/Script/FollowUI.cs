@@ -7,7 +7,6 @@ public class FollowUI : MonoBehaviour
     public Transform target;
     public Vector2 offset;
     public Vector2 scale;
-    public Stats stats;
     public Camera renderCamera;
 
     private Slider slider;
@@ -33,14 +32,7 @@ public class FollowUI : MonoBehaviour
             return;
         }
 
-        if (null == stats)
-        {
-            Debug.LogError($"{gameObject.name} has no stats component");
-            return;
-        }
-
         UpdatePositionAndScale();
-        slider.value = stats.hp / stats.maxHP;
     }
 
     private void OnValidate()

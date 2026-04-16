@@ -10,7 +10,6 @@ GameObject:
   m_Component:
   - component: {fileID: 4403417677050532586}
   - component: {fileID: 7429500498763290325}
-  - component: {fileID: 3463831888438310459}
   m_Layer: 9
   m_Name: Player
   m_TagString: Untagged
@@ -51,20 +50,3 @@ MonoBehaviour:
   left: 97
   up: 119
   down: 115
---- !u!114 &3463831888438310459
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 8032580599193173473}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: b4ecebc7b9f48784abd853b201d220a0, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::HealthSystem
-  maxHP: 10
-  currHP: 10
-  OnValueChanged:
-    m_PersistentCalls:
-      m_Calls: []
