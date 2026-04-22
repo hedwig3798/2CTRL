@@ -96,13 +96,12 @@ public class Spawner
 
             go.transform.position = spawnPos;
 
-            BlackBoardHandler datahandler = go.gameObject.GetComponent<BlackBoardHandler>();
-            if (null == datahandler)
+            if (null == sa.blackBoardHandler)
             {
                 Debug.LogError("it has no BlackBoardHandler");
                 yield return flag;
             }
-            BlackBoard data = datahandler.GetBlackBoard();
+            BlackBoard data = sa.blackBoardHandler.GetBlackBoard();
             if (null == data)
             {
                 Debug.LogError("BlackBoardHandler has no data");
@@ -112,7 +111,7 @@ public class Spawner
             data.SetFloat(DATA_TYPE.HPRate, HPRate);
             data.SetFloat(DATA_TYPE.moveSpeedRate, speedRate);
             data.SetTransform(DATA_TYPE.moveTarget, target);
-            datahandler.Initialized();
+            sa.blackBoardHandler.Initialized();
 
             yield return flag;
         }
