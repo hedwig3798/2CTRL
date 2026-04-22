@@ -1,24 +1,27 @@
 using System.Collections;
 using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using System.Xml.Serialization;
-using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.Pool;
 
+/// <summary>
+/// spawable 객체를 생성하는 스포너
+/// </summary>
 public class Spawner
     : MonoBehaviour
 {
-    public SpawnableInitData settingData;
-
     [SerializeField]
     private Transform spawnLocation;
 
     [SerializeField]
     private WaveData[] waveArray;
 
-    private Dictionary<Spawnable, IObjectPool<Spawnable>> poolDict = new Dictionary<Spawnable, IObjectPool<Spawnable>>();
+    private Dictionary<Spawnable, IObjectPool<Spawnable>> poolDict 
+        = new Dictionary<Spawnable, IObjectPool<Spawnable>>();
+
+    // 몬스터 데이터
+    public Transform target;
+    public float speedRate;
+    public float HPRate;
 
     private void Awake()
     {
@@ -53,9 +56,7 @@ public class Spawner
     private Spawnable CreateObject(Spawnable _sa)
     {
         Spawnable sa = Instantiate(_sa);
-        sa.gameObject.SetActive(false);
         sa.SetPool(poolDict[_sa]);
-        sa.settingData = settingData;
         sa.gameObject.tag = gameObject.tag;
 
         return sa;
@@ -63,7 +64,10 @@ public class Spawner
 
     private void OnSpawn(Spawnable _object)
     {
+
+
         _object.gameObject.SetActive(true);
+
     }
 
     private void OnRelease(Spawnable _object)
@@ -82,7 +86,6 @@ public class Spawner
         while (true)
         {
             Spawnable sa = poolDict[_data.spawnObject].Get();
-
             GameObject go = sa.gameObject;
 
             float dis = Random.Range(_data.spawnRange.x, _data.spawnRange.y);
@@ -93,9 +96,23 @@ public class Spawner
 
             go.transform.position = spawnPos;
 
-            sa.OnSpawn(settingData);
+            BlackBoardHandler datahandler = go.gameObject.GetComponent<BlackBoardHandler>();
+            if (null == datahandler)
+            {
+                Debug.LogError("it has no BlackBoardHandler");
+                yield return flag;
+            }
+            BlackBoard data = datahandler.GetBlackBoard();
+            if (null == data)
+            {
+                Debug.LogError("BlackBoardHandler has no data");
+                yield return flag;
+            }
 
-            go.SetActive(true);
+            data.SetFloat(DATA_TYPE.HPRate, HPRate);
+            data.SetFloat(DATA_TYPE.moveSpeedRate, speedRate);
+            data.SetTransform(DATA_TYPE.moveTarget, target);
+            datahandler.Initialized();
 
             yield return flag;
         }

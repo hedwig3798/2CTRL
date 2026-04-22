@@ -3,6 +3,9 @@ using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.Events;
 
+/// <summary>
+/// 실제 체력의 증감 및 사망 처리
+/// </summary>
 public class HealthSystem 
     : MonoBehaviour
     , IDamageable
@@ -34,10 +37,6 @@ public class HealthSystem
     private void Awake()
     {
         spawnable = GetComponent<Spawnable>();
-        if (null != spawnable)
-        {
-            spawnable.OnSpawnEvent += ResetHP;
-        }
         isDead = false;
     }
 

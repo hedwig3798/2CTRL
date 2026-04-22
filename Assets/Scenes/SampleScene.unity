@@ -282,6 +282,21 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 6351928893930343484, guid: 112baedc988c94c4d9e55af8508930bb,
         type: 3}
+      propertyPath: HPRate
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 6351928893930343484, guid: 112baedc988c94c4d9e55af8508930bb,
+        type: 3}
+      propertyPath: target
+      value: 
+      objectReference: {fileID: 3693616566516423400}
+    - target: {fileID: 6351928893930343484, guid: 112baedc988c94c4d9e55af8508930bb,
+        type: 3}
+      propertyPath: speedRate
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 6351928893930343484, guid: 112baedc988c94c4d9e55af8508930bb,
+        type: 3}
       propertyPath: defaultTarget
       value: 
       objectReference: {fileID: 3693616566516423400}

@@ -1,12 +1,11 @@
 using System;
-using UnityEngine;
 
 [AttributeUsage(AttributeTargets.Field)]
-public class PipelineComponentAttribute : Attribute
+public class PipelineAttribute : Attribute
 {
     public Type targetType;
 
-    public PipelineComponentAttribute(Type _type)
+    public PipelineAttribute(Type _type)
     {
         targetType = _type;
     }
@@ -24,7 +23,7 @@ public enum DAMAGE_PIPELINE
 
     SHIELD,         // 角靛 贸府
 
-    [PipelineComponent(typeof(HealthSystem))]
+    [Pipeline(typeof(HealthSystem))]
     HEALTH,         // 眉仿 贸府
 
     KNOCKBACK,      // 乘归 贸府

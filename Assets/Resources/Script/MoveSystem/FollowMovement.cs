@@ -1,10 +1,16 @@
 using UnityEngine;
 
-public class Follow : MonoBehaviour
+public class Follow 
+    : MonoBehaviour
+    , IMovementSystem
 {
     public Transform target;
 
-    // Update is called once per frame
+    public void Init(MovementInitData _initData)
+    {
+        target = _initData.target;
+    }
+
     void Update()
     {
         Vector3 vec = target.position;

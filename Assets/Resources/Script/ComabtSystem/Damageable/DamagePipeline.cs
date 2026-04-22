@@ -54,8 +54,11 @@ public class DamagePipeline : MonoBehaviour
             }
 
             // PipelineComponentAttribute 가 있는지 확인
-            PipelineComponentAttribute attribute 
-                = (PipelineComponentAttribute)Attribute.GetCustomAttribute(fieldInfo, typeof(PipelineComponentAttribute));
+            PipelineAttribute attribute 
+                = (PipelineAttribute)Attribute.GetCustomAttribute(
+                        fieldInfo
+                        , typeof(PipelineAttribute)
+                    );
             if (null == attribute)
             {
                 continue;
@@ -74,8 +77,6 @@ public class DamagePipeline : MonoBehaviour
 
             // IDamageable 인터페이스로 캐스팅 해서 넣기
             pipeline[(int)currentType] = component as IDamageable;
-
-            Debug.Log(currentType.ToString());
         }
     }
 }

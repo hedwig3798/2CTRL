@@ -3,8 +3,11 @@ using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.InputSystem;
 using UnityEngine.InputSystem.Controls;
+using static UnityEngine.GraphicsBuffer;
 
-public class ArrowMovemnt : MonoBehaviour
+public class ArrowMovemnt 
+    : MonoBehaviour
+    , IMovementSystem
 {
     [SerializeField]
     private SpriteRenderer spriteRenderer;
@@ -15,6 +18,11 @@ public class ArrowMovemnt : MonoBehaviour
     public KeyCode left;
     public KeyCode up;
     public KeyCode down;
+
+    public void Init(MovementInitData _initData)
+    {
+        speed = _initData.speed;
+    }
 
     void Update()
     {

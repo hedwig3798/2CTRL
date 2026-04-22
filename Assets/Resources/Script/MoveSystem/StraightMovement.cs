@@ -4,6 +4,7 @@ using UnityEngine;
 
 public class Straight
     : MonoBehaviour
+    , Initializable
 {
     public Vector3 dir = Vector3.zero;
     public Transform target;
@@ -12,7 +13,16 @@ public class Straight
     [SerializeField]
     private SpriteRenderer spriteRenderer;
 
-    private Spawnable spawnable;
+    public void Initialize(BlackBoard _data)
+    {
+        target = _data.GetTransform(DATA_TYPE.moveTarget);
+
+        dir = target.position - transform.position;
+        dir.z = 0;
+        dir = dir.normalized;
+
+        speed *= _data.GetFloat(DATA_TYPE.moveSpeedRate);
+    }
 
     private void Awake()
     {
@@ -20,27 +30,6 @@ public class Straight
         {
             dir = Random.insideUnitCircle.normalized;
         }
-
-        spawnable = GetComponent<Spawnable>();
-
-        if (spawnable != null)
-        {
-            spawnable.OnSpawnEvent += SetDirection;
-        }
-    }
-
-    private void SetDirection()
-    {
-        if (null == spawnable)
-        {
-            return;
-        }
-
-        target = spawnable.settingData.target;
-
-        dir = target.position - transform.position;
-        dir.z = 0;
-        dir = dir.normalized;
     }
 
     private void Update()
