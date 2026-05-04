@@ -7,22 +7,13 @@ using static UnityEngine.GraphicsBuffer;
 
 public class ArrowMovemnt 
     : MonoBehaviour
-    , IMovementSystem
 {
-    [SerializeField]
-    private SpriteRenderer spriteRenderer;
-
     public float speed = 5.0f;
 
     public KeyCode right;
     public KeyCode left;
     public KeyCode up;
     public KeyCode down;
-
-    public void Init(MovementInitData _initData)
-    {
-        speed = _initData.speed;
-    }
 
     void Update()
     {

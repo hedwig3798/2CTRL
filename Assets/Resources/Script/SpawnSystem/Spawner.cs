@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Pool;
+using static UnityEditor.Experimental.GraphView.GraphView;
 
 /// <summary>
 /// spawable 객체를 생성하는 스포너
@@ -31,8 +32,6 @@ public class Spawner
             {
                 if (false == poolDict.ContainsKey(sd.spawnObject))
                 {
-                    sd.spawnObject.gameObject.SetActive(false);
-
                     poolDict[sd.spawnObject] = new ObjectPool<Spawnable>
                         (
                             createFunc: () => CreateObject(sd.spawnObject)
@@ -57,17 +56,18 @@ public class Spawner
     {
         Spawnable sa = Instantiate(_sa);
         sa.SetPool(poolDict[_sa]);
-        sa.gameObject.tag = gameObject.tag;
 
+        Transform[] transforms = sa.gameObject.GetComponentsInChildren<Transform>(true);
+        foreach (Transform t in transforms)
+        {
+            t.gameObject.layer = gameObject.layer;
+        }
         return sa;
     }
 
     private void OnSpawn(Spawnable _object)
     {
-
-
         _object.gameObject.SetActive(true);
-
     }
 
     private void OnRelease(Spawnable _object)
@@ -111,7 +111,7 @@ public class Spawner
             data.SetFloat(DATA_TYPE.HPRate, HPRate);
             data.SetFloat(DATA_TYPE.moveSpeedRate, speedRate);
             data.SetTransform(DATA_TYPE.moveTarget, target);
-            sa.blackBoardHandler.Initialized();
+            sa.blackBoardHandler.Initialize();
 
             yield return flag;
         }

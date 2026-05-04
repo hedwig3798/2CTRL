@@ -6,39 +6,67 @@ public class Straight
     : MonoBehaviour
     , Initializable
 {
-    public Vector3 dir = Vector3.zero;
+    [Header("movement value")]
+    private Vector3 direction;
     public Transform target;
     public float speed;
 
+    [Header("sprite value")]
+    [SerializeField]
+    private SPRITE_ROTATE_MODE rotateMode;
     [SerializeField]
     private SpriteRenderer spriteRenderer;
+    [SerializeField]
+    private bool isDefaultLeft = true;
+    [SerializeField]
+    [Range(0f, 360f)]
+    private float rotateOffset;
+
+    private void FlipSprite()
+    {
+        if (null == spriteRenderer)
+        {
+            return;
+        }
+
+        bool flip = direction.x < 0;
+        spriteRenderer.flipX = isDefaultLeft ^ flip;
+    }
 
     public void Initialize(BlackBoard _data)
     {
         target = _data.GetTransform(DATA_TYPE.moveTarget);
 
-        dir = target.position - transform.position;
-        dir.z = 0;
-        dir = dir.normalized;
+        direction = target.position - transform.position;
+        direction = direction.normalized;
 
         speed *= _data.GetFloat(DATA_TYPE.moveSpeedRate);
+
+        if (SPRITE_ROTATE_MODE.ROTATE == rotateMode)
+        {
+            float angle = Mathf.Atan2(direction.y, direction.x) * Mathf.Rad2Deg;
+            transform.rotation = Quaternion.Euler(0f, 0f, angle);
+        }
     }
 
     private void Awake()
     {
-        if (dir == Vector3.zero)
+        if (direction == Vector3.zero)
         {
-            dir = Random.insideUnitCircle.normalized;
+            direction = Random.insideUnitCircle.normalized;
         }
     }
 
     private void Update()
     {
-        transform.Translate(speed * Time.deltaTime * dir);
-
-        if (spriteRenderer != null)
+        if (SPRITE_ROTATE_MODE.ROTATE == rotateMode)
         {
-            spriteRenderer.flipX = !(dir.x < 0);
+            transform.Translate(speed * Time.deltaTime * Vector3.right);
+        }
+        else
+        {
+            transform.Translate(speed * Time.deltaTime * direction);
+            FlipSprite();
         }
     }
 }

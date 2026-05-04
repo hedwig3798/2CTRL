@@ -1,6 +1,7 @@
 using UnityEngine;
 
-public class BlackBoardHandler : MonoBehaviour
+public class BlackBoardHandler 
+    : MonoBehaviour
 {
     private BlackBoard blackBoard = new BlackBoard();
     private Initializable[] initializables;
@@ -15,7 +16,7 @@ public class BlackBoardHandler : MonoBehaviour
         return blackBoard;
     }
 
-    public void Initialized()
+    public void Initialize()
     {
         if (null != initializables)
         {

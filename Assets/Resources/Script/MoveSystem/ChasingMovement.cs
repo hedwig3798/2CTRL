@@ -6,21 +6,20 @@ using UnityEngine.UIElements;
 
 public sealed class ChasingMovement
     : MonoBehaviour
-    , IMovementSystem
+    , Initializable
 {
     public Transform target;
     public float speed;
     Vector3 dir;
 
-    public void Init(MovementInitData _initData)
+    public void Initialize(BlackBoard _data)
     {
-        target = _initData.target;
-        speed = _initData.speed;
+        target = _data.GetTransform(DATA_TYPE.moveTarget);
+        speed = _data.GetFloat(DATA_TYPE.moveSpeedRate);
     }
 
     private void Update()
     {
-
         if (target != null)
         {
             dir = MathUtils.GetDirection(transform, target);

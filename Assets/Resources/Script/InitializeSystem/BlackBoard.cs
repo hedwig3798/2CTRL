@@ -9,6 +9,9 @@ public enum DATA_TYPE
 
     // HealthInitData
     HPRate,
+
+    // Attack
+    attackDamage,
 }
 
 public class BlackBoard

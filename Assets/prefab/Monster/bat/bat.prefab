@@ -20,7 +20,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!4 &4628968974783216965
 Transform:
   m_ObjectHideFlags: 0
@@ -50,10 +50,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e8385b339d2d4f04ba965ac2fa90479a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Straight
-  dir: {x: 0, y: 0, z: 0}
   target: {fileID: 0}
   speed: 1
+  rotateMode: 1
   spriteRenderer: {fileID: 1076880932603965364}
+  isDefaultLeft: 1
+  rotateOffset: 0
 --- !u!114 &4410402836052769883
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -66,7 +68,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ca2a64c3ec4e59f4eaada5bd00e5eac6, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Spawnable
-  settingData: {fileID: 0}
+  blackBoardHandler: {fileID: 0}
 --- !u!58 &3149682256001452028
 CircleCollider2D:
   m_ObjectHideFlags: 0
@@ -102,7 +104,7 @@ CircleCollider2D:
   m_CompositeOperation: 0
   m_CompositeOrder: 0
   m_Offset: {x: 0, y: 0}
-  m_Radius: 0.2
+  m_Radius: 0.16
 --- !u!114 &-2871526423900118107
 MonoBehaviour:
   m_ObjectHideFlags: 0
