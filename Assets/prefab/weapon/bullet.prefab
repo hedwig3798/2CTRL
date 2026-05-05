@@ -105,7 +105,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::Projectile
   blackBoardHandler: {fileID: 825000503613356245}
   owner: {fileID: 0}
-  damage: 10
+  baseDamage: 10
 --- !u!114 &825000503613356245
 MonoBehaviour:
   m_ObjectHideFlags: 0

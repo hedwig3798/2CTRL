@@ -46,6 +46,7 @@ public class ProjectileWeapon
                 BlackBoard b = p.blackBoardHandler.GetBlackBoard();
                 b.SetTransform(DATA_TYPE.moveTarget, FindNerest());
                 b.SetFloat(DATA_TYPE.moveSpeedRate, speedRate);
+                b.SetFloat(DATA_TYPE.damageRate, damageRate);
             }
             p.blackBoardHandler.Initialize();
         }
@@ -61,8 +62,6 @@ public class ProjectileWeapon
             , filter
             , candinate
         );
-
-        Debug.Log($"{hitCount}");
 
         if (0 == hitCount)
         {
@@ -88,6 +87,7 @@ public class ProjectileWeapon
     private void Awake()
     {
         filter.useLayerMask = true;
+        filter.useTriggers = true;
         filter.SetLayerMask(targetLayer);
 
         projectilePool = new ObjectPool<Projectile>
@@ -117,7 +117,11 @@ public class ProjectileWeapon
     private Projectile CreateObject(Projectile _projectile)
     {
         Projectile projectile = Instantiate(_projectile);
-
+        Transform[] transforms = projectile.gameObject.GetComponentsInChildren<Transform>(true);
+        foreach (Transform t in transforms)
+        {
+            t.gameObject.layer = gameObject.layer;
+        }
         return projectile;
     }
 

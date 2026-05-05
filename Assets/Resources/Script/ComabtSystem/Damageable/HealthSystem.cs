@@ -2,22 +2,26 @@ using System.Runtime.CompilerServices;
 using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.Events;
+using System;
 
 /// <summary>
 /// 실제 체력의 증감 및 사망 처리
 /// </summary>
-public class HealthSystem 
+public class HealthSystem
     : MonoBehaviour
     , IDamageable
+    , Initializable
 {
     public float maxHP;
     public float currHP;
 
-    public bool isDead { get; private set; }
+    public bool isDead;
+
+    public Action<GameObject> OnDeath;
 
     private Spawnable spawnable;
 
-    public UnityEvent<float, float> OnValueChanged;
+    public GameObject owner;
 
     public void ProcessDamage(ref DamageMassage _msg)
     {
@@ -30,19 +34,22 @@ public class HealthSystem
         if (currHP < 0)
         {
             currHP = 0;
+            OnDeath?.Invoke(gameObject);
             isDead = true;
         }
+    }
+
+    public void Initialize(BlackBoard _data)
+    {
+        isDead = false;
+        currHP = maxHP;
+
+        OnDeath += _data.dropManager.DropItem;
     }
 
     private void Awake()
     {
         spawnable = GetComponent<Spawnable>();
-        isDead = false;
-    }
-
-    private void ResetHP()
-    {
-        currHP = maxHP;
         isDead = false;
     }
 }

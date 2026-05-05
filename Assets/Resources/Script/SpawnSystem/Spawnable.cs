@@ -18,4 +18,10 @@ public class Spawnable
     {
         blackBoardHandler = gameObject.GetComponent<BlackBoardHandler>();
     }
+
+    private void OnDisable()
+    {
+        Debug.Log("release");
+        pool.Release(this);
+    }
 }

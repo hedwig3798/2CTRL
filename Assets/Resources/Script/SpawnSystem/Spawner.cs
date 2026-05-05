@@ -11,6 +11,11 @@ public class Spawner
     : MonoBehaviour
 {
     [SerializeField]
+    [Header("Managers")]
+    private DropManager dropManager;
+
+    [SerializeField]
+    [Header("Spawn Setting")]
     private Transform spawnLocation;
 
     [SerializeField]
@@ -20,6 +25,7 @@ public class Spawner
         = new Dictionary<Spawnable, IObjectPool<Spawnable>>();
 
     // 몬스터 데이터
+    [Header("Spawn Data")]
     public Transform target;
     public float speedRate;
     public float HPRate;
@@ -62,6 +68,10 @@ public class Spawner
         {
             t.gameObject.layer = gameObject.layer;
         }
+
+        BlackBoard data = sa.blackBoardHandler.GetBlackBoard();
+        data.dropManager = dropManager;
+
         return sa;
     }
 

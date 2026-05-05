@@ -37,7 +37,7 @@ public class DamagePipeline : MonoBehaviour
         }
 
         // 파이프라인 enum 값 가져오기
-        DAMAGE_PIPELINE[] enumValues 
+        DAMAGE_PIPELINE[] enumValues
             = (DAMAGE_PIPELINE[])Enum.GetValues(typeof(DAMAGE_PIPELINE));
 
         // enum 값에 따른 속성 가져오기
@@ -54,7 +54,7 @@ public class DamagePipeline : MonoBehaviour
             }
 
             // PipelineComponentAttribute 가 있는지 확인
-            PipelineAttribute attribute 
+            PipelineAttribute attribute
                 = (PipelineAttribute)Attribute.GetCustomAttribute(
                         fieldInfo
                         , typeof(PipelineAttribute)

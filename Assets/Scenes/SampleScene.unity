@@ -165,6 +165,11 @@ PrefabInstance:
       objectReference: {fileID: 3693616566516423400}
     - target: {fileID: 2378375243013374915, guid: 39fe69f364a4c884d8f406603e80ffc3,
         type: 3}
+      propertyPath: range
+      value: 1000
+      objectReference: {fileID: 0}
+    - target: {fileID: 2378375243013374915, guid: 39fe69f364a4c884d8f406603e80ffc3,
+        type: 3}
       propertyPath: coolTime
       value: 1
       objectReference: {fileID: 0}
@@ -182,6 +187,11 @@ PrefabInstance:
         type: 3}
       propertyPath: m_Name
       value: ProjectileWeapon
+      objectReference: {fileID: 0}
+    - target: {fileID: 5482854523075796515, guid: 39fe69f364a4c884d8f406603e80ffc3,
+        type: 3}
+      propertyPath: m_Layer
+      value: 13
       objectReference: {fileID: 0}
     - target: {fileID: 5718015747857215526, guid: 39fe69f364a4c884d8f406603e80ffc3,
         type: 3}
@@ -361,7 +371,7 @@ PrefabInstance:
     - target: {fileID: 4784257472737569390, guid: 112baedc988c94c4d9e55af8508930bb,
         type: 3}
       propertyPath: m_Name
-      value: SpawnManger
+      value: SpawnManager
       objectReference: {fileID: 0}
     - target: {fileID: 4784257472737569390, guid: 112baedc988c94c4d9e55af8508930bb,
         type: 3}

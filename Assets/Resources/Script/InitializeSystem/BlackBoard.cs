@@ -11,7 +11,8 @@ public enum DATA_TYPE
     HPRate,
 
     // Attack
-    attackDamage,
+    damageRate,
+
 }
 
 public class BlackBoard
@@ -20,6 +21,8 @@ public class BlackBoard
     private Dictionary<DATA_TYPE, float> floatDict = new Dictionary<DATA_TYPE, float>();
     private Dictionary<DATA_TYPE, Transform> transformDict = new Dictionary<DATA_TYPE, Transform>();
     #endregion
+
+    public DropManager dropManager;
 
     public void ClearBoard()
     {
