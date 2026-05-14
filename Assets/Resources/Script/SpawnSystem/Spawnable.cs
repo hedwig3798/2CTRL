@@ -21,7 +21,7 @@ public class Spawnable
 
     private void OnDisable()
     {
-        Debug.Log("release");
+        // Debug.Log("release");
         pool.Release(this);
     }
 }

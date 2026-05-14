@@ -5,8 +5,6 @@ using UnityEngine;
 
 public class DamagePipeline : MonoBehaviour
 {
-    public GameObject targetObject;
-
     private IDamageable[] pipeline
         = new IDamageable[(int)DAMAGE_PIPELINE.END];
 
@@ -28,12 +26,6 @@ public class DamagePipeline : MonoBehaviour
         for (int i = 0; i < (int)DAMAGE_PIPELINE.END; ++i)
         {
             pipeline[i] = null;
-        }
-
-        // 타깃 오브젝트가 없으면 무시
-        if (null == targetObject)
-        {
-            return;
         }
 
         // 파이프라인 enum 값 가져오기
@@ -73,7 +65,7 @@ public class DamagePipeline : MonoBehaviour
 
             // 그 타입의 컴포넌트 가져오기
             // null 이여도 어차피 null 저장하면 된다.
-            Component component = targetObject.GetComponent(targetType);
+            Component component = GetComponent(targetType);
 
             // IDamageable 인터페이스로 캐스팅 해서 넣기
             pipeline[(int)currentType] = component as IDamageable;

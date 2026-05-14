@@ -29,6 +29,7 @@ public class Spawner
     public Transform target;
     public float speedRate;
     public float HPRate;
+    public float damagerate;
 
     private void Awake()
     {
@@ -120,6 +121,7 @@ public class Spawner
 
             data.SetFloat(DATA_TYPE.HPRate, HPRate);
             data.SetFloat(DATA_TYPE.moveSpeedRate, speedRate);
+            data.SetFloat(DATA_TYPE.damageRate, damagerate);
             data.SetTransform(DATA_TYPE.moveTarget, target);
             sa.blackBoardHandler.Initialize();
 

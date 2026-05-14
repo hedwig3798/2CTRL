@@ -19,9 +19,6 @@ public class HealthSystem
 
     public Action<GameObject> OnDeath;
 
-    private Spawnable spawnable;
-
-    public GameObject owner;
 
     public void ProcessDamage(ref DamageMassage _msg)
     {
@@ -49,7 +46,6 @@ public class HealthSystem
 
     private void Awake()
     {
-        spawnable = GetComponent<Spawnable>();
         isDead = false;
     }
 }

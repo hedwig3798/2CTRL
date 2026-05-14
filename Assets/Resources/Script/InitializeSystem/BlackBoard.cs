@@ -45,15 +45,23 @@ public class BlackBoard
     #region Getter
     public float GetFloat(DATA_TYPE _type)
     {
+        if (false == floatDict.ContainsKey(_type))
+        {
+            Debug.LogWarning($"{ToString()} has no {_type.ToString()}");
+            return 0.0f;
+        }
+
         return floatDict[_type];
     }
     public Transform GetTransform(DATA_TYPE _type)
     {
-        if (transformDict.ContainsKey(_type))
+        if (false == transformDict.ContainsKey(_type))
         {
-            return transformDict[_type];
+            Debug.LogWarning($"{ToString()} has no {_type.ToString()}");
+            return null;
         }
-        return null;
+
+        return transformDict[_type];
     }
     #endregion
 }
