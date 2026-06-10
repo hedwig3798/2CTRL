@@ -3,7 +3,6 @@ using UnityEngine.Pool;
 
 public class DropManager
     : MonoBehaviour
-    , IPoolable
 {
     public GameObject dropItem;
 
@@ -12,6 +11,7 @@ public class DropManager
     public void DropItem(GameObject _deadObject)
     {
         GameObject item = dropItemPool.Get();
+        item.layer = gameObject.layer;
         item.transform.position = _deadObject.transform.position;
     }
 

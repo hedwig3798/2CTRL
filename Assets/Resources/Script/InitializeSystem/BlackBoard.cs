@@ -4,15 +4,17 @@ using UnityEngine;
 public enum DATA_TYPE
 {
     // MovementInitData
-    moveTarget,
-    moveSpeedRate,
+    moveTarget,     // transform
+    moveSpeedRate,  // float
 
     // HealthInitData
-    HPRate,
+    HPRate,         // float
 
     // Attack
-    damageRate,
+    damageRate,     // float
 
+    // Item
+    expRate,        // float
 }
 
 public class BlackBoard

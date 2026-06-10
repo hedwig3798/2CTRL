@@ -196,7 +196,7 @@ PrefabInstance:
     - target: {fileID: 5482854523075796515, guid: 39fe69f364a4c884d8f406603e80ffc3,
         type: 3}
       propertyPath: m_IsActive
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 5718015747857215526, guid: 39fe69f364a4c884d8f406603e80ffc3,
         type: 3}
@@ -367,6 +367,11 @@ PrefabInstance:
         type: 3}
       propertyPath: m_Name
       value: DropManager
+      objectReference: {fileID: 0}
+    - target: {fileID: 5972941073957934948, guid: f4f172b61efe1d242baab2dfb2f65b32,
+        type: 3}
+      propertyPath: m_Layer
+      value: 15
       objectReference: {fileID: 0}
     - target: {fileID: 7244059223487525078, guid: f4f172b61efe1d242baab2dfb2f65b32,
         type: 3}
