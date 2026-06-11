@@ -1,9 +1,13 @@
+using UnityEditor.Rendering;
 using UnityEngine;
 
 public class ExpItem 
     : MonoBehaviour
     , Initializable
 {
+    [SerializeField]
+    private GameObject owner;
+
     [SerializeField]
     private float baseExp;
 
@@ -14,8 +18,12 @@ public class ExpItem
         expRate = _data.GetFloat(DATA_TYPE.expRate);
     }
 
-    public float GetExp()
+    private void OnTriggerEnter2D(Collider2D _other)
     {
-        return baseExp * expRate;
+        if (_other.TryGetComponent(out ExpSystem expSystem))
+        {
+            expSystem.GetExp(baseExp * expRate);
+            owner.SetActive(false);
+        }
     }
 }

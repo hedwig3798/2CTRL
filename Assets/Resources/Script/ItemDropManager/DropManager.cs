@@ -4,14 +4,14 @@ using UnityEngine.Pool;
 public class DropManager
     : MonoBehaviour
 {
-    public GameObject dropItem;
+    public Spawnable dropItem;
 
-    private IObjectPool<GameObject> dropItemPool;
+    private IObjectPool<Spawnable> dropItemPool;
 
     public void DropItem(GameObject _deadObject)
     {
-        GameObject item = dropItemPool.Get();
-        item.layer = gameObject.layer;
+        Spawnable item = dropItemPool.Get();
+        item.gameObject.layer = gameObject.layer;
         item.transform.position = _deadObject.transform.position;
     }
 
@@ -23,7 +23,7 @@ public class DropManager
             return;
         }
 
-        dropItemPool = new ObjectPool<GameObject>
+        dropItemPool = new ObjectPool<Spawnable>
         (
             createFunc: () => CreateObject(dropItem)
             , OnSpawn
@@ -35,22 +35,28 @@ public class DropManager
         );
     }
 
-    private GameObject CreateObject(GameObject _object)
+    private Spawnable CreateObject(Spawnable _object)
     {
-        return Instantiate(_object);
+        Spawnable sa = Instantiate(_object);
+        sa.SetPool(dropItemPool);
+
+
+        return sa;
     }
 
-    private void OnSpawn(GameObject _object)
+    private void OnSpawn(Spawnable _object)
     {
-        _object.SetActive(true);
+        _object.blackBoardHandler.GetBlackBoard().SetFloat(DATA_TYPE.expRate, 1.0f);
+        _object.blackBoardHandler.Initialize();
+        _object.gameObject.SetActive(true);
     }
 
-    private void OnRelease(GameObject _object)
+    private void OnRelease(Spawnable _object)
     {
-        _object.SetActive(false);
+        _object.gameObject.SetActive(false);
     }
 
-    private void OnDespawn(GameObject _object)
+    private void OnDespawn(Spawnable _object)
     {
         Destroy(_object.gameObject);
     }
