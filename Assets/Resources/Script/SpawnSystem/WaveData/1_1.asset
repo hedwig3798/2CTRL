@@ -18,5 +18,5 @@ MonoBehaviour:
       type: 3}
     count: {x: 3, y: 3}
     spawnRange: {x: 3, y: 4}
-    spawnInterval: 2
+    spawnInterval: 1
   time: 100
