@@ -196,7 +196,7 @@ PrefabInstance:
     - target: {fileID: 5482854523075796515, guid: 39fe69f364a4c884d8f406603e80ffc3,
         type: 3}
       propertyPath: m_IsActive
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 5718015747857215526, guid: 39fe69f364a4c884d8f406603e80ffc3,
         type: 3}
@@ -502,11 +502,6 @@ PrefabInstance:
       propertyPath: m_Layer
       value: 11
       objectReference: {fileID: 0}
-    - target: {fileID: 4784257472737569390, guid: 112baedc988c94c4d9e55af8508930bb,
-        type: 3}
-      propertyPath: m_IsActive
-      value: 0
-      objectReference: {fileID: 0}
     - target: {fileID: 6351928893930343484, guid: 112baedc988c94c4d9e55af8508930bb,
         type: 3}
       propertyPath: HPRate
@@ -583,7 +578,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1404787552}
   - component: {fileID: 1404787551}
-  m_Layer: 7
+  m_Layer: 0
   m_Name: chunkLoader
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -604,25 +599,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::WFCChunkLoader
   tileDatas:
   - {fileID: -8454128055168906263, guid: f62d809f3a432b24596aab6668a50001, type: 3}
-  - {fileID: -8454128055168906263, guid: f19591a479585ab4ab952867de59c42a, type: 3}
-  - {fileID: -8454128055168906263, guid: 67a8460cb0d51e646a9aedd8c11904d1, type: 3}
-  - {fileID: -8454128055168906263, guid: bf064ac140f1bb1408ebbdd9de622f55, type: 3}
-  - {fileID: -8454128055168906263, guid: 6903d196f02bc23488c56cbb65cc741c, type: 3}
-  - {fileID: -8454128055168906263, guid: 20e7aa2e31a1f084aa847990c63d5f67, type: 3}
-  - {fileID: -8454128055168906263, guid: 388daa86d2267a84db1b85cb94924190, type: 3}
-  - {fileID: -8454128055168906263, guid: fa6fbeecc07b3b8458187a96473f82e3, type: 3}
-  - {fileID: -8454128055168906263, guid: 67c2542d7dadff94085ce69f369889b1, type: 3}
-  - {fileID: -8454128055168906263, guid: 054de4b1533b3b0438ef9834e910f4f8, type: 3}
-  - {fileID: -8454128055168906263, guid: 24311c92ba32c6245a26e651749615c9, type: 3}
-  - {fileID: -8454128055168906263, guid: bbb28a0886bff6f41afa6cd7573eab21, type: 3}
-  - {fileID: -8454128055168906263, guid: f34040ea5ca26b042a01b493c52c9ad5, type: 3}
-  - {fileID: -8454128055168906263, guid: f2b588ff6088ece468d6b38c6df2ebe9, type: 3}
-  - {fileID: -8454128055168906263, guid: 78947e13c3d28fd46a076c904536b0e8, type: 3}
-  - {fileID: -8454128055168906263, guid: d4f0736d055fc2543b904c88e70e38f6, type: 3}
-  - {fileID: -8454128055168906263, guid: 4e3b318b1a69db9458a086332f0593ac, type: 3}
-  - {fileID: -8454128055168906263, guid: d74e8ef61c74c50478f07c80ddc7d3db, type: 3}
-  - {fileID: -8454128055168906263, guid: f681040f6e4a28149a66d92088e370e5, type: 3}
-  tileScale: 3
 --- !u!4 &1404787552
 Transform:
   m_ObjectHideFlags: 0
@@ -632,7 +608,7 @@ Transform:
   m_GameObject: {fileID: 1404787550}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalPosition: {x: 0.25011, y: 0.66601, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -924,11 +900,6 @@ PrefabInstance:
         type: 3}
       propertyPath: m_Name
       value: LeftPlayer
-      objectReference: {fileID: 0}
-    - target: {fileID: 8032580599193173473, guid: dfbc18bc829b28e43ade99fa866b1ee7,
-        type: 3}
-      propertyPath: m_IsActive
-      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 8258775729630652618, guid: dfbc18bc829b28e43ade99fa866b1ee7,
         type: 3}

@@ -583,7 +583,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1404787552}
   - component: {fileID: 1404787551}
-  m_Layer: 7
+  m_Layer: 0
   m_Name: chunkLoader
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -622,7 +622,6 @@ MonoBehaviour:
   - {fileID: -8454128055168906263, guid: 4e3b318b1a69db9458a086332f0593ac, type: 3}
   - {fileID: -8454128055168906263, guid: d74e8ef61c74c50478f07c80ddc7d3db, type: 3}
   - {fileID: -8454128055168906263, guid: f681040f6e4a28149a66d92088e370e5, type: 3}
-  tileScale: 3
 --- !u!4 &1404787552
 Transform:
   m_ObjectHideFlags: 0
@@ -632,7 +631,7 @@ Transform:
   m_GameObject: {fileID: 1404787550}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalPosition: {x: 0.25011, y: 0.66601, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -928,7 +927,7 @@ PrefabInstance:
     - target: {fileID: 8032580599193173473, guid: dfbc18bc829b28e43ade99fa866b1ee7,
         type: 3}
       propertyPath: m_IsActive
-      value: 1
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 8258775729630652618, guid: dfbc18bc829b28e43ade99fa866b1ee7,
         type: 3}
