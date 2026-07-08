@@ -11,10 +11,12 @@ public class TileData
     public TileData[] validLeft;
     public TileData[] validRight;
 
-    public ForestSocketEnum upSocket;
-    public ForestSocketEnum downSocket;
-    public ForestSocketEnum leftSocket;
-    public ForestSocketEnum rightSocket;
+    public TileSocket upSocket;
+    public TileSocket downSocket;
+    public TileSocket leftSocket;
+    public TileSocket rightSocket;
+
+    public TileSet tileSet;
 
     private Sprite sprite;
 

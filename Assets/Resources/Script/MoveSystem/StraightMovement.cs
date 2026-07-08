@@ -35,6 +35,13 @@ public class Straight
 
     public void Initialize(BlackBoard _data)
     {
+        Transform pos = _data.GetTransform(DATA_TYPE.startPosition);
+
+        if (null != pos)
+        {
+            transform.position = pos.position;
+        }
+
         target = _data.GetTransform(DATA_TYPE.moveTarget);
 
         direction = target.position - transform.position;

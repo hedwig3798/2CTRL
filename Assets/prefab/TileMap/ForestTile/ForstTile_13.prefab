@@ -50,10 +50,11 @@ MonoBehaviour:
   validDown: []
   validLeft: []
   validRight: []
-  upSocket: 2
-  downSocket: 0
-  leftSocket: 0
-  rightSocket: 5
+  upSocket: {fileID: 11400000, guid: d1dc77dee8f840e41952ddbd3df6f4d5, type: 2}
+  downSocket: {fileID: 11400000, guid: d91a7d01a716b5b4aa3339cd608346b9, type: 2}
+  leftSocket: {fileID: 11400000, guid: d91a7d01a716b5b4aa3339cd608346b9, type: 2}
+  rightSocket: {fileID: 11400000, guid: f6e4f9c534eeebd4b8c8b5a744e95a4f, type: 2}
+  tileSet: {fileID: 11400000, guid: 9fb2eaf3da6c41e4fa364574ad579b2a, type: 2}
 --- !u!212 &1376040668594623120
 SpriteRenderer:
   m_ObjectHideFlags: 0

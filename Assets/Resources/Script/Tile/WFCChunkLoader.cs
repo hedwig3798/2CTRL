@@ -384,6 +384,11 @@ public class WFCChunkLoader : MonoBehaviour
 
     private void Awake()
     {
+        if (0 == tileDatas.Length)
+        {
+            enabled = false;
+        }
+
         InitializeMatrix();
     }
 

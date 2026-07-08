@@ -1,0 +1,22 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: bad8d25e9cc80064dbeef545ac8a5610, type: 3}
+  m_Name: ForestTileset
+  m_EditorClassIdentifier: Assembly-CSharp::TileSet
+  tileSetName: 
+  sockets:
+  - {fileID: 11400000, guid: d91a7d01a716b5b4aa3339cd608346b9, type: 2}
+  - {fileID: 11400000, guid: 55523915efa14e4458c3ae65fe30a21c, type: 2}
+  - {fileID: 11400000, guid: a4954023c6098114fab99a8d3b458376, type: 2}
+  - {fileID: 11400000, guid: f6e4f9c534eeebd4b8c8b5a744e95a4f, type: 2}
+  - {fileID: 11400000, guid: d1dc77dee8f840e41952ddbd3df6f4d5, type: 2}
+  - {fileID: 11400000, guid: aa32cd4e3bdd7604dac382ed85fc533f, type: 2}

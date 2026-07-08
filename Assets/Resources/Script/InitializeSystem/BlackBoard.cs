@@ -3,6 +3,9 @@ using UnityEngine;
 
 public enum DATA_TYPE
 {
+    // position
+    startPosition,
+
     // MovementInitData
     moveTarget,     // transform
     moveSpeedRate,  // float
@@ -49,7 +52,6 @@ public class BlackBoard
     {
         if (false == floatDict.ContainsKey(_type))
         {
-            Debug.LogWarning($"{ToString()} has no {_type.ToString()}");
             return 0.0f;
         }
 
@@ -59,7 +61,6 @@ public class BlackBoard
     {
         if (false == transformDict.ContainsKey(_type))
         {
-            Debug.LogWarning($"{ToString()} has no {_type.ToString()}");
             return null;
         }
 

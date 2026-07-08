@@ -62,10 +62,11 @@ MonoBehaviour:
   - {fileID: -8454128055168906263, guid: 4e3b318b1a69db9458a086332f0593ac, type: 3}
   - {fileID: -8454128055168906263, guid: d74e8ef61c74c50478f07c80ddc7d3db, type: 3}
   - {fileID: -8454128055168906263, guid: f681040f6e4a28149a66d92088e370e5, type: 3}
-  upSocket: 2
-  downSocket: 2
-  leftSocket: 0
-  rightSocket: 1
+  upSocket: {fileID: 11400000, guid: d1dc77dee8f840e41952ddbd3df6f4d5, type: 2}
+  downSocket: {fileID: 11400000, guid: d1dc77dee8f840e41952ddbd3df6f4d5, type: 2}
+  leftSocket: {fileID: 11400000, guid: d91a7d01a716b5b4aa3339cd608346b9, type: 2}
+  rightSocket: {fileID: 11400000, guid: 55523915efa14e4458c3ae65fe30a21c, type: 2}
+  tileSet: {fileID: 11400000, guid: 9fb2eaf3da6c41e4fa364574ad579b2a, type: 2}
 --- !u!212 &1376040668594623120
 SpriteRenderer:
   m_ObjectHideFlags: 0

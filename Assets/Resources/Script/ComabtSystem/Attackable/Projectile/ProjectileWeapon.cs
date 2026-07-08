@@ -45,6 +45,7 @@ public class ProjectileWeapon
             {
                 BlackBoard b = p.blackBoardHandler.GetBlackBoard();
                 b.SetTransform(DATA_TYPE.moveTarget, FindNerest());
+                b.SetTransform(DATA_TYPE.startPosition, transform);
                 b.SetFloat(DATA_TYPE.moveSpeedRate, speedRate);
                 b.SetFloat(DATA_TYPE.damageRate, damageRate);
             }

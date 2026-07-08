@@ -40,6 +40,7 @@ public class DropManager
         Spawnable sa = Instantiate(_object);
         sa.SetPool(dropItemPool);
 
+        LayerUtils.SetLayer(sa.gameObject, gameObject.layer);
 
         return sa;
     }

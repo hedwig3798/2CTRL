@@ -1,0 +1,67 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!1 &2969764201426380929
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 3720727702967245612}
+  - component: {fileID: 7907613963683787990}
+  m_Layer: 7
+  m_Name: chunkLoader 1
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &3720727702967245612
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2969764201426380929}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &7907613963683787990
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2969764201426380929}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9fb18ead38f0d614682947521e48445e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::WFCChunkLoader
+  tileDatas:
+  - {fileID: -8454128055168906263, guid: f62d809f3a432b24596aab6668a50001, type: 3}
+  - {fileID: -8454128055168906263, guid: f19591a479585ab4ab952867de59c42a, type: 3}
+  - {fileID: -8454128055168906263, guid: 67a8460cb0d51e646a9aedd8c11904d1, type: 3}
+  - {fileID: -8454128055168906263, guid: bf064ac140f1bb1408ebbdd9de622f55, type: 3}
+  - {fileID: -8454128055168906263, guid: 6903d196f02bc23488c56cbb65cc741c, type: 3}
+  - {fileID: -8454128055168906263, guid: 20e7aa2e31a1f084aa847990c63d5f67, type: 3}
+  - {fileID: -8454128055168906263, guid: 388daa86d2267a84db1b85cb94924190, type: 3}
+  - {fileID: -8454128055168906263, guid: fa6fbeecc07b3b8458187a96473f82e3, type: 3}
+  - {fileID: -8454128055168906263, guid: 67c2542d7dadff94085ce69f369889b1, type: 3}
+  - {fileID: -8454128055168906263, guid: 054de4b1533b3b0438ef9834e910f4f8, type: 3}
+  - {fileID: -8454128055168906263, guid: 24311c92ba32c6245a26e651749615c9, type: 3}
+  - {fileID: -8454128055168906263, guid: bbb28a0886bff6f41afa6cd7573eab21, type: 3}
+  - {fileID: -8454128055168906263, guid: f34040ea5ca26b042a01b493c52c9ad5, type: 3}
+  - {fileID: -8454128055168906263, guid: f2b588ff6088ece468d6b38c6df2ebe9, type: 3}
+  - {fileID: -8454128055168906263, guid: 78947e13c3d28fd46a076c904536b0e8, type: 3}
+  - {fileID: -8454128055168906263, guid: d4f0736d055fc2543b904c88e70e38f6, type: 3}
+  - {fileID: -8454128055168906263, guid: 4e3b318b1a69db9458a086332f0593ac, type: 3}
+  - {fileID: -8454128055168906263, guid: d74e8ef61c74c50478f07c80ddc7d3db, type: 3}
+  - {fileID: -8454128055168906263, guid: f681040f6e4a28149a66d92088e370e5, type: 3}
+  tileScale: 3
