@@ -1,5 +1,5 @@
-using NUnit.Framework.Constraints;
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -28,6 +28,8 @@ public class WFCChunkLoader : MonoBehaviour
 
     [Header("tile scale")]
     public int tileScale;
+
+    public int testSize;
 
     private Vector2 tileSize;
 
@@ -105,7 +107,6 @@ public class WFCChunkLoader : MonoBehaviour
     }
 
     // 가중치 기반으로 랜덤하게 섞은 타일 인덱스 리스트 반환
-    // 일단 구현만 함, 나중에 수정해야 할듯?
     private List<int> GetWeightedRandomTiles(CellState currCell)
     {
         // 뽑을 리스트
@@ -124,7 +125,7 @@ public class WFCChunkLoader : MonoBehaviour
 
         // 섞은 리스트
         List<int> shuffledIndices = new();
-        // 뽑을 수 있담면
+        // 뽑을 수 있다면
         while (0 < availablePairs.Count)
         {
             // 가중치 기반 랜덤 가져오기
@@ -194,7 +195,7 @@ public class WFCChunkLoader : MonoBehaviour
     }
 
     // 반복문 구조의 타일 확정 메인 로직
-    private bool CollapseTile(Vector2Int _LT, Vector2Int _RB)
+    private IEnumerator CollapseTile(Vector2Int _LT, Vector2Int _RB)
     {
         // 백트래킹을 위한 스택
         Stack<SearchState> stack = new Stack<SearchState>();
@@ -204,7 +205,7 @@ public class WFCChunkLoader : MonoBehaviour
         // 없으면 끝
         if (null == firstState)
         {
-            return true;
+            yield break;
         }
 
         // 가능한 타일이 있다면
@@ -213,9 +214,19 @@ public class WFCChunkLoader : MonoBehaviour
             stack.Push(firstState);
         }
 
+        int tracking = 0;
+
         // 스택의 값을 하나씩 가져오면서 시작
         while (0 < stack.Count)
         {
+            tracking++;
+            if (tracking >= 1000)
+            {
+                tracking = 0;
+                // Debug.LogWarning("too long");
+                yield return new WaitForEndOfFrame();
+            }
+
             SearchState state = stack.Peek();
 
             // 백트래킹 되어서 온 경우 이전 상태로 돌리기
@@ -224,6 +235,8 @@ public class WFCChunkLoader : MonoBehaviour
                 for (int d = 0; d < 4; ++d)
                 {
                     Vector2Int nextIndex = new(state.index.x + dx[d], state.index.y + dy[d]);
+
+                    if (_LT.x > nextIndex.x || _RB.x <= nextIndex.x || _LT.y > nextIndex.y || _RB.y <= nextIndex.y) continue;
 
                     if (true == states.TryGetValue(nextIndex, out CellState restoreCell))
                     {
@@ -263,6 +276,7 @@ public class WFCChunkLoader : MonoBehaviour
                 for (int d = 0; d < 4; ++d)
                 {
                     Vector2Int nextIndex = new(state.index.x + dx[d], state.index.y + dy[d]);
+
                     if (states.TryGetValue(nextIndex, out CellState nextCell))
                     {
                         state.oldBitmask[d] = nextCell.bitMask;
@@ -311,7 +325,7 @@ public class WFCChunkLoader : MonoBehaviour
                         temp.layer = gameObject.layer;
                     }
 
-                    return true;
+                    yield break;
                 }
 
                 if (0 < nextState.tilesToTry.Count)
@@ -327,6 +341,38 @@ public class WFCChunkLoader : MonoBehaviour
             }
             else
             {
+                if (0 < state.currentTryIndex)
+                {
+                    for (int d = 0; d < 4; ++d)
+                    {
+                        Vector2Int nextIndex = new(state.index.x + dx[d], state.index.y + dy[d]);
+
+                        if (true == states.TryGetValue(nextIndex, out CellState restoreCell))
+                        {
+                            if (-1 != state.oldBitmask[d])
+                            {
+                                restoreCell.bitMask = state.oldBitmask[d];
+                            }
+                            else
+                            {
+                                restoreCell.bitMask = -1;
+                            }
+
+                            restoreCell.entropy = 0;
+                            for (int j = 0; j < tileDatas.Length; ++j)
+                            {
+                                if (0 < (restoreCell.bitMask & (1 << j)))
+                                {
+                                    ++restoreCell.entropy;
+                                }
+                            }
+
+                            states[nextIndex] = restoreCell;
+                            pq.Enqueue(nextIndex, restoreCell);
+                        }
+                    }
+                }
+
                 // 현재 셀에서 가능한 타일이 없으므로 이전 셀로 백트래킹
                 SearchState popped = stack.Pop();
                 isVisit[popped.index] = false;
@@ -334,7 +380,7 @@ public class WFCChunkLoader : MonoBehaviour
             }
         }
 
-        return false;
+        yield break;
     }
 
     public void LoadChunk(Vector2Int _LT, Vector2Int _RB)
@@ -379,7 +425,7 @@ public class WFCChunkLoader : MonoBehaviour
         }
 
         // 붕괴 시작
-        CollapseTile(_LT, _RB);
+        StartCoroutine(CollapseTile(_LT, _RB));
     }
 
     private void Awake()
@@ -396,6 +442,6 @@ public class WFCChunkLoader : MonoBehaviour
     {
         SetTileScale();
 
-        LoadChunk(new Vector2Int(-8, -8), new Vector2Int(8, 8));
+        LoadChunk(new Vector2Int(-testSize, -testSize), new Vector2Int(testSize, testSize));
     }
 }

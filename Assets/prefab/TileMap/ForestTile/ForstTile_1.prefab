@@ -45,7 +45,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: aa25847d75127f8408787004a41abfa6, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Tile
-  weight: 1
+  weight: 10
   validUp:
   - {fileID: -8454128055168906263}
   - {fileID: -8454128055168906263, guid: f19591a479585ab4ab952867de59c42a, type: 3}
