@@ -10,8 +10,18 @@ public class DropManager
 
     public void DropItem(GameObject _deadObject)
     {
+        if (null == dropItemPool || null == _deadObject)
+        {
+            return;
+        }
+
         Spawnable item = dropItemPool.Get();
-        item.gameObject.layer = gameObject.layer;
+        if (null == item)
+        {
+            return;
+        }
+
+        LayerUtils.SetLayer(item.gameObject, gameObject.layer);
         item.transform.position = _deadObject.transform.position;
     }
 
@@ -47,14 +57,21 @@ public class DropManager
 
     private void OnSpawn(Spawnable _object)
     {
-        _object.blackBoardHandler.GetBlackBoard().SetFloat(DATA_TYPE.expRate, 1.0f);
-        _object.blackBoardHandler.Initialize();
+        if (null != _object.blackBoardHandler)
+        {
+            _object.blackBoardHandler.GetBlackBoard().SetFloat(DATA_TYPE.expRate, 1.0f);
+            _object.blackBoardHandler.Initialize();
+        }
         _object.gameObject.SetActive(true);
     }
 
     private void OnRelease(Spawnable _object)
     {
-        _object.gameObject.SetActive(false);
+        _object.MarkReturningToPool();
+        if (_object.gameObject.activeSelf)
+        {
+            _object.gameObject.SetActive(false);
+        }
     }
 
     private void OnDespawn(Spawnable _object)

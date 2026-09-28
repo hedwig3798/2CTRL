@@ -1,11 +1,6 @@
-using NUnit.Framework.Constraints;
-using Unity.VisualScripting;
 using UnityEngine;
-using UnityEngine.InputSystem;
-using UnityEngine.InputSystem.Controls;
-using static UnityEngine.GraphicsBuffer;
 
-public class ArrowMovemnt 
+public class ArrowMovemnt
     : MonoBehaviour
 {
     [Header("movement value")]
@@ -27,7 +22,7 @@ public class ArrowMovemnt
     [SerializeField]
     [Range(0f, 360f)]
     private float rotateOffset;
-    
+
     private bool isLeft = true;
 
     private void FlipSprite()
@@ -64,6 +59,26 @@ public class ArrowMovemnt
             transform.Translate(Vector2.down * speed * Time.deltaTime);
         }
 
-        FlipSprite();
+        if (SPRITE_ROTATE_MODE.FLIP == rotateMode)
+        {
+            FlipSprite();
+        }
+        else if (SPRITE_ROTATE_MODE.ROTATE == rotateMode)
+        {
+            Vector2 move = Vector2.zero;
+            if (Input.GetKey(right)) move.x += 1f;
+            if (Input.GetKey(left)) move.x -= 1f;
+            if (Input.GetKey(up)) move.y += 1f;
+            if (Input.GetKey(down)) move.y -= 1f;
+            if (move.sqrMagnitude > 0.0001f)
+            {
+                float angle = Mathf.Atan2(move.y, move.x) * Mathf.Rad2Deg + rotateOffset;
+                transform.rotation = Quaternion.Euler(0f, 0f, angle);
+            }
+        }
+        else
+        {
+            FlipSprite();
+        }
     }
 }

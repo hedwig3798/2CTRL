@@ -29,17 +29,17 @@ public class DissolveEffectContorller
             return;
         }
 
-        // 이벤트 구독
+        // ???? ????
         healthSystem.OnDeath += Play;
 
-        // 머테리얼 블록 생성
+        // ??????? ???? ????
         materialBlock = new MaterialPropertyBlock();
         spriteRenderer.GetPropertyBlock(materialBlock);
     }
 
     public void Play(GameObject _object)
     {
-        // 중복 실행 방지
+        // ??? ???? ????
         if (true == isDissolved)
         {
             return;
@@ -47,7 +47,7 @@ public class DissolveEffectContorller
 
         isDissolved = true;
 
-        // 이펙트 코루틴
+        // ????? ????
         StartCoroutine(DissoveLoop());
     }
 
@@ -55,11 +55,11 @@ public class DissolveEffectContorller
     {
         float currentTime = 0.0f;
 
-        // 초기화
+        // ????
         materialBlock.SetFloat("_DissolveAmount", 1.0f);
         spriteRenderer.SetPropertyBlock(materialBlock);
 
-        // 점점 사라지는 이펙트
+        // ???? ??????? ?????
         while (duration > currentTime)
         {
             currentTime += Time.deltaTime;
@@ -72,17 +72,25 @@ public class DissolveEffectContorller
         }
 
         isDissolved = false;
-        owner.SetActive(false);
+        if (null != owner)
+        {
+            owner.SetActive(false);
+        }
+        else
+        {
+            gameObject.SetActive(false);
+        }
     }
 
     public void Initialize(BlackBoard _data)
     {
-        // 값 초기화
+        // ?? ????
         isDissolved = false;
 
-        if (null == materialBlock)
+        if (null == materialBlock || null == spriteRenderer)
         {
             Debug.LogError("DissolveEffectContorller has no MaterialBlock");
+            return;
         }
 
         materialBlock.SetFloat("_DissolveAmount", 1.0f);

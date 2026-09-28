@@ -12,8 +12,13 @@ public class ItemTrigger : MonoBehaviour
             return;
         }
 
-        SlingshotMovement movement = _other.GetComponent<SlingshotMovement>();
-        movement.target = owner.transform;
+        if (false == _other.TryGetComponent(out SlingshotMovement movement))
+        {
+            return;
+        }
+
+        Transform magnet = null != owner ? owner.transform : transform;
+        movement.target = magnet;
         movement.isStop = false;
     }
 }

@@ -1,7 +1,6 @@
-using UnityEditor.Rendering;
 using UnityEngine;
 
-public class ExpItem 
+public class ExpItem
     : MonoBehaviour
     , Initializable
 {
@@ -16,6 +15,10 @@ public class ExpItem
     public void Initialize(BlackBoard _data)
     {
         expRate = _data.GetFloat(DATA_TYPE.expRate);
+        if (expRate <= 0f)
+        {
+            expRate = 1f;
+        }
     }
 
     private void OnTriggerEnter2D(Collider2D _other)
@@ -23,7 +26,14 @@ public class ExpItem
         if (_other.TryGetComponent(out ExpSystem expSystem))
         {
             expSystem.GetExp(baseExp * expRate);
-            owner.SetActive(false);
+            if (null != owner)
+            {
+                owner.SetActive(false);
+            }
+            else
+            {
+                gameObject.SetActive(false);
+            }
         }
     }
 }

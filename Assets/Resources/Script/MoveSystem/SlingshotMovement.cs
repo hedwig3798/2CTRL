@@ -1,7 +1,6 @@
-using Unity.VisualScripting;
 using UnityEngine;
 
-public class SlingshotMovement 
+public class SlingshotMovement
     : MonoBehaviour
     , Initializable
 {

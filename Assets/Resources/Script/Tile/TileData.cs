@@ -24,7 +24,12 @@ public class TileData
     {
         if (null == sprite)
         {
-            sprite = GetComponent<SpriteRenderer>().sprite;
+            SpriteRenderer renderer = GetComponent<SpriteRenderer>();
+            if (null == renderer || null == renderer.sprite)
+            {
+                return Vector2.one;
+            }
+            sprite = renderer.sprite;
         }
         return sprite.bounds.size;
     }

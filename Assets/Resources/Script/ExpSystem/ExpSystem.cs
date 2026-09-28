@@ -1,5 +1,4 @@
 using System;
-using System.Linq;
 using UnityEngine;
 
 public class ExpSystem
@@ -14,47 +13,62 @@ public class ExpSystem
 
     public void GetExp(float _exp)
     {
-        // 이미 최대 레벨인 경우 무시
-        if (currLevel == levelTable.maxLevel)
+        if (null == levelTable || null == levelTable.expTable || 0 == levelTable.expTable.Length)
         {
             return;
         }
 
-        // 경험치 증가
+        if (currLevel >= levelTable.maxLevel)
+        {
+            return;
+        }
+
         currExp += _exp;
 
-        // 레벨업
+        if (maxExp <= 0f)
+        {
+            maxExp = GetNeedExp(currLevel);
+            if (maxExp <= 0f)
+            {
+                return;
+            }
+        }
+
         int levelUpAmount = 0;
 
-        // 현재 경험치가 최대 경험치를 넘긴 경우
-        while (currExp >= maxExp)
+        while (currExp >= maxExp && maxExp > 0f)
         {
-            // 레벨업 계산 처리
             currExp -= maxExp;
             levelUpAmount++;
             currLevel++;
 
-            // 레벨업 후 최대 레벨에 달성한 경우 탈출
-            if (currLevel == levelTable.maxLevel)
+            if (currLevel >= levelTable.maxLevel)
             {
+                currLevel = levelTable.maxLevel;
                 break;
             }
 
-            // 현재 레벨 데이터가 테이블에 없는 경우 가장 마지막 수치로
-            if (currLevel >= levelTable.expTable.Length)
-            {
-                maxExp = levelTable.expTable.Last();
-            }
-            else
-            {
-                maxExp = levelTable.expTable[currLevel];
-            }
+            maxExp = GetNeedExp(currLevel);
         }
 
-        // 레벨업 처리
         if (0 < levelUpAmount)
         {
             levelUpAction?.Invoke(gameObject, levelUpAmount);
         }
+    }
+
+    private float GetNeedExp(int level)
+    {
+        if (level < 0)
+        {
+            level = 0;
+        }
+
+        if (level >= levelTable.expTable.Length)
+        {
+            return levelTable.expTable[levelTable.expTable.Length - 1];
+        }
+
+        return levelTable.expTable[level];
     }
 }

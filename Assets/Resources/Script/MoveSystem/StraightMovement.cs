@@ -1,5 +1,3 @@
-using System.Collections.Generic;
-using System.Threading;
 using UnityEngine;
 
 public class Straight
@@ -21,6 +19,8 @@ public class Straight
     [SerializeField]
     [Range(0f, 360f)]
     private float rotateOffset;
+
+    private float baseSpeed;
 
     private void FlipSprite()
     {
@@ -44,20 +44,42 @@ public class Straight
 
         target = _data.GetTransform(DATA_TYPE.moveTarget);
 
-        direction = target.position - transform.position;
-        direction = direction.normalized;
+        float rate = _data.GetFloat(DATA_TYPE.moveSpeedRate);
+        if (rate <= 0f)
+        {
+            rate = 1f;
+        }
+        speed = baseSpeed * rate;
 
-        speed *= _data.GetFloat(DATA_TYPE.moveSpeedRate);
+        if (null == target)
+        {
+            if (direction == Vector3.zero)
+            {
+                direction = Vector3.right;
+            }
+            return;
+        }
+
+        direction = target.position - transform.position;
+        if (direction.sqrMagnitude < 0.0001f)
+        {
+            direction = Vector3.right;
+        }
+        else
+        {
+            direction = direction.normalized;
+        }
 
         if (SPRITE_ROTATE_MODE.ROTATE == rotateMode)
         {
-            float angle = Mathf.Atan2(direction.y, direction.x) * Mathf.Rad2Deg;
+            float angle = Mathf.Atan2(direction.y, direction.x) * Mathf.Rad2Deg + rotateOffset;
             transform.rotation = Quaternion.Euler(0f, 0f, angle);
         }
     }
 
     private void Awake()
     {
+        baseSpeed = speed;
         if (direction == Vector3.zero)
         {
             direction = Random.insideUnitCircle.normalized;

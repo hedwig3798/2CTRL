@@ -1,4 +1,3 @@
-using System;
 using UnityEngine;
 using UnityEngine.Pool;
 
@@ -6,6 +5,7 @@ public class Spawnable
     : MonoBehaviour
 {
     private IObjectPool<Spawnable> pool;
+    private bool returningToPool;
 
     public BlackBoardHandler blackBoardHandler;
 
@@ -14,14 +14,37 @@ public class Spawnable
         pool = _pool;
     }
 
+    public void MarkReturningToPool()
+    {
+        returningToPool = true;
+    }
+
     private void Awake()
     {
-        blackBoardHandler = gameObject.GetComponent<BlackBoardHandler>();
+        if (null == blackBoardHandler)
+        {
+            blackBoardHandler = gameObject.GetComponent<BlackBoardHandler>();
+        }
+    }
+
+    private void OnEnable()
+    {
+        returningToPool = false;
     }
 
     private void OnDisable()
     {
-        // Debug.Log("release");
+        ReturnToPool();
+    }
+
+    public void ReturnToPool()
+    {
+        if (returningToPool || null == pool)
+        {
+            return;
+        }
+
+        returningToPool = true;
         pool.Release(this);
     }
 }

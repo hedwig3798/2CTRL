@@ -18,9 +18,14 @@ public class BlackBoardHandler
 
     public void Initialize()
     {
-        if (null != initializables)
+        if (null == initializables)
         {
-            foreach (var i in initializables)
+            initializables = GetComponentsInChildren<Initializable>(true);
+        }
+
+        foreach (var i in initializables)
+        {
+            if (null != i)
             {
                 i.Initialize(blackBoard);
             }

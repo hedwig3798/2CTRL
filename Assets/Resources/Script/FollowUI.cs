@@ -1,4 +1,3 @@
-using System.Drawing;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -20,15 +19,14 @@ public class FollowUI : MonoBehaviour
         if (null == slider)
         {
             Debug.LogError($"{gameObject.name} has no slider component");
+            enabled = false;
         }
     }
 
-    // Update is called once per frame
     void Update()
     {
-        if (null == slider)
+        if (null == slider || null == target)
         {
-            Debug.LogError($"{gameObject.name} has no slider component");
             return;
         }
 
@@ -45,7 +43,8 @@ public class FollowUI : MonoBehaviour
         myTransform = GetComponent<RectTransform>();
 
         if (renderCamera == null
-            || myTransform == null)
+            || myTransform == null
+            || target == null)
         {
             return;
         }

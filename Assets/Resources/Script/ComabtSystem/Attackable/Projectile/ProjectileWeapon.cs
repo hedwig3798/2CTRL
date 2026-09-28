@@ -26,7 +26,7 @@ public class ProjectileWeapon
 
     private IObjectPool<Projectile> projectilePool;
 
-    private Collider2D[] candinate = new Collider2D[20];
+    private Collider2D[] candinate = new Collider2D[64];
     private ContactFilter2D filter = new ContactFilter2D();
 
     private float timer = 0;
@@ -41,14 +41,17 @@ public class ProjectileWeapon
         for (int i = 0; i < fireCount; ++i)
         {
             Projectile p = projectilePool.Get();
-            if (p != null)
+            if (null == p || null == p.blackBoardHandler)
             {
-                BlackBoard b = p.blackBoardHandler.GetBlackBoard();
-                b.SetTransform(DATA_TYPE.moveTarget, FindNerest());
-                b.SetTransform(DATA_TYPE.startPosition, transform);
-                b.SetFloat(DATA_TYPE.moveSpeedRate, speedRate);
-                b.SetFloat(DATA_TYPE.damageRate, damageRate);
+                continue;
             }
+
+            BlackBoard b = p.blackBoardHandler.GetBlackBoard();
+            b.SetTransform(DATA_TYPE.moveTarget, _target);
+            b.SetTransform(DATA_TYPE.startPosition, transform);
+            b.SetFloat(DATA_TYPE.moveSpeedRate, speedRate);
+            b.SetFloat(DATA_TYPE.damageRate, damageRate);
+            p.owner = this;
             p.blackBoardHandler.Initialize();
         }
     }
@@ -64,20 +67,24 @@ public class ProjectileWeapon
             , candinate
         );
 
-        if (0 == hitCount)
+        if (0 >= hitCount)
         {
             return result;
         }
 
-        float minDistance = Mathf.Infinity;
-        result = candinate[0].transform;
-        for (int i = 1; i < hitCount; ++i)
+        float minDistance = float.MaxValue;
+        for (int i = 0; i < hitCount; ++i)
         {
             Transform curr = candinate[i].transform;
+            if (curr == transform || (null != owner && curr == owner))
+            {
+                continue;
+            }
 
-            float currDistance = (result.position - transform.position).sqrMagnitude;
+            float currDistance = (curr.position - transform.position).sqrMagnitude;
             if (currDistance < minDistance)
             {
+                minDistance = currDistance;
                 result = curr;
             }
         }
@@ -105,25 +112,30 @@ public class ProjectileWeapon
 
     private void Update()
     {
+        if (coolTime <= 0f)
+        {
+            return;
+        }
+
         timer += Time.deltaTime;
 
         if (timer >= coolTime)
         {
             timer -= coolTime;
-
             Attack(FindNerest());
         }
     }
 
     private Projectile CreateObject(Projectile _projectile)
     {
-        Projectile projectile = Instantiate(_projectile);
-        Transform[] transforms = projectile.gameObject.GetComponentsInChildren<Transform>(true);
+        Projectile created = Instantiate(_projectile);
+        created.SetPool(projectilePool);
+        Transform[] transforms = created.gameObject.GetComponentsInChildren<Transform>(true);
         foreach (Transform t in transforms)
         {
             t.gameObject.layer = gameObject.layer;
         }
-        return projectile;
+        return created;
     }
 
     private void OnSpawn(Projectile _object)
@@ -133,7 +145,11 @@ public class ProjectileWeapon
 
     private void OnRelease(Projectile _object)
     {
-        _object.gameObject.SetActive(false);
+        _object.MarkReturningToPool();
+        if (_object.gameObject.activeSelf)
+        {
+            _object.gameObject.SetActive(false);
+        }
     }
 
     private void OnDespawn(Projectile _object)

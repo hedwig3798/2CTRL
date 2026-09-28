@@ -1,6 +1,4 @@
-using Unity.VisualScripting;
 using UnityEngine;
-using static UnityEditor.Experimental.GraphView.GraphView;
 
 public class ContactDamage
     : MonoBehaviour
@@ -24,14 +22,25 @@ public class ContactDamage
     public void Initialize(BlackBoard _data)
     {
         timer = coolTime;
+        target = null;
         damageRate = _data.GetFloat(DATA_TYPE.damageRate);
+        if (damageRate <= 0f)
+        {
+            damageRate = 1f;
+        }
+        damageMassage.attacker = owner;
+    }
+
+    private void OnDisable()
+    {
+        target = null;
     }
 
     private void Awake()
     {
         timer = coolTime;
         damageMassage = new DamageMassage();
-        damageMassage.attacker = target;
+        damageMassage.attacker = owner;
     }
 
     private void Update()
@@ -48,12 +57,9 @@ public class ContactDamage
         else
         {
             timer = coolTime;
-
-            if (null != target)
-            {
-                damageMassage.damage = baseDamage * damageRate;
-                target.ProcessDamage(ref damageMassage);
-            }
+            damageMassage.damage = baseDamage * damageRate;
+            damageMassage.attacker = owner;
+            target.ProcessDamage(ref damageMassage);
         }
     }
 
@@ -72,7 +78,12 @@ public class ContactDamage
 
     private void OnCollisionExit2D(Collision2D _collision)
     {
-        if (target == _collision.collider.gameObject.TryGetComponent(out DamagePipeline dp))
+        if (false == _collision.collider.gameObject.TryGetComponent(out DamagePipeline dp))
+        {
+            return;
+        }
+
+        if (target == dp)
         {
             target = null;
         }

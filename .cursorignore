@@ -1,0 +1,47 @@
+# 빌드 및 임시 폴더
+/[Ll]ibrary/
+/[Tt]emp/
+/[Oo]bj/
+/[Bb]uild/
+/[Bb]uilds/
+/[Ll]ogs/
+/[Mm]emoryCaptures/
+
+# 유니티 메타 데이터
+*.meta
+
+# 3D 모델, 이미지, 사운드 등 리소스 파일
+*.fbx
+*.obj
+*.blend
+*.png
+*.jpg
+*.jpeg
+*.tga
+*.psd
+*.tif
+*.mp3
+*.ogg
+*.wav
+*.mp4
+
+# 유니티 직렬화 데이터 및 에셋 파일
+*.unity
+*.prefab
+*.mat
+*.anim
+*.controller
+*.asset
+*.physicMaterial
+*.guiskin
+*.fontsettings
+
+# IDE 및 솔루션 설정 파일
+*.csproj
+*.sln
+.vs/
+.idea/
+.vscode/
+
+# 크래시 리포트
+sysinfo.txt

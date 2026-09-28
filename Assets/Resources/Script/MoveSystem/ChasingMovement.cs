@@ -1,8 +1,4 @@
-using System.Collections.Generic;
-using System.Threading;
 using UnityEngine;
-using UnityEngine.UIElements;
-
 
 public sealed class ChasingMovement
     : MonoBehaviour
@@ -12,20 +8,42 @@ public sealed class ChasingMovement
     public float speed;
     Vector3 dir;
 
+    private float baseSpeed;
+    private HealthSystem healthSystem;
+
+    private void Awake()
+    {
+        baseSpeed = speed;
+        healthSystem = GetComponentInParent<HealthSystem>();
+    }
+
     public void Initialize(BlackBoard _data)
     {
         target = _data.GetTransform(DATA_TYPE.moveTarget);
-        speed = _data.GetFloat(DATA_TYPE.moveSpeedRate);
+        float rate = _data.GetFloat(DATA_TYPE.moveSpeedRate);
+        if (rate <= 0f)
+        {
+            rate = 1f;
+        }
+        speed = baseSpeed * rate;
+        dir = Vector3.zero;
     }
 
     private void Update()
     {
-        if (target != null)
+        if (null == target)
         {
-            dir = MathUtils.GetDirection(transform, target);
-            dir.z = 0;
-
+            return;
         }
-        transform.Translate(dir * speed);
+
+        // 사망 연출(디졸브) 중에는 멈춘다
+        if (null != healthSystem && healthSystem.isDead)
+        {
+            return;
+        }
+
+        dir = MathUtils.GetDirection(transform, target);
+        dir.z = 0;
+        transform.Translate(dir * speed * Time.deltaTime);
     }
 }

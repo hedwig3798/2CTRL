@@ -2,10 +2,9 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Pool;
-using static UnityEditor.Experimental.GraphView.GraphView;
 
 /// <summary>
-/// spawable °´Ã¼¸¦ »ý¼ºÇÏ´Â ½ºÆ÷³Ê
+/// spawable ï¿½ï¿½Ã¼ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½Ï´ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 /// </summary>
 public class Spawner
     : MonoBehaviour
@@ -21,10 +20,10 @@ public class Spawner
     [SerializeField]
     private WaveData[] waveArray;
 
-    private Dictionary<Spawnable, IObjectPool<Spawnable>> poolDict 
+    private Dictionary<Spawnable, IObjectPool<Spawnable>> poolDict
         = new Dictionary<Spawnable, IObjectPool<Spawnable>>();
 
-    // ¸ó½ºÅÍ µ¥ÀÌÅÍ
+    // ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
     [Header("Spawn Data")]
     public Transform target;
     public float speedRate;
@@ -33,15 +32,31 @@ public class Spawner
 
     private void Awake()
     {
+        if (null == waveArray)
+        {
+            return;
+        }
+
         foreach (var wd in waveArray)
         {
+            if (null == wd || null == wd.spwanArray)
+            {
+                continue;
+            }
+
             foreach (var sd in wd.spwanArray)
             {
+                if (null == sd.spawnObject)
+                {
+                    continue;
+                }
+
                 if (false == poolDict.ContainsKey(sd.spawnObject))
                 {
-                    poolDict[sd.spawnObject] = new ObjectPool<Spawnable>
+                    Spawnable prefab = sd.spawnObject;
+                    poolDict[prefab] = new ObjectPool<Spawnable>
                         (
-                            createFunc: () => CreateObject(sd.spawnObject)
+                            createFunc: () => CreateObject(prefab)
                             , OnSpawn
                             , OnRelease
                             , OnDespawn
@@ -56,6 +71,12 @@ public class Spawner
 
     private void Start()
     {
+        if (null == waveArray || 0 == waveArray.Length)
+        {
+            Debug.LogError("[Spawner] WaveDataï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½Ï´ï¿½.");
+            return;
+        }
+
         StartCoroutine(Wave());
     }
 
@@ -70,8 +91,11 @@ public class Spawner
             t.gameObject.layer = gameObject.layer;
         }
 
-        BlackBoard data = sa.blackBoardHandler.GetBlackBoard();
-        data.dropManager = dropManager;
+        if (null != sa.blackBoardHandler)
+        {
+            BlackBoard data = sa.blackBoardHandler.GetBlackBoard();
+            data.dropManager = dropManager;
+        }
 
         return sa;
     }
@@ -83,7 +107,11 @@ public class Spawner
 
     private void OnRelease(Spawnable _object)
     {
-        _object.gameObject.SetActive(false);
+        _object.MarkReturningToPool();
+        if (_object.gameObject.activeSelf)
+        {
+            _object.gameObject.SetActive(false);
+        }
     }
 
     private void OnDespawn(Spawnable _object)
@@ -93,16 +121,32 @@ public class Spawner
 
     IEnumerator Spawn(SpawnData _data)
     {
-        WaitForSeconds flag = new WaitForSeconds(_data.spawnInterval);
+        if (null == _data.spawnObject || false == poolDict.ContainsKey(_data.spawnObject))
+        {
+            yield break;
+        }
+
+        Transform origin = null != spawnLocation ? spawnLocation : transform;
+        WaitForSeconds flag = new WaitForSeconds(Mathf.Max(0.01f, _data.spawnInterval));
         while (true)
         {
             Spawnable sa = poolDict[_data.spawnObject].Get();
+            if (null == sa)
+            {
+                yield return flag;
+                continue;
+            }
+
             GameObject go = sa.gameObject;
 
             float dis = Random.Range(_data.spawnRange.x, _data.spawnRange.y);
             Vector2 dir = Random.insideUnitCircle.normalized;
+            if (dir.sqrMagnitude < 0.0001f)
+            {
+                dir = Vector2.right;
+            }
 
-            Vector2 spawnPos = spawnLocation.position;
+            Vector2 spawnPos = origin.position;
             spawnPos += dir * dis;
 
             go.transform.position = spawnPos;
@@ -110,15 +154,21 @@ public class Spawner
             if (null == sa.blackBoardHandler)
             {
                 Debug.LogError("it has no BlackBoardHandler");
+                poolDict[_data.spawnObject].Release(sa);
                 yield return flag;
+                continue;
             }
+
             BlackBoard data = sa.blackBoardHandler.GetBlackBoard();
             if (null == data)
             {
                 Debug.LogError("BlackBoardHandler has no data");
+                poolDict[_data.spawnObject].Release(sa);
                 yield return flag;
+                continue;
             }
 
+            data.dropManager = dropManager;
             data.SetFloat(DATA_TYPE.HPRate, HPRate);
             data.SetFloat(DATA_TYPE.moveSpeedRate, speedRate);
             data.SetFloat(DATA_TYPE.damageRate, damagerate);
@@ -135,9 +185,17 @@ public class Spawner
 
         for (int i = 0; i < waveArray.Length; i++)
         {
+            if (null == waveArray[i] || null == waveArray[i].spwanArray)
+            {
+                continue;
+            }
+
             foreach (Coroutine c in spawCoroutine)
             {
-                StopCoroutine(c);
+                if (null != c)
+                {
+                    StopCoroutine(c);
+                }
             }
             spawCoroutine.Clear();
 
@@ -147,7 +205,6 @@ public class Spawner
             }
 
             yield return new WaitForSeconds(waveArray[i].time);
-
         }
     }
 }
