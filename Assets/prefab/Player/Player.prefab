@@ -94,7 +94,6 @@ GameObject:
   - component: {fileID: 7824922074171291554}
   - component: {fileID: 1197282222138486179}
   - component: {fileID: 6170297878970326083}
-  - component: {fileID: 8247339902896286395}
   m_Layer: 9
   m_Name: damaePipeline
   m_TagString: Untagged
@@ -132,6 +131,7 @@ MonoBehaviour:
   maxHP: 10
   currHP: 10
   isDead: 0
+  sliderUI: {fileID: 6667985548718928506}
 --- !u!114 &1197282222138486179
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -180,18 +180,74 @@ CircleCollider2D:
   m_CompositeOrder: 0
   m_Offset: {x: 0, y: 0}
   m_Radius: 0.2
---- !u!114 &8247339902896286395
+--- !u!1 &1608497705108805143
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 3420151052025669546}
+  - component: {fileID: 6667985548718928506}
+  m_Layer: 0
+  m_Name: UI
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!224 &3420151052025669546
+RectTransform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1608497705108805143}
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 4403417677050532586}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+  m_AnchorMin: {x: 0.5, y: 0.5}
+  m_AnchorMax: {x: 0.5, y: 0.5}
+  m_AnchoredPosition: {x: 0, y: 0}
+  m_SizeDelta: {x: 30, y: 4}
+  m_Pivot: {x: 0.5, y: 0.5}
+--- !u!114 &6667985548718928506
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1195629311347736763}
+  m_GameObject: {fileID: 1608497705108805143}
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: af8aff984a9c07d47b451c9d23fb255d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::SliderUI
+  attachToSceneCanvas: 1
+  screen: 0
+  background: {fileID: 0}
+  fill: {fileID: 0}
+  backgroundSprite: {fileID: 0}
+  backgroundColor: {r: 0.2, g: 0.2, b: 0.2, a: 1}
+  fillSprite: {fileID: 0}
+  fillColor: {r: 0.85, g: 0.2, b: 0.2, a: 1}
+  size: {x: 30, y: 4}
+  maxValue: 100
+  currValue: 100
+  direction: 0
+  smoothSpeed: 0
+  target: {fileID: 0}
+  worldOffset: {x: 0, y: 0, z: 0}
+  screenOffset: {x: 0, y: -16.2}
+  targetCamera: {fileID: 0}
+  hideWhenBehindCamera: 1
+  showDebugRect: 1
+  debugRectColor: {r: 0, g: 1, b: 0, a: 1}
 --- !u!1 &6758244074288707635
 GameObject:
   m_ObjectHideFlags: 0
@@ -210,21 +266,25 @@ GameObject:
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
---- !u!4 &8183424997861969205
-Transform:
+--- !u!224 &8183424997861969205
+RectTransform:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 6758244074288707635}
-  serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 3.6, y: 3.6, z: 3.6}
-  m_ConstrainProportionsScale: 1
+  m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 4403417677050532586}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+  m_AnchorMin: {x: 0.5, y: 0.5}
+  m_AnchorMax: {x: 0.5, y: 0.5}
+  m_AnchoredPosition: {x: 0, y: 0}
+  m_SizeDelta: {x: 0.18, y: 0.2}
+  m_Pivot: {x: 0.5, y: 0.5}
 --- !u!212 &38985485846973122
 SpriteRenderer:
   m_ObjectHideFlags: 0
@@ -425,6 +485,7 @@ Transform:
   - {fileID: 7626283073693476446}
   - {fileID: 4318940602386063422}
   - {fileID: 2666922003028805711}
+  - {fileID: 3420151052025669546}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &7429500498763290325

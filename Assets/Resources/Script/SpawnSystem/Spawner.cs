@@ -23,7 +23,7 @@ public class Spawner
     private Dictionary<Spawnable, IObjectPool<Spawnable>> poolDict
         = new Dictionary<Spawnable, IObjectPool<Spawnable>>();
 
-    // ���� ������
+    // 
     [Header("Spawn Data")]
     public Transform target;
     public float speedRate;
