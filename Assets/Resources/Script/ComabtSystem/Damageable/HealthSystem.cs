@@ -17,6 +17,9 @@ public class HealthSystem
 
     public Action<GameObject> OnDeath;
 
+    [SerializeField]
+    private bool isInvincibility = false;
+
     private DropManager boundDropManager;
     private float baseMaxHP;
 
@@ -95,6 +98,12 @@ public class HealthSystem
         {
             Transform textTarget = (null != damageTextTarget) ? damageTextTarget : transform;
             damageTextManager.Show(appliedDamage, textTarget, damageTextScreen);
+        }
+
+        if (true == isInvincibility)
+        {
+            CurrHP = MaxHP;
+            return;
         }
 
         if (CurrHP <= 0)

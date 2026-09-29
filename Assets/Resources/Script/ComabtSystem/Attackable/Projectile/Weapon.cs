@@ -1,9 +1,12 @@
 using UnityEngine;
 using UnityEngine.Pool;
 
-public class ProjectileWeapon
+/// <summary>
+/// 무기 스펙을 가지고 쿨타임마다 발사체를 풀에서 꺼내 발사한다
+/// 타겟 탐색 / 공격 로직은 Projectile 이 담당한다
+/// </summary>
+public class Weapon
     : MonoBehaviour
-    , IAttackable
 {
     [Header("weapon")]
     public Transform owner;
@@ -17,87 +20,41 @@ public class ProjectileWeapon
     [Header("target layer")]
     public LayerMask targetLayer;
 
-    [Header("weapon damage")]
+    [Header("weapon spec")]
+    [Tooltip("한 번에 발사하는 발사체 수")]
     public int fireCount;
+    [Tooltip("공격 간격 (초)")]
     public float coolTime;
+    [Tooltip("타겟 탐색 범위")]
     public float range;
     public float damageRate;
     public float speedRate;
 
     private IObjectPool<Projectile> projectilePool;
 
-    private Collider2D[] candinate = new Collider2D[64];
-    private ContactFilter2D filter = new ContactFilter2D();
-
     private float timer = 0;
 
-    public void Attack(Transform _target)
+    public void Fire()
     {
-        if (null == _target)
-        {
-            return;
-        }
-
         for (int i = 0; i < fireCount; ++i)
         {
             Projectile p = projectilePool.Get();
-            if (null == p || null == p.blackBoardHandler)
+            if (null == p)
             {
                 continue;
             }
 
-            BlackBoard b = p.blackBoardHandler.GetBlackBoard();
-            b.SetTransform(DATA_TYPE.moveTarget, _target);
-            b.SetTransform(DATA_TYPE.startPosition, transform);
-            b.SetFloat(DATA_TYPE.moveSpeedRate, speedRate);
-            b.SetFloat(DATA_TYPE.damageRate, damageRate);
-            p.owner = this;
-            p.blackBoardHandler.Initialize();
-        }
-    }
-
-    private Transform FindNerest()
-    {
-        Transform result = null;
-
-        int hitCount = Physics2D.OverlapCircle(
-            transform.position
-            , range
-            , filter
-            , candinate
-        );
-
-        if (0 >= hitCount)
-        {
-            return result;
-        }
-
-        float minDistance = float.MaxValue;
-        for (int i = 0; i < hitCount; ++i)
-        {
-            Transform curr = candinate[i].transform;
-            if (curr == transform || (null != owner && curr == owner))
+            if (false == p.Launch(this))
             {
-                continue;
-            }
-
-            float currDistance = (curr.position - transform.position).sqrMagnitude;
-            if (currDistance < minDistance)
-            {
-                minDistance = currDistance;
-                result = curr;
+                // 타겟이 없으면 이번 발사는 전부 취소
+                projectilePool.Release(p);
+                return;
             }
         }
-
-        return result;
     }
 
     private void Awake()
     {
-        filter.useLayerMask = true;
-        filter.useTriggers = true;
-        filter.SetLayerMask(targetLayer);
-
         projectilePool = new ObjectPool<Projectile>
             (
                 createFunc: () => CreateObject(projectile)
@@ -122,7 +79,7 @@ public class ProjectileWeapon
         if (timer >= coolTime)
         {
             timer -= coolTime;
-            Attack(FindNerest());
+            Fire();
         }
     }
 

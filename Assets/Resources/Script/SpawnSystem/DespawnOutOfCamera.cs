@@ -48,7 +48,7 @@ public class DespawnOutOfCamera
         }
     }
 
-    // 레이어는 생성 후 Spawner / ProjectileWeapon 이 바꾸므로, 레이어가 바뀌었을 때만 다시 찾는다
+    // 레이어는 생성 후 Spawner / Weapon 이 바꾸므로, 레이어가 바뀌었을 때만 다시 찾는다
     private Camera GetCamera()
     {
         if (null != targetCamera)

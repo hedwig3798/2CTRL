@@ -127,10 +127,30 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 2378375243013374915, guid: 39fe69f364a4c884d8f406603e80ffc3,
+        type: 3}
+      propertyPath: owner
+      value: 
+      objectReference: {fileID: 1848389353}
+    - target: {fileID: 2378375243013374915, guid: 39fe69f364a4c884d8f406603e80ffc3,
+        type: 3}
+      propertyPath: fireCount
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 2378375243013374915, guid: 39fe69f364a4c884d8f406603e80ffc3,
+        type: 3}
+      propertyPath: targetLayer.m_Bits
+      value: 4294967295
+      objectReference: {fileID: 0}
     - target: {fileID: 5482854523075796515, guid: 39fe69f364a4c884d8f406603e80ffc3,
         type: 3}
       propertyPath: m_Name
       value: ProjectileWeapon
+      objectReference: {fileID: 0}
+    - target: {fileID: 5482854523075796515, guid: 39fe69f364a4c884d8f406603e80ffc3,
+        type: 3}
+      propertyPath: m_Layer
+      value: 13
       objectReference: {fileID: 0}
     - target: {fileID: 5718015747857215526, guid: 39fe69f364a4c884d8f406603e80ffc3,
         type: 3}
@@ -195,10 +215,20 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 979919996084699913, guid: 2bb22a816a2d70049b5b32a740f3679d,
+        type: 3}
+      propertyPath: m_Layer
+      value: 11
+      objectReference: {fileID: 0}
     - target: {fileID: 3892769670665353481, guid: 2bb22a816a2d70049b5b32a740f3679d,
         type: 3}
       propertyPath: m_Name
-      value: bat
+      value: Dummy
+      objectReference: {fileID: 0}
+    - target: {fileID: 3892769670665353481, guid: 2bb22a816a2d70049b5b32a740f3679d,
+        type: 3}
+      propertyPath: m_Layer
+      value: 11
       objectReference: {fileID: 0}
     - target: {fileID: 4487578378264670573, guid: 2bb22a816a2d70049b5b32a740f3679d,
         type: 3}
@@ -254,6 +284,31 @@ PrefabInstance:
         type: 3}
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 5421751804561227995, guid: 2bb22a816a2d70049b5b32a740f3679d,
+        type: 3}
+      propertyPath: m_Layer
+      value: 11
+      objectReference: {fileID: 0}
+    - target: {fileID: 6933514607482801567, guid: 2bb22a816a2d70049b5b32a740f3679d,
+        type: 3}
+      propertyPath: m_Layer
+      value: 11
+      objectReference: {fileID: 0}
+    - target: {fileID: 7448138843906447106, guid: 2bb22a816a2d70049b5b32a740f3679d,
+        type: 3}
+      propertyPath: m_Layer
+      value: 11
+      objectReference: {fileID: 0}
+    - target: {fileID: 8568073102507205356, guid: 2bb22a816a2d70049b5b32a740f3679d,
+        type: 3}
+      propertyPath: isInvincibility
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 8719077516767091274, guid: 2bb22a816a2d70049b5b32a740f3679d,
+        type: 3}
+      propertyPath: m_Layer
+      value: 11
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -352,6 +407,12 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!4 &1848389353 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 5718015747857215526, guid: 39fe69f364a4c884d8f406603e80ffc3,
+    type: 3}
+  m_PrefabInstance: {fileID: 386644783}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1660057539 &9223372036854775807
 SceneRoots:
   m_ObjectHideFlags: 0
