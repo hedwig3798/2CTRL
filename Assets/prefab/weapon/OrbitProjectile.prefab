@@ -1,6 +1,6 @@
 %YAML 1.1
 %TAG !u! tag:unity3d.com,2011:
---- !u!1 &828605911027424652
+--- !u!1 &3678636292339608902
 GameObject:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -8,8 +8,8 @@ GameObject:
   m_PrefabAsset: {fileID: 0}
   serializedVersion: 6
   m_Component:
-  - component: {fileID: 6407040916884590168}
-  - component: {fileID: 3322147996030990474}
+  - component: {fileID: 5996250529527298669}
+  - component: {fileID: 7887555885940496096}
   m_Layer: 0
   m_Name: visual
   m_TagString: Untagged
@@ -17,28 +17,28 @@ GameObject:
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
---- !u!4 &6407040916884590168
+--- !u!4 &5996250529527298669
 Transform:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 828605911027424652}
+  m_GameObject: {fileID: 3678636292339608902}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
-  m_Father: {fileID: 1126022227805470873}
+  m_Father: {fileID: 529634055904086351}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!212 &3322147996030990474
+--- !u!212 &7887555885940496096
 SpriteRenderer:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 828605911027424652}
+  m_GameObject: {fileID: 3678636292339608902}
   m_Enabled: 1
   m_CastShadows: 0
   m_ReceiveShadows: 0
@@ -91,7 +91,7 @@ SpriteRenderer:
   m_WasSpriteAssigned: 1
   m_MaskInteraction: 0
   m_SpriteSortPoint: 0
---- !u!1 &2487235699511279634
+--- !u!1 &4438947091302550524
 GameObject:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -99,82 +99,41 @@ GameObject:
   m_PrefabAsset: {fileID: 0}
   serializedVersion: 6
   m_Component:
-  - component: {fileID: 1126022227805470873}
-  - component: {fileID: 4280806990094466557}
-  - component: {fileID: 4803801878435851661}
-  - component: {fileID: 5392044630429327319}
-  - component: {fileID: 4698037154307709476}
+  - component: {fileID: 529634055904086351}
+  - component: {fileID: 7645745405705943378}
+  - component: {fileID: 7570110665446899610}
+  - component: {fileID: 3584330095549229829}
+  - component: {fileID: 5587504719526633958}
   m_Layer: 0
-  m_Name: ChainProjectile
+  m_Name: OrbitProjectile
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
---- !u!4 &1126022227805470873
+--- !u!4 &529634055904086351
 Transform:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2487235699511279634}
+  m_GameObject: {fileID: 4438947091302550524}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 1.92408, y: -0.00859, z: 0}
-  m_LocalScale: {x: 0.1, y: 0.1, z: 0.1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
-  - {fileID: 6407040916884590168}
+  - {fileID: 5996250529527298669}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &4280806990094466557
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2487235699511279634}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: f5d59af65a188a14d86cebf515460ea3, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::ChainMovement
-  target: {fileID: 0}
-  speed: 1
-  switchDistance: 0.2
---- !u!114 &4803801878435851661
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2487235699511279634}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 06b0558659a69ac4d9ca9a1b62037cfb, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::OneHitProjectile
-  baseDamage: 10
-  blackBoardHandler: {fileID: 0}
---- !u!114 &5392044630429327319
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2487235699511279634}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: e76df251cee9fac4c85dd8019a799a14, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::BlackBoardHandler
---- !u!58 &4698037154307709476
+--- !u!58 &7645745405705943378
 CircleCollider2D:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2487235699511279634}
+  m_GameObject: {fileID: 4438947091302550524}
   m_Enabled: 1
   serializedVersion: 3
   m_Density: 1
@@ -204,3 +163,44 @@ CircleCollider2D:
   m_CompositeOrder: 0
   m_Offset: {x: 0, y: 0}
   m_Radius: 0.5
+--- !u!114 &7570110665446899610
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4438947091302550524}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 773f8cd69e44f874ea803ab3631cf79b, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::OrbitMovement
+  target: {fileID: 0}
+  radius: 1.5
+  angularSpeed: 180
+--- !u!114 &3584330095549229829
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4438947091302550524}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e76df251cee9fac4c85dd8019a799a14, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::BlackBoardHandler
+--- !u!114 &5587504719526633958
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4438947091302550524}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: fa2bc92c98d7f3e48a77c4f1fec256b0, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::AuraProjectile
+  baseDamage: 10
+  blackBoardHandler: {fileID: 0}
