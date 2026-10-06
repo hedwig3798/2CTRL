@@ -17,6 +17,17 @@ public class HealthSystem
 
     public Action<GameObject> OnDeath;
 
+    /// <summary>
+    /// HP 가 바뀔 때 호출 (현재치, 최대치)
+    /// </summary>
+    public Action<float, float> OnHPChanged;
+
+    /// <summary>
+    /// 데미지를 받았을 때 호출 (표시할 데미지 양)
+    /// 무적이면 받은 데미지 그대로, 아니면 실제로 깎인 양
+    /// </summary>
+    public Action<float> OnDamaged;
+
     [SerializeField]
     private bool isInvincibility = false;
 
@@ -25,17 +36,6 @@ public class HealthSystem
 
     // 사망 시 꺼서 추가 피격/접촉/타깃 탐색을 막는다
     private Collider2D[] colliders;
-
-    [SerializeField]
-    private SliderUI sliderUI;
-
-    [Header("데미지 텍스트")]
-    [Tooltip("데미지 텍스트가 뜰 위치 (비어있으면 자기 자신)")]
-    [SerializeField]
-    private Transform damageTextTarget;
-    [Tooltip("데미지 텍스트가 그려질 화면\nAuto : 대상의 레이어로 결정")]
-    [SerializeField]
-    private UI_SCREEN damageTextScreen = UI_SCREEN.Auto;
 
     public float CurrHP
     {
@@ -51,14 +51,22 @@ public class HealthSystem
 
     public void SetCurrHP(float _val)
     {
+        if (true == Mathf.Approximately(currHP, _val))
+        {
+            return;
+        }
         currHP = _val;
-        sliderUI.CurrValue = _val;
+        OnHPChanged?.Invoke(currHP, maxHP);
     }
 
     public void SetMaxHP(float _val)
     {
+        if (true == Mathf.Approximately(maxHP, _val))
+        {
+            return;
+        }
         maxHP = _val;
-        sliderUI.MaxValue = _val;
+        OnHPChanged?.Invoke(currHP, maxHP);
     }
 
     private void SetCollidersEnabled(bool _enabled)
@@ -93,11 +101,12 @@ public class HealthSystem
 
         // 현재 HP 보다 큰 데미지는 실제로 깎인 양만 출력
         float appliedDamage = prevHP - CurrHP;
-        DamageTextManager damageTextManager = DamageTextManager.Instance;
-        if (0f < appliedDamage && null != damageTextManager)
+
+        // 무적이면 HP 가 다시 채워지므로 받은 데미지를 그대로 출력
+        float displayDamage = (true == isInvincibility) ? _msg.damage : appliedDamage;
+        if (0f < displayDamage)
         {
-            Transform textTarget = (null != damageTextTarget) ? damageTextTarget : transform;
-            damageTextManager.Show(appliedDamage, textTarget, damageTextScreen);
+            OnDamaged?.Invoke(displayDamage);
         }
 
         if (true == isInvincibility)

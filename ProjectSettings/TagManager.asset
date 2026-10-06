@@ -55,6 +55,9 @@ TagManager:
   - name: attack
     uniqueID: 4189426099
     locked: 0
+  - name: Front UI
+    uniqueID: 2778501555
+    locked: 0
   m_RenderingLayers:
   - Default
   - Layer 1
