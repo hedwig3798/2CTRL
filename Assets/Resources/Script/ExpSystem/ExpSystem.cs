@@ -10,6 +10,7 @@ public class ExpSystem
     public LevelTable levelTable;
 
     public Action<GameObject, int> levelUpAction;
+    public Action<float, float> OnExpChanged;
 
     public void GetExp(float _exp)
     {
@@ -50,6 +51,8 @@ public class ExpSystem
 
             maxExp = GetNeedExp(currLevel);
         }
+
+        OnExpChanged?.Invoke(currExp, maxExp);
 
         if (0 < levelUpAmount)
         {

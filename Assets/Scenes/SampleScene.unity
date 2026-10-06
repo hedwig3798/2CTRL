@@ -1786,6 +1786,16 @@ PrefabInstance:
       propertyPath: m_Layer
       value: 8
       objectReference: {fileID: 0}
+    - target: {fileID: 9028930449176545278, guid: dfbc18bc829b28e43ade99fa866b1ee7,
+        type: 3}
+      propertyPath: m_Camera
+      value: 
+      objectReference: {fileID: 1196257383}
+    - target: {fileID: 9028930449176545278, guid: dfbc18bc829b28e43ade99fa866b1ee7,
+        type: 3}
+      propertyPath: m_SortingLayerID
+      value: -1516465741
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects:
@@ -2136,6 +2146,16 @@ PrefabInstance:
         type: 3}
       propertyPath: coolTimeReduce
       value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 9028930449176545278, guid: dfbc18bc829b28e43ade99fa866b1ee7,
+        type: 3}
+      propertyPath: m_Camera
+      value: 
+      objectReference: {fileID: 2083139459}
+    - target: {fileID: 9028930449176545278, guid: dfbc18bc829b28e43ade99fa866b1ee7,
+        type: 3}
+      propertyPath: m_SortingLayerID
+      value: -1516465741
       objectReference: {fileID: 0}
     m_RemovedComponents:
     - {fileID: 0}
