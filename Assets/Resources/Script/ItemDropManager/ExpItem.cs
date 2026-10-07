@@ -1,5 +1,9 @@
 using UnityEngine;
 
+/// <summary>
+/// 드랍되는 EXP 아이템
+/// 스스로 EXP 를 지급하지 않고, ItemCollector 가 Collect 로 수집해 공용 ExpSystem 에 전달한다.
+/// </summary>
 public class ExpItem
     : MonoBehaviour
     , Initializable
@@ -12,8 +16,12 @@ public class ExpItem
 
     private float expRate;
 
+    private bool collected;
+
     public void Initialize(BlackBoard _data)
     {
+        collected = false;
+
         expRate = _data.GetFloat(DATA_TYPE.expRate);
         if (expRate <= 0f)
         {
@@ -21,19 +29,27 @@ public class ExpItem
         }
     }
 
-    private void OnTriggerEnter2D(Collider2D _other)
+    /// <summary>
+    /// 아이템을 수집하고 획득 EXP 를 반환 (이미 수집된 경우 0)
+    /// </summary>
+    public float Collect()
     {
-        if (_other.TryGetComponent(out ExpSystem expSystem))
+        if (true == collected)
         {
-            expSystem.GetExp(baseExp * expRate);
-            if (null != owner)
-            {
-                owner.SetActive(false);
-            }
-            else
-            {
-                gameObject.SetActive(false);
-            }
+            return 0f;
         }
+
+        collected = true;
+
+        if (null != owner)
+        {
+            owner.SetActive(false);
+        }
+        else
+        {
+            gameObject.SetActive(false);
+        }
+
+        return baseExp * expRate;
     }
 }

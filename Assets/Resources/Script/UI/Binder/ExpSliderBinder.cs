@@ -1,18 +1,18 @@
 using UnityEngine;
 
 /// <summary>
-/// ExpSystem 의 EXP 변동을 SliderUI 에 반영하는 연결 컴포넌트
+/// 공용 ExpSystem 의 EXP 변동을 SliderUI 에 반영하는 연결 컴포넌트
 /// SliderUI 는 EXP 를 모르고, ExpSystem 은 UI 를 모른다. 둘 사이의 연결만 담당한다.
-/// - target 이 비어있으면 부모에서 ExpSystem 을 찾는다.
+/// - target 이 비어있으면 씬의 공용 ExpSystem (ExpSystem.Instance) 을 사용한다.
 /// - slider 가 비어있으면 자기 자신에서 SliderUI 를 찾는다.
 ///
-/// 런타임에 대상이 정해지는 경우 (플레이어 스폰 후 HUD 연결 등)
-///   binder.SetTarget(player.GetComponent<ExpSystem>());
+/// 런타임에 대상을 바꾸는 경우
+///   binder.SetTarget(ExpSystem.Instance);
 /// </summary>
 public class ExpSliderBinder
     : MonoBehaviour
 {
-    [Tooltip("EXP 를 표시할 대상 (비어있으면 부모에서 탐색)")]
+    [Tooltip("EXP 를 표시할 대상 (비어있으면 공용 ExpSystem 사용)")]
     [SerializeField]
     private ExpSystem target;
 
@@ -45,7 +45,7 @@ public class ExpSliderBinder
     {
         if (null == target)
         {
-            target = GetComponentInParent<ExpSystem>();
+            target = ExpSystem.Instance;
         }
         if (null == slider)
         {
