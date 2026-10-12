@@ -3,16 +3,12 @@ using UnityEngine.UI;
 
 /// <summary>
 /// 레벨업 시 게임을 일시정지하고 레벨업 패널을 표시하는 UI
-/// - EventManager.OnLevelUp 을 구독하므로, 항상 활성 상태인 Canvas 루트에 붙이고 panel 만 On/Off 한다.
+/// - EventManager.OnLevelUp 을 구독하므로, 항상 활성 상태인 Canvas 루트에 붙이고 자식 전체를 On/Off 한다.
 /// - 한 번에 여러 레벨이 오르면 오른 레벨 수만큼 버튼을 눌러야 재개된다.
 /// </summary>
 public class LevelUpUI
     : MonoBehaviour
 {
-    [Tooltip("레벨업 시 표시할 패널 (이 오브젝트의 자식)")]
-    [SerializeField]
-    private GameObject panel;
-
     [Tooltip("누르면 게임을 재개하는 버튼")]
     [SerializeField]
     private Button resumeButton;
@@ -20,16 +16,15 @@ public class LevelUpUI
     // 아직 처리하지 않은 레벨업 횟수
     private int pendingCount = 0;
 
-    public bool IsOpen => null != panel && true == panel.activeSelf;
+    private bool isOpen = false;
+
+    public bool IsOpen => isOpen;
 
     private void Awake()
     {
         ValidateSetup();
 
-        if (null != panel)
-        {
-            panel.SetActive(false);
-        }
+        SetChildrenActive(false);
     }
 
     /// <summary>
@@ -37,22 +32,13 @@ public class LevelUpUI
     /// </summary>
     private void ValidateSetup()
     {
-        if (null == panel)
-        {
-            Debug.LogWarning($"[LevelUpUI] panel 이 연결되지 않았습니다. ({name})", this);
-        }
-        else if (panel == gameObject)
-        {
-            Debug.LogWarning($"[LevelUpUI] panel 이 자기 자신입니다. 패널을 끄면 이벤트 구독도 끊기므로 Canvas 루트에 붙이고 자식 패널을 연결하세요. ({name})", this);
-        }
-
         if (null == resumeButton)
         {
             Debug.LogWarning($"[LevelUpUI] resumeButton 이 연결되지 않았습니다. ({name})", this);
         }
-        else if (null != panel && false == resumeButton.transform.IsChildOf(panel.transform))
+        else if (resumeButton.transform == transform || false == resumeButton.transform.IsChildOf(transform))
         {
-            Debug.LogWarning($"[LevelUpUI] resumeButton 이 panel 의 자식이 아니어서 패널을 꺼도 버튼이 남습니다. ({name})", this);
+            Debug.LogWarning($"[LevelUpUI] resumeButton 이 이 오브젝트의 자식이 아니어서 UI 를 닫아도 버튼이 남습니다. ({name})", this);
         }
 
         if (null != resumeButton)
@@ -121,16 +107,21 @@ public class LevelUpUI
         }
     }
 
+    /// <summary>
+    /// 루트는 이벤트 구독을 위해 켜둔 채, 직계 자식 전체를 On/Off
+    /// </summary>
+    private void SetChildrenActive(bool _active)
+    {
+        foreach (Transform child in transform)
+        {
+            child.gameObject.SetActive(_active);
+        }
+    }
+
     private void Open()
     {
-        if (null == panel)
-        {
-            Debug.LogWarning($"[LevelUpUI] panel 이 연결되지 않았습니다. ({name})");
-            pendingCount = 0;
-            return;
-        }
-
-        panel.SetActive(true);
+        SetChildrenActive(true);
+        isOpen = true;
         GamePause.Pause(this);
     }
 
@@ -138,10 +129,8 @@ public class LevelUpUI
     {
         pendingCount = 0;
 
-        if (null != panel)
-        {
-            panel.SetActive(false);
-        }
+        SetChildrenActive(false);
+        isOpen = false;
         GamePause.Resume(this);
     }
 }
