@@ -5,7 +5,7 @@ using UnityEngine;
 /// 리워드 풀 매니져 (씬에 하나 배치)
 /// - RewardPoolType 의 값마다 RandomPool 이 하나씩 생긴다 (처음엔 비어 있음)
 /// - 풀은 private 이지만 인스펙터에서 항목과 가중치를 채울 수 있다
-/// - 항목은 어떤 에셋이든 넣을 수 있고, 꺼낼 때 Get&lt;T&gt; 로 원하는 타입으로 받는다
+/// - 항목은 RewardData 이며, Get / GetAny 로 가중치 랜덤으로 꺼낸다
 /// - RewardPoolType 으로 풀에 접근해서 추가 / 삭제 / 가중치 조절을 한다
 /// </summary>
 [DisallowMultipleComponent]
@@ -16,7 +16,7 @@ public class RewardManager
     private class PoolSlot
     {
         public RewardPoolType type;
-        public RandomPool<Object> pool = new RandomPool<Object>();
+        public RandomPool<RewardData> pool = new RandomPool<RewardData>();
     }
 
     private static RewardManager instance;
@@ -38,36 +38,36 @@ public class RewardManager
     [SerializeField]
     private List<PoolSlot> pools = new List<PoolSlot>();
 
-    private Dictionary<RewardPoolType, RandomPool<Object>> poolMap;
+    private Dictionary<RewardPoolType, RandomPool<RewardData>> poolMap;
 
     /// <summary>
     /// type 에 해당하는 풀을 가져온다 (값 조절용)
     /// </summary>
-    public RandomPool<Object> GetPool(RewardPoolType _type)
+    public RandomPool<RewardData> GetPool(RewardPoolType _type)
     {
         if (null == poolMap)
         {
             EnsurePools();
         }
 
-        poolMap.TryGetValue(_type, out RandomPool<Object> pool);
+        poolMap.TryGetValue(_type, out RandomPool<RewardData> pool);
         return pool;
     }
 
-    public void Add(RewardPoolType _type, Object _item, float _weight)
+    public void Add(RewardPoolType _type, RewardData _item, float _weight)
     {
         GetPool(_type)?.Add(_item, _weight);
     }
 
-    public bool Remove(RewardPoolType _type, Object _item)
+    public bool Remove(RewardPoolType _type, RewardData _item)
     {
-        RandomPool<Object> pool = GetPool(_type);
+        RandomPool<RewardData> pool = GetPool(_type);
         return null != pool && pool.Remove(_item);
     }
 
-    public int RemoveAll(RewardPoolType _type, Object _item)
+    public int RemoveAll(RewardPoolType _type, RewardData _item)
     {
-        RandomPool<Object> pool = GetPool(_type);
+        RandomPool<RewardData> pool = GetPool(_type);
         return null != pool ? pool.RemoveAll(_item) : 0;
     }
 
@@ -83,31 +83,30 @@ public class RewardManager
 
     public int Count(RewardPoolType _type)
     {
-        RandomPool<Object> pool = GetPool(_type);
+        RandomPool<RewardData> pool = GetPool(_type);
         return null != pool ? pool.Count : 0;
     }
 
     /// <summary>
-    /// type 풀에서 가중치 랜덤으로 하나를 T 로 가져온다 (풀에서 빼지 않는다)
-    /// 풀이 비었거나 뽑힌 항목이 T 가 아니면 null
+    /// type 풀에서 가중치 랜덤으로 하나를 가져온다 (풀에서 빼지 않는다)
+    /// 풀이 비었거나 뽑힌 항목이 비어 있으면 null
     /// </summary>
-    public T Get<T>(RewardPoolType _type) where T : Object
+    public RewardData Get(RewardPoolType _type)
     {
-        TryGet(_type, out T item);
+        TryGet(_type, out RewardData item);
         return item;
     }
 
-    /// <returns>풀이 비었거나 뽑힌 항목이 T 가 아니면 false</returns>
-    public bool TryGet<T>(RewardPoolType _type, out T _item) where T : Object
+    /// <returns>풀이 비었거나 뽑힌 항목이 비어 있으면 false</returns>
+    public bool TryGet(RewardPoolType _type, out RewardData _item)
     {
         _item = null;
-        RandomPool<Object> pool = GetPool(_type);
-        if (null == pool || false == pool.TryGet(out Object picked))
+        RandomPool<RewardData> pool = GetPool(_type);
+        if (null == pool || false == pool.TryGet(out _item))
         {
             return false;
         }
 
-        _item = picked as T;
         return null != _item;
     }
 
@@ -124,7 +123,7 @@ public class RewardManager
             }
 
             float total = 0f;
-            foreach (RandomPool<Object> pool in poolMap.Values)
+            foreach (RandomPool<RewardData> pool in poolMap.Values)
             {
                 total += pool.TotalWeight;
             }
@@ -133,24 +132,24 @@ public class RewardManager
     }
 
     /// <summary>
-    /// 등록된 모든 풀에서 가중치 랜덤으로 하나를 T 로 가져온다 (풀에서 빼지 않는다)
-    /// 모든 풀이 비었거나 뽑힌 항목이 T 가 아니면 null
+    /// 등록된 모든 풀에서 가중치 랜덤으로 하나를 가져온다 (풀에서 빼지 않는다)
+    /// 모든 풀이 비었거나 뽑힌 항목이 비어 있으면 null
     /// </summary>
-    public T GetAny<T>() where T : Object
+    public RewardData GetAny()
     {
-        TryGetAny(out T item, out _);
+        TryGetAny(out RewardData item, out _);
         return item;
     }
 
     /// <summary>
-    /// 등록된 모든 풀에서 가중치 랜덤으로 하나를 T 로 가져온다 (풀에서 빼지 않는다)
+    /// 등록된 모든 풀에서 가중치 랜덤으로 하나를 가져온다 (풀에서 빼지 않는다)
     /// 1. 0 ~ 모든 풀의 가중치 합 사이의 랜덤 값을 뽑는다
     /// 2. enum 순서로 풀의 총 가중치를 빼 나가며 그 값이 속한 풀을 고른다
     /// 3. 고른 풀에서 남은 가중치 값에 해당하는 항목을 가져온다
     /// </summary>
     /// <param name="_type">뽑힌 항목이 속한 풀</param>
-    /// <returns>모든 풀이 비었거나 뽑힌 항목이 T 가 아니면 false</returns>
-    public bool TryGetAny<T>(out T _item, out RewardPoolType _type) where T : Object
+    /// <returns>모든 풀이 비었거나 뽑힌 항목이 비어 있으면 false</returns>
+    public bool TryGetAny(out RewardData _item, out RewardPoolType _type)
     {
         _item = null;
         _type = default;
@@ -162,7 +161,7 @@ public class RewardManager
         }
 
         float roll = Random.Range(0f, total);
-        RandomPool<Object> picked = null;
+        RandomPool<RewardData> picked = null;
         foreach (PoolSlot slot in pools)
         {
             float weight = slot.pool.TotalWeight;
@@ -181,13 +180,68 @@ public class RewardManager
             roll -= weight;
         }
 
-        if (null == picked || false == picked.TryGetByWeight(roll, out Object item))
+        if (null == picked || false == picked.TryGetByWeight(roll, out _item))
         {
             return false;
         }
 
-        _item = item as T;
         return null != _item;
+    }
+
+    // GetRandomUnique 에서 재사용하는 후보 버퍼
+    private readonly List<RewardData> candidates = new List<RewardData>();
+    private readonly HashSet<RewardData> candidateSet = new HashSet<RewardData>();
+
+    /// <summary>
+    /// 등록된 모든 풀에서 가중치를 무시하고 균등 랜덤으로 중복 없이 최대 _count 개를 가져온다 (풀에서 빼지 않는다)
+    /// - null 항목, weight 가 0 인 항목은 제외하고, 같은 데이터는 한 번만 뽑힌다
+    /// - 후보가 _count 보다 적으면 후보 수만큼만 가져온다
+    /// </summary>
+    /// <param name="_result">결과를 담을 리스트 (먼저 비운다)</param>
+    /// <returns>가져온 개수</returns>
+    public int GetRandomUnique(int _count, List<RewardData> _result)
+    {
+        _result.Clear();
+        if (_count <= 0)
+        {
+            return 0;
+        }
+
+        if (null == poolMap)
+        {
+            EnsurePools();
+        }
+
+        candidates.Clear();
+        candidateSet.Clear();
+        foreach (PoolSlot slot in pools)
+        {
+            RandomPool<RewardData> pool = slot.pool;
+            for (int i = 0; i < pool.Count; ++i)
+            {
+                RewardData item = pool.GetItem(i);
+                if (null == item || pool.GetWeight(i) <= 0f || false == candidateSet.Add(item))
+                {
+                    continue;
+                }
+                candidates.Add(item);
+            }
+        }
+
+        // 부분 Fisher-Yates 셔플로 앞에서부터 count 개를 고른다
+        int count = Mathf.Min(_count, candidates.Count);
+        for (int i = 0; i < count; ++i)
+        {
+            int pick = Random.Range(i, candidates.Count);
+            (candidates[i], candidates[pick]) = (candidates[pick], candidates[i]);
+            _result.Add(candidates[i]);
+        }
+
+        Debug.Log($"[RewardManager] 보상 {count}/{_count} 개 뽑음 (후보 {candidates.Count}) : {string.Join(", ", _result.ConvertAll(_data => _data.name))}", this);
+
+        candidates.Clear();
+        candidateSet.Clear();
+        return count;
     }
 
     private void Awake()
@@ -243,7 +297,7 @@ public class RewardManager
 
         RewardPoolType[] types = (RewardPoolType[])System.Enum.GetValues(typeof(RewardPoolType));
         pools.Clear();
-        poolMap = new Dictionary<RewardPoolType, RandomPool<Object>>(types.Length);
+        poolMap = new Dictionary<RewardPoolType, RandomPool<RewardData>>(types.Length);
 
         foreach (RewardPoolType type in types)
         {
@@ -253,7 +307,7 @@ public class RewardManager
             }
             if (null == slot.pool)
             {
-                slot.pool = new RandomPool<Object>();
+                slot.pool = new RandomPool<RewardData>();
             }
 
             pools.Add(slot);

@@ -24,6 +24,12 @@ public class LevelUpUI
     {
         ValidateSetup();
 
+        // 자식이 꺼지면 Awake 가 호출되지 않으므로, 끄기 전에 레벨업 구독을 위한 초기화를 해 둠
+        foreach (SelectPanelGroup group in GetComponentsInChildren<SelectPanelGroup>(true))
+        {
+            group.Initialize();
+        }
+
         SetChildrenActive(false);
     }
 

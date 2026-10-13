@@ -142,8 +142,9 @@ MonoBehaviour:
       m_Calls: []
   m_text: explain text
   m_isRightToLeft: 0
-  m_fontAsset: {fileID: 11400000, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
-  m_sharedMaterial: {fileID: 2180264, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
+  m_fontAsset: {fileID: 11400000, guid: f1fae9bb0370b5c47b9170a99a15e34e, type: 2}
+  m_sharedMaterial: {fileID: -4178291018763762942, guid: f1fae9bb0370b5c47b9170a99a15e34e,
+    type: 2}
   m_fontSharedMaterials: []
   m_fontMaterial: {fileID: 0}
   m_fontMaterials: []
@@ -278,8 +279,9 @@ MonoBehaviour:
       m_Calls: []
   m_text: explain text
   m_isRightToLeft: 0
-  m_fontAsset: {fileID: 11400000, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
-  m_sharedMaterial: {fileID: 2180264, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
+  m_fontAsset: {fileID: 11400000, guid: f1fae9bb0370b5c47b9170a99a15e34e, type: 2}
+  m_sharedMaterial: {fileID: -4178291018763762942, guid: f1fae9bb0370b5c47b9170a99a15e34e,
+    type: 2}
   m_fontSharedMaterials: []
   m_fontMaterial: {fileID: 0}
   m_fontMaterials: []
@@ -489,8 +491,9 @@ MonoBehaviour:
       m_Calls: []
   m_text: item name
   m_isRightToLeft: 0
-  m_fontAsset: {fileID: 11400000, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
-  m_sharedMaterial: {fileID: 2180264, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
+  m_fontAsset: {fileID: 11400000, guid: f1fae9bb0370b5c47b9170a99a15e34e, type: 2}
+  m_sharedMaterial: {fileID: -4178291018763762942, guid: f1fae9bb0370b5c47b9170a99a15e34e,
+    type: 2}
   m_fontSharedMaterials: []
   m_fontMaterial: {fileID: 0}
   m_fontMaterials: []
@@ -623,6 +626,10 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::SelectPanel
   selectBackground: {fileID: 4001853767180403775}
   isSelected: 0
+  image: {fileID: 966635345826984155}
+  nameText: {fileID: 3792151326330653376}
+  explainText1: {fileID: 7476458010802189084}
+  explainText2: {fileID: 7926652683673402249}
 --- !u!1 &9182903347445366728
 GameObject:
   m_ObjectHideFlags: 0
@@ -681,7 +688,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: UnityEngine.UI::UnityEngine.UI.Image
   m_Material: {fileID: 0}
-  m_Color: {r: 0, g: 0, b: 0, a: 1}
+  m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_RaycastTarget: 1
   m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
   m_Maskable: 1
@@ -689,8 +696,8 @@ MonoBehaviour:
     m_PersistentCalls:
       m_Calls: []
   m_Sprite: {fileID: 10907, guid: 0000000000000000f000000000000000, type: 0}
-  m_Type: 1
-  m_PreserveAspect: 0
+  m_Type: 0
+  m_PreserveAspect: 1
   m_FillCenter: 1
   m_FillMethod: 4
   m_FillAmount: 1
