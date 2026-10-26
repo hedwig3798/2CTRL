@@ -13,22 +13,22 @@ public class PipelineAttribute : Attribute
 
 public enum DAMAGE_PIPELINE
 {
-    INVINCIBLE = 0,     // ¹«Àû
+    INVINCIBLE = 0,     // ë¬´ì 
 
-    DODGE,          // È¸ÇÇ ÆÇÁ¤
+    DODGE,          // íšŒí”¼ íŒì •
 
-    FIXED,          // °íÁ¤ µ¥¹ÌÁö Ã³¸®
+    FIXED,          // ê³ ì • ë°ë¯¸ì§€ ì²˜ë¦¬
 
-    DEFENSE,        // ¹æ¾î·Â Ã³¸®
+    DEFENSE,        // ë°©ì–´ë ¥ ì²˜ë¦¬
 
-    SHIELD,         // ½Çµå Ã³¸®
+    SHIELD,         // ì‹¤ë“œ ì²˜ë¦¬
 
     [Pipeline(typeof(HealthSystem))]
-    HEALTH,         // Ã¼·Â Ã³¸®
+    HEALTH,         // ì²´ë ¥ ì²˜ë¦¬
 
-    KNOCKBACK,      // ³Ë¹é Ã³¸®
+    KNOCKBACK,      // ë„‰ë°± ì²˜ë¦¬
 
-    PAYBACK,        // µ¥¹ÌÁö ÆäÀÌ¹é Ã³¸®
+    PAYBACK,        // ë°ë¯¸ì§€ íŽ˜ì´ë°± ì²˜ë¦¬
 
     END,
 }

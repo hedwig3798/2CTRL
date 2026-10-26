@@ -42,7 +42,7 @@ public class TileDataEditor
 
         if (null == tileData.tileSet)
         {
-            EditorGUILayout.HelpBox("TileSet À» ¼³Á¤ÇØÁÖ¼¼¿ä", MessageType.Info);
+            EditorGUILayout.HelpBox("TileSet ì„ ì„¤ì •í•´ì£¼ì„¸ìš”", MessageType.Info);
             return;
         }
 
@@ -81,7 +81,7 @@ public class TileDataEditor
     {
         int currentIndex = 0;
 
-        // ÇöÀç ÇÒ´çµÈ ¼ÒÄÏ ¿¡¼ÂÀÌ ¹è¿­ÀÇ ¸î ¹øÂ° ÀÎµ¦½ºÀÎÁö Å½»ö
+        // í˜„ì¬ í• ë‹¹ëœ ì†Œì¼“ ì—ì…‹ì´ ë°°ì—´ì˜ ëª‡ ë²ˆì§¸ ì¸ë±ìŠ¤ì¸ì§€ íƒìƒ‰
         if (null != _currSocket)
         {
             for (int i = 0; i < _tileSockets.Length; ++i)
@@ -94,16 +94,16 @@ public class TileDataEditor
             }
         }
 
-        // ÀÎ½ºÆåÅÍ¿¡ ÆË¾÷ ¸Ş´º Ãâ·Â
+        // ì¸ìŠ¤í™í„°ì— íŒì—… ë©”ë‰´ ì¶œë ¥
         int selectedIndex = EditorGUILayout.Popup(_name, currentIndex, _popupOptions);
 
-        // 0¹ø(None) ¼±ÅÃ ½Ã null ¹İÈ¯
+        // 0ë²ˆ(None) ì„ íƒ ì‹œ null ë°˜í™˜
         if (0 == selectedIndex)
         {
             return null;
         }
 
-        // ¼±ÅÃµÈ ÀÎµ¦½º¿¡ ¸ÅÇÎµÇ´Â ¼ÒÄÏ SO ¹İÈ¯
+        // ì„ íƒëœ ì¸ë±ìŠ¤ì— ë§¤í•‘ë˜ëŠ” ì†Œì¼“ SO ë°˜í™˜
         return _tileSockets[selectedIndex - 1];
     }
 }

@@ -3,7 +3,7 @@ using UnityEngine;
 
 public enum SPRITE_ROTATE_MODE
 {
-    NONE = 0,   // È¸ÀüÇÏÁö ¾ÊÀ½
-    FLIP,       // ÁÂ¿ì·Î¸¸ ¹ÝÀü
-    ROTATE,     // ¹æÇâ¿¡ µû¸¥ È¸Àü
+    NONE = 0,   // íšŒì „í•˜ì§€ ì•ŠìŒ
+    FLIP,       // ì¢Œìš°ë¡œë§Œ ë°˜ì „
+    ROTATE,     // ë°©í–¥ì— ë”°ë¥¸ íšŒì „
 }

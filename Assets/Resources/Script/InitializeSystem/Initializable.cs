@@ -1,7 +1,7 @@
 using UnityEngine;
 
 /// <summary>
-/// ¿ÜºÎ Å¬·¡½º¿¡ ÀÇÇØ ÃÊ±âÈ­ µÉ ¼ö ÀÖ´Â ÄÄÆ÷³ÍÆ®
+/// ì™¸ë¶€ í´ë˜ìŠ¤ì— ì˜í•´ ì´ˆê¸°í™” ë  ìˆ˜ ìˆëŠ” ì»´í¬ë„ŒíŠ¸
 /// </summary>
 public interface Initializable
 {

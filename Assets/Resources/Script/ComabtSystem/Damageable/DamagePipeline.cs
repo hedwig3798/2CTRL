@@ -22,30 +22,30 @@ public class DamagePipeline : MonoBehaviour
 
     private void Awake()
     {
-        // ÆÄÀÌÇÁ¶óÀÎ ÃÊ±âÈ­
+        // íŒŒì´í”„ë¼ì¸ ì´ˆê¸°í™”
         for (int i = 0; i < (int)DAMAGE_PIPELINE.END; ++i)
         {
             pipeline[i] = null;
         }
 
-        // ÆÄÀÌÇÁ¶óÀÎ enum °ª °¡Á®¿À±â
+        // íŒŒì´í”„ë¼ì¸ enum ê°’ ê°€ì ¸ì˜¤ê¸°
         DAMAGE_PIPELINE[] enumValues
             = (DAMAGE_PIPELINE[])Enum.GetValues(typeof(DAMAGE_PIPELINE));
 
-        // enum °ª¿¡ µû¸¥ ¼Ó¼º °¡Á®¿À±â
+        // enum ê°’ì— ë”°ë¥¸ ì†ì„± ê°€ì ¸ì˜¤ê¸°
         for (int i = 0; i < enumValues.Length - 1; ++i)
         {
-            // ÇöÀç enum °ª
+            // í˜„ì¬ enum ê°’
             DAMAGE_PIPELINE currentType = enumValues[i];
 
-            // Field Á¤º¸°¡ ÀÖ´ÂÁö È®ÀÎ
+            // Field ì •ë³´ê°€ ìˆëŠ”ì§€ í™•ì¸
             FieldInfo fieldInfo = currentType.GetType().GetField(currentType.ToString());
             if (null == fieldInfo)
             {
                 continue;
             }
 
-            // PipelineComponentAttribute °¡ ÀÖ´ÂÁö È®ÀÎ
+            // PipelineComponentAttribute ê°€ ìˆëŠ”ì§€ í™•ì¸
             PipelineAttribute attribute
                 = (PipelineAttribute)Attribute.GetCustomAttribute(
                         fieldInfo
@@ -56,18 +56,18 @@ public class DamagePipeline : MonoBehaviour
                 continue;
             }
 
-            // Å¸ÀÔÀÌ Á¤ÇØÁ® ÀÖ´ÂÁö È®ÀÎ
+            // íƒ€ì…ì´ ì •í•´ì ¸ ìˆëŠ”ì§€ í™•ì¸
             Type targetType = attribute.targetType;
             if (null == targetType)
             {
                 continue;
             }
 
-            // ±× Å¸ÀÔÀÇ ÄÄÆ÷³ÍÆ® °¡Á®¿À±â
-            // null ÀÌ¿©µµ ¾îÂ÷ÇÇ null ÀúÀåÇÏ¸é µÈ´Ù.
+            // ê·¸ íƒ€ì…ì˜ ì»´í¬ë„ŒíŠ¸ ê°€ì ¸ì˜¤ê¸°
+            // null ì´ì—¬ë„ ì–´ì°¨í”¼ null ì €ì¥í•˜ë©´ ëœë‹¤.
             Component component = GetComponent(targetType);
 
-            // IDamageable ÀÎÅÍÆäÀÌ½º·Î Ä³½ºÆÃ ÇØ¼­ ³Ö±â
+            // IDamageable ì¸í„°í˜ì´ìŠ¤ë¡œ ìºìŠ¤íŒ… í•´ì„œ ë„£ê¸°
             pipeline[(int)currentType] = component as IDamageable;
         }
     }

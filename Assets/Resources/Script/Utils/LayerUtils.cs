@@ -9,7 +9,7 @@ public static class LayerUtils
             return;
         }
 
-        // true¸¦ ÀÎÀÚ·Î ³Ñ±â¸é ºñÈ°¼ºÈ­µÈ ÀÚ½Ä ¿ÀºêÁ§Æ®±îÁö ¸ğµÎ Æ÷ÇÔÇØ¼­ °¡Á®¿É´Ï´Ù.
+        // trueë¥¼ ì¸ìë¡œ ë„˜ê¸°ë©´ ë¹„í™œì„±í™”ëœ ìì‹ ì˜¤ë¸Œì íŠ¸ê¹Œì§€ ëª¨ë‘ í¬í•¨í•´ì„œ ê°€ì ¸ì˜µë‹ˆë‹¤.
         Transform[] allChildren = _object.GetComponentsInChildren<Transform>(true);
 
         foreach (Transform child in allChildren)
