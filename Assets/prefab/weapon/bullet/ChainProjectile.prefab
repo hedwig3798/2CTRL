@@ -154,7 +154,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 06b0558659a69ac4d9ca9a1b62037cfb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::OneHitProjectile
-  baseDamage: 10
   blackBoardHandler: {fileID: 0}
 --- !u!114 &5392044630429327319
 MonoBehaviour:

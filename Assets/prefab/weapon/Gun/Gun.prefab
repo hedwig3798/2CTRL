@@ -52,11 +52,13 @@ MonoBehaviour:
   targetLayer:
     serializedVersion: 2
     m_Bits: 0
-  fireCount: 1
-  coolTime: 0.5
+  damage: 10
+  attackSpeed: 2
   range: 10
-  damageRate: 1
+  fireCount: 2
   speedRate: 1
   hitCount: 1
+  fireDelay: 0.5
+  spreadRange: 2
   chainCount: 0
   chainRange: 0

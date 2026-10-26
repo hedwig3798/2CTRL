@@ -12,6 +12,7 @@ using UnityEngine.Serialization;
 ///   - 예) "{0} 이(가) {1} 증가합니다", "{0} +{1:0.#}", "{0} {1:P0} 증가"
 ///   - 비어 있는 key / value 자리는 빈 문자열로 채운다
 /// - RewardManager 의 풀에 넣고 Get / GetAny 로 꺼내 쓴다
+/// - 골랐을 때 실제 동작은 effect(RewardEffect) 가 담당하며, RewardManager.ApplyReward 로 실행한다
 /// - 런타임에 Set / Clear 로 에셋을 바꾸면 에디터에서는 에셋에 그대로 남으므로,
 ///   런타임용 데이터는 ScriptableObject.CreateInstance&lt;RewardData&gt;() 로 만들어 쓴다
 /// </summary>
@@ -50,7 +51,31 @@ public class RewardData
     [SerializeField]
     private string explain2 = "+{1:0.##}";
 
+    [Tooltip("이 보상을 골랐을 때 실행할 효과 (비어 있으면 표시만 하고 아무것도 하지 않음)")]
+    [SerializeField]
+    private RewardEffect effect;
+
+    public bool HasEffect => null != effect;
+
+    /// <summary>
+    /// 보상 효과를 실행한다 (effect 가 없으면 아무것도 하지 않는다)
+    /// </summary>
+    public void Apply(RewardContext _context)
+    {
+        if (null == effect)
+        {
+            return;
+        }
+
+        effect.Apply(_context, this);
+    }
+
     #region Getter
+    public RewardEffect GetEffect()
+    {
+        return effect;
+    }
+
     public bool HasImage => null != image;
     public bool HasName => false == string.IsNullOrEmpty(rewardName);
     public bool HasKey => hasKey;

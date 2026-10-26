@@ -9,6 +9,7 @@ public enum DATA_TYPE
     // MovementInitData
     moveTarget,     // transform
     moveSpeedRate,  // float
+    moveTargetPoint,// vector (moveTarget 에 랜덤 보정을 더한 실제 이동 지점)
 
     // HealthInitData
     HPRate,         // float
@@ -40,6 +41,7 @@ public class BlackBoard
     private Dictionary<DATA_TYPE, float> floatDict = new Dictionary<DATA_TYPE, float>();
     private Dictionary<DATA_TYPE, Transform> transformDict = new Dictionary<DATA_TYPE, Transform>();
     private Dictionary<DATA_TYPE, int> intDict = new Dictionary<DATA_TYPE, int>();
+    private Dictionary<DATA_TYPE, Vector3> vectorDict = new Dictionary<DATA_TYPE, Vector3>();
     #endregion
 
     public DropManager dropManager;
@@ -49,6 +51,7 @@ public class BlackBoard
         floatDict.Clear();
         transformDict.Clear();
         intDict.Clear();
+        vectorDict.Clear();
     }
 
     #region Setter
@@ -65,6 +68,16 @@ public class BlackBoard
     public void SetInt(DATA_TYPE _type, int _val)
     {
         intDict[_type] = _val;
+    }
+
+    public void SetVector(DATA_TYPE _type, Vector3 _val)
+    {
+        vectorDict[_type] = _val;
+    }
+
+    public void RemoveVector(DATA_TYPE _type)
+    {
+        vectorDict.Remove(_type);
     }
     #endregion
 
@@ -95,6 +108,10 @@ public class BlackBoard
         }
 
         return intDict[_type];
+    }
+    public bool TryGetVector(DATA_TYPE _type, out Vector3 _val)
+    {
+        return vectorDict.TryGetValue(_type, out _val);
     }
     #endregion
 }

@@ -25,6 +25,37 @@ public class ArrowMovemnt
 
     private bool isLeft = true;
 
+    // 있으면 speed 를 플레이어 MoveSpeed 스텟으로 맞춘다
+    private PlayerStats stats;
+
+    private void Awake()
+    {
+        stats = GetComponentInParent<PlayerStats>();
+    }
+
+    private void OnEnable()
+    {
+        if (null != stats)
+        {
+            stats.OnStatChanged -= HandleStatChanged;
+            stats.OnStatChanged += HandleStatChanged;
+            HandleStatChanged(stats);
+        }
+    }
+
+    private void OnDisable()
+    {
+        if (null != stats)
+        {
+            stats.OnStatChanged -= HandleStatChanged;
+        }
+    }
+
+    private void HandleStatChanged(PlayerStats _stats)
+    {
+        speed = _stats.Get(ValueType.MoveSpeed);
+    }
+
     private void FlipSprite()
     {
         if (null == spriteRenderer)

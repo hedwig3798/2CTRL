@@ -44,6 +44,9 @@ public class Straight
 
         target = _data.GetTransform(DATA_TYPE.moveTarget);
 
+        // 무기가 랜덤 보정한 지점이 있으면 타겟 대신 그 지점을 향한다
+        bool hasPoint = _data.TryGetVector(DATA_TYPE.moveTargetPoint, out Vector3 point);
+
         float rate = _data.GetFloat(DATA_TYPE.moveSpeedRate);
         if (rate <= 0f)
         {
@@ -51,7 +54,7 @@ public class Straight
         }
         speed = baseSpeed * rate;
 
-        if (null == target)
+        if (null == target && false == hasPoint)
         {
             if (direction == Vector3.zero)
             {
@@ -60,7 +63,7 @@ public class Straight
             return;
         }
 
-        direction = target.position - transform.position;
+        direction = (true == hasPoint ? point : target.position) - transform.position;
         if (direction.sqrMagnitude < 0.0001f)
         {
             direction = Vector3.right;

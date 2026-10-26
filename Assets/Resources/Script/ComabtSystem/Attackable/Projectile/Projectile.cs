@@ -9,9 +9,6 @@ using UnityEngine.Pool;
 public abstract class Projectile
     : MonoBehaviour
 {
-    [Header("projectile damage")]
-    public float baseDamage;
-
     [Header("black board")]
     [Tooltip("Weapon 이 발사 시 공통 정보(시작 위치, 이동 대상, 속도, 배치)를 기록한다")]
     public BlackBoardHandler blackBoardHandler;
@@ -85,6 +82,7 @@ public abstract class Projectile
 
     /// <summary>
     /// 무기 스펙을 받아 발사한다
+    /// 데미지는 무기 스텟 + 플레이어 스텟 (Weapon.FinalDamage)
     /// 타겟이 없어 발사하지 못하면 false 를 반환하고, 무기가 즉시 풀로 반환한다
     /// 성공하면 BlackBoard 로 이동 컴포넌트를 초기화한다 (OnLaunch 에서 값을 덮어쓸 수 있다)
     /// </summary>
@@ -92,12 +90,7 @@ public abstract class Projectile
     {
         weapon = _weapon;
 
-        float rate = weapon.damageRate;
-        if (rate <= 0f)
-        {
-            rate = 1f;
-        }
-        damageMassage.damage = rate * baseDamage;
+        damageMassage.damage = weapon.FinalDamage;
         damageMassage.isReflected = false;
         damageMassage.attacker = null;
 
@@ -106,8 +99,36 @@ public abstract class Projectile
             return false;
         }
 
+        WriteMoveTargetPoint();
         InitializeBlackBoard();
         return true;
+    }
+
+    /// <summary>
+    /// 최종 이동 대상(moveTarget)을 중심으로 반지름 spreadRange 인 원 안에서 랜덤한 지점을 뽑아 moveTargetPoint 로 기록한다
+    /// OnLaunch 에서 moveTarget 이 확정된 뒤 호출된다. 이동 대상이 없으면 이전 발사의 지점을 지운다
+    /// </summary>
+    private void WriteMoveTargetPoint()
+    {
+        BlackBoard b = GetBlackBoard();
+        if (null == b)
+        {
+            return;
+        }
+
+        Transform target = b.GetTransform(DATA_TYPE.moveTarget);
+        if (null == target)
+        {
+            b.RemoveVector(DATA_TYPE.moveTargetPoint);
+            return;
+        }
+
+        Vector3 point = target.position;
+        if (weapon.spreadRange > 0f)
+        {
+            point += (Vector3)(Random.insideUnitCircle * weapon.spreadRange);
+        }
+        b.SetVector(DATA_TYPE.moveTargetPoint, point);
     }
 
     protected abstract bool OnLaunch();

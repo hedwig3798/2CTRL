@@ -16,7 +16,7 @@ public struct AuraTarget
 
 /// <summary>
 /// 발사 후 소멸하지 않고 닿은 적을 타격하는 발사체
-/// Enter 한 대상을 즉시 타격하고 기억했다가, 무기의 coolTime 마다 다시 타격한다
+/// Enter 한 대상을 즉시 타격하고 기억했다가, 무기의 FinalCoolTime 마다 다시 타격한다
 /// Exit 한 대상은 기억에서 제거한다
 /// 이동은 BlackBoard 로 초기화되는 이동 컴포넌트(Follow, OrbitMovement 등)가 담당한다
 /// </summary>
@@ -57,7 +57,7 @@ public class AuraProjectile
             }
 
             Hit(dp);
-            target.nextHitTime = Time.time + weapon.coolTime;
+            target.nextHitTime = Time.time + weapon.FinalCoolTime;
             targets[dp] = target;
         }
     }
@@ -92,7 +92,7 @@ public class AuraProjectile
 
         // 처음 들어온 대상은 즉시 타격
         Hit(dp);
-        target.nextHitTime = Time.time + weapon.coolTime;
+        target.nextHitTime = Time.time + weapon.FinalCoolTime;
         targets.Add(dp, target);
     }
 

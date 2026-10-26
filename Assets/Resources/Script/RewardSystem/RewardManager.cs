@@ -38,7 +38,37 @@ public class RewardManager
     [SerializeField]
     private List<PoolSlot> pools = new List<PoolSlot>();
 
+    [Tooltip("몬스터 보상을 적용할 스포너 (비어 있으면 씬에서 찾음)")]
+    [SerializeField]
+    private Spawner spawner;
+
     private Dictionary<RewardPoolType, RandomPool<RewardData>> poolMap;
+
+    /// <summary>
+    /// 보상을 적용한다 (보상이 비어 있거나 effect 가 없으면 무시)
+    /// </summary>
+    /// <param name="_side">플레이어 보상을 받을 쪽</param>
+    public void ApplyReward(RewardData _data, PlayerSide _side)
+    {
+        if (null == _data || false == _data.HasEffect)
+        {
+            return;
+        }
+
+        if (null == spawner)
+        {
+            spawner = FindFirstObjectByType<Spawner>();
+        }
+
+        RewardContext context = new RewardContext
+        {
+            Player = PlayerStats.Find(_side),
+            Spawner = spawner,
+        };
+
+        Debug.Log($"[RewardManager] 보상 적용 : {_data.name} → {_side} ({(null != context.Player ? context.Player.name : "플레이어 없음")})", this);
+        _data.Apply(context);
+    }
 
     /// <summary>
     /// type 에 해당하는 풀을 가져온다 (값 조절용)
@@ -216,18 +246,64 @@ public class RewardManager
         candidateSet.Clear();
         foreach (PoolSlot slot in pools)
         {
-            RandomPool<RewardData> pool = slot.pool;
-            for (int i = 0; i < pool.Count; ++i)
-            {
-                RewardData item = pool.GetItem(i);
-                if (null == item || pool.GetWeight(i) <= 0f || false == candidateSet.Add(item))
-                {
-                    continue;
-                }
-                candidates.Add(item);
-            }
+            AddCandidates(slot.pool);
         }
 
+        return PickCandidates(_count, _result);
+    }
+
+    /// <summary>
+    /// _types 의 풀에서만 가중치를 무시하고 균등 랜덤으로 중복 없이 최대 _count 개를 가져온다 (풀에서 빼지 않는다)
+    /// - null 항목, weight 가 0 인 항목은 제외하고, 같은 데이터는 한 번만 뽑힌다
+    /// - 후보가 _count 보다 적으면 후보 수만큼만 가져온다
+    /// </summary>
+    /// <param name="_types">후보를 모을 풀 목록</param>
+    /// <param name="_result">결과를 담을 리스트 (먼저 비운다)</param>
+    /// <returns>가져온 개수</returns>
+    public int GetRandomUnique(int _count, IReadOnlyList<RewardPoolType> _types, List<RewardData> _result)
+    {
+        _result.Clear();
+        if (_count <= 0 || null == _types)
+        {
+            return 0;
+        }
+
+        candidates.Clear();
+        candidateSet.Clear();
+        foreach (RewardPoolType type in _types)
+        {
+            AddCandidates(GetPool(type));
+        }
+
+        return PickCandidates(_count, _result);
+    }
+
+    /// <summary>
+    /// 풀의 유효한 항목을 중복 없이 후보에 추가한다
+    /// </summary>
+    private void AddCandidates(RandomPool<RewardData> _pool)
+    {
+        if (null == _pool)
+        {
+            return;
+        }
+
+        for (int i = 0; i < _pool.Count; ++i)
+        {
+            RewardData item = _pool.GetItem(i);
+            if (null == item || _pool.GetWeight(i) <= 0f || false == candidateSet.Add(item))
+            {
+                continue;
+            }
+            candidates.Add(item);
+        }
+    }
+
+    /// <summary>
+    /// 모아 둔 후보에서 최대 _count 개를 균등 랜덤으로 골라 _result 에 담고 후보를 비운다
+    /// </summary>
+    private int PickCandidates(int _count, List<RewardData> _result)
+    {
         // 부분 Fisher-Yates 셔플로 앞에서부터 count 개를 고른다
         int count = Mathf.Min(_count, candidates.Count);
         for (int i = 0; i < count; ++i)

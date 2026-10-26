@@ -103,7 +103,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 06b0558659a69ac4d9ca9a1b62037cfb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Projectile
-  baseDamage: 10
   blackBoardHandler: {fileID: 825000503613356245}
   hitCount: 1
 --- !u!114 &825000503613356245

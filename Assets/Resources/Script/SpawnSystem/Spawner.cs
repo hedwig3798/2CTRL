@@ -4,6 +4,21 @@ using UnityEngine;
 using UnityEngine.Pool;
 
 /// <summary>
+/// 몬스터 보정 종류 (레벨업 보상으로 Spawner 의 비율을 바꿀 때 사용)
+/// - HP / 데미지 / 속도 비율은 스폰될 때 BlackBoard 로 전달하므로, 보상으로 바뀐 비율은 이후 스폰되는 몬스터부터 적용된다
+/// </summary>
+public enum SpawnModifierType
+{
+    /// <summary>
+    /// 개체수 비율 (스폰 간격 = spawnInterval / 비율)
+    /// </summary>
+    Count,
+    HP,
+    Damage,
+    Speed,
+}
+
+/// <summary>
 /// spawable ��ü�� �����ϴ� ������
 /// </summary>
 public class Spawner
@@ -23,12 +38,68 @@ public class Spawner
     private Dictionary<Spawnable, IObjectPool<Spawnable>> poolDict
         = new Dictionary<Spawnable, IObjectPool<Spawnable>>();
 
-    // 
+    //
     [Header("Spawn Data")]
     public Transform target;
+    [Tooltip("기본 이동 속도 비율 (보상으로 보정됨)")]
     public float speedRate;
+    [Tooltip("기본 HP 비율 (보상으로 보정됨)")]
     public float HPRate;
+    [Tooltip("기본 데미지 비율 (보상으로 보정됨)")]
     public float damagerate;
+
+    private static readonly int ModifierCount = System.Enum.GetValues(typeof(SpawnModifierType)).Length;
+
+    // 보상으로 누적된 보정값. 최종값 = (base + ΣAdd) × (1 + ΣMultiply)
+    private readonly float[] addRates = new float[ModifierCount];
+    private readonly float[] mulRates = new float[ModifierCount];
+
+    // 개체수 비율이 이 값보다 작아지지 않게 한다 (스폰 간격이 무한히 길어지지 않도록)
+    private const float MinCountRate = 0.1f;
+
+    /// <summary>
+    /// 보상으로 몬스터 비율을 보정한다
+    /// </summary>
+    public void AddRate(SpawnModifierType _type, StatModifierMode _mode, float _value)
+    {
+        int i = (int)_type;
+        switch (_mode)
+        {
+            case StatModifierMode.Add:
+                addRates[i] += _value;
+                break;
+            case StatModifierMode.Multiply:
+                mulRates[i] += _value;
+                break;
+        }
+
+        Debug.Log($"[Spawner] {_type} {_mode} {_value:+0.##;-0.##} → {GetRate(_type):0.##}", this);
+    }
+
+    /// <summary>
+    /// 보정이 적용된 최종 비율 (Count 의 base 는 1)
+    /// </summary>
+    public float GetRate(SpawnModifierType _type)
+    {
+        int i = (int)_type;
+        float rate = (GetBaseRate(_type) + addRates[i]) * (1f + mulRates[i]);
+        return SpawnModifierType.Count == _type ? Mathf.Max(MinCountRate, rate) : Mathf.Max(0f, rate);
+    }
+
+    private float GetBaseRate(SpawnModifierType _type)
+    {
+        switch (_type)
+        {
+            case SpawnModifierType.HP:
+                return HPRate;
+            case SpawnModifierType.Damage:
+                return damagerate;
+            case SpawnModifierType.Speed:
+                return speedRate;
+            default:
+                return 1f;
+        }
+    }
 
     private void Awake()
     {
@@ -127,9 +198,18 @@ public class Spawner
         }
 
         Transform origin = null != spawnLocation ? spawnLocation : transform;
-        WaitForSeconds flag = new WaitForSeconds(Mathf.Max(0.01f, _data.spawnInterval));
+        float interval = -1f;
+        WaitForSeconds flag = null;
         while (true)
         {
+            // 개체수 보상으로 비율이 바뀌었을 때만 대기 시간을 다시 만든다
+            float newInterval = Mathf.Max(0.01f, _data.spawnInterval / GetRate(SpawnModifierType.Count));
+            if (false == Mathf.Approximately(interval, newInterval))
+            {
+                interval = newInterval;
+                flag = new WaitForSeconds(interval);
+            }
+
             Spawnable sa = poolDict[_data.spawnObject].Get();
             if (null == sa)
             {
@@ -169,9 +249,9 @@ public class Spawner
             }
 
             data.dropManager = dropManager;
-            data.SetFloat(DATA_TYPE.HPRate, HPRate);
-            data.SetFloat(DATA_TYPE.moveSpeedRate, speedRate);
-            data.SetFloat(DATA_TYPE.damageRate, damagerate);
+            data.SetFloat(DATA_TYPE.HPRate, GetRate(SpawnModifierType.HP));
+            data.SetFloat(DATA_TYPE.moveSpeedRate, GetRate(SpawnModifierType.Speed));
+            data.SetFloat(DATA_TYPE.damageRate, GetRate(SpawnModifierType.Damage));
             data.SetTransform(DATA_TYPE.moveTarget, target);
             sa.blackBoardHandler.Initialize();
 

@@ -202,5 +202,4 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: fa2bc92c98d7f3e48a77c4f1fec256b0, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::AuraProjectile
-  baseDamage: 10
   blackBoardHandler: {fileID: 0}

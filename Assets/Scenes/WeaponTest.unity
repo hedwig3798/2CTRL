@@ -134,7 +134,7 @@ PrefabInstance:
       objectReference: {fileID: 1848389353}
     - target: {fileID: 2378375243013374915, guid: 39fe69f364a4c884d8f406603e80ffc3,
         type: 3}
-      propertyPath: coolTime
+      propertyPath: attackSpeed
       value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 2378375243013374915, guid: 39fe69f364a4c884d8f406603e80ffc3,

@@ -45,7 +45,7 @@ public class OneHitProjectile
             return false;
         }
 
-        Transform target = FindNearest(weapon.transform.position, weapon.range);
+        Transform target = FindNearest(weapon.transform.position, weapon.FinalRange);
         if (null == target)
         {
             return false;

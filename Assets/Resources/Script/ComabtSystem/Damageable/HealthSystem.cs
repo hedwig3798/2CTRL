@@ -37,6 +37,9 @@ public class HealthSystem
     // 사망 시 꺼서 추가 피격/접촉/타깃 탐색을 막는다
     private Collider2D[] colliders;
 
+    // 플레이어면 최대 HP 를 플레이어 HP 스텟으로 맞춘다 (적은 null)
+    private PlayerStats playerStats;
+
     public float CurrHP
     {
         get => currHP;
@@ -163,10 +166,45 @@ public class HealthSystem
         {
             baseMaxHP = MaxHP;
         }
+
+        playerStats = GetComponentInParent<PlayerStats>();
+    }
+
+    private void OnEnable()
+    {
+        if (null != playerStats)
+        {
+            playerStats.OnStatChanged -= HandlePlayerStatChanged;
+            playerStats.OnStatChanged += HandlePlayerStatChanged;
+        }
+    }
+
+    /// <summary>
+    /// 최대 HP 를 플레이어 HP 스텟으로 맞춘다
+    /// 최대치가 늘면 늘어난 만큼 현재 HP 도 채우고, 줄면 현재 HP 를 최대치로 자른다 (살아 있으면 최소 1)
+    /// </summary>
+    private void HandlePlayerStatChanged(PlayerStats _stats)
+    {
+        float newMax = Mathf.Max(1f, _stats.Get(ValueType.HP));
+        float delta = newMax - MaxHP;
+        MaxHP = newMax;
+
+        if (true == isDead)
+        {
+            return;
+        }
+
+        float newCurr = (delta > 0f) ? CurrHP + delta : Mathf.Min(CurrHP, MaxHP);
+        CurrHP = Mathf.Max(1f, newCurr);
     }
 
     private void OnDisable()
     {
+        if (null != playerStats)
+        {
+            playerStats.OnStatChanged -= HandlePlayerStatChanged;
+        }
+
         if (null != boundDropManager)
         {
             OnDeath -= boundDropManager.DropItem;
