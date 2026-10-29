@@ -10,3 +10,18 @@
 - 파생: `OneHitProjectile`(+Initializable), `AuraProjectile`(+struct AuraTarget), Weapons/ 아래: Drone, Explosive(+Init), LaserBeam(+Init), Mine, PoisonZone(+PoisonZoneLandMovement), Shockwave, SplitShot, Sweep(+SweepMovement).
 - `TargetFinder`(static): 타겟 탐색. `ContactDamage`(+Initializable): 접촉 데미지.
 의존: BlackBoard, MoveSystem, SpawnSystem(풀), StatSystem.
+
+## 몬스터 시스템 연동 변경 (2026-10-29)
+
+기록은 몬스터 연동 변경분만 있음. 나머지는 필요 시 코드 확인.
+
+### HealthSystem (`ComabtSystem/Damageable/HealthSystem.cs`)
+- 기존: OnDeath(GameObject), OnDamaged(float), isInvincibility, Initialize(BlackBoard)(HPRate 반영).
+- 추가(몬스터 키워드용):
+  - `Func<bool> DeathInterceptor`: HP<=0 시 OnDeath 전에 호출(단일 소유자, MonsterBrain). true면 OnDeath 없이 다운(`isDead=true`, `IsDowned=true`, 콜라이더 꺼짐).
+  - `bool IsDowned`.
+  - `Kill()`: 이미 죽었으면 무시, CurrHP=0 후 Die() (인터셉터 거침). 자폭 등.
+  - `Revive(float hpRatio)`: 다운 상태에서만 동작. 콜라이더 복구, HP = max(1, MaxHP*ratio).
+  - private `Die()`: isDead, 콜라이더 끄기, 인터셉터 -> 다운 또는 OnDeath.
+  - Initialize에서 isDowned 리셋.
+- 사용처: [monster.md](monster.md)

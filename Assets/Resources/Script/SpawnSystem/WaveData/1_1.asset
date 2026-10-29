@@ -14,9 +14,16 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::WaveData
   waveID: 
   spwanArray:
-  - spawnObject: {fileID: 4410402836052769883, guid: 247c2e464fbb99747a7b166f93aa3225,
-      type: 3}
+  - spawnObject: {fileID: 4410402836052769883, guid: 247c2e464fbb99747a7b166f93aa3225, type: 3}
     count: {x: 3, y: 3}
     spawnRange: {x: 3, y: 4}
     spawnInterval: 1
+  - spawnObject: {fileID: 4629255957395271076, guid: e635f0312efdac5489a07079d8c53b88, type: 3}
+    count: {x: 1, y: 1}
+    spawnRange: {x: 3, y: 4}
+    spawnInterval: 3
+  - spawnObject: {fileID: 2835197232059612484, guid: 906f69b250e20514dbb6d9609fd1c23c, type: 3}
+    count: {x: 1, y: 1}
+    spawnRange: {x: 3, y: 4}
+    spawnInterval: 6
   time: 100

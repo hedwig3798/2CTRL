@@ -1,0 +1,20 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 52471296c587e8c4e87cbe0dbfdf538a, type: 3}
+  m_Name: HazardTrail
+  m_EditorClassIdentifier: Game.Runtime::HazardTrailKeyword
+  zonePrefab: {fileID: 8463673409290315225, guid: f42461c79e0e77b4e816775480c58021, type: 3}
+  interval: 1.2
+  radius: 0.6
+  duration: 2.5
+  tickInterval: 0.5
+  damagePerTick: 1

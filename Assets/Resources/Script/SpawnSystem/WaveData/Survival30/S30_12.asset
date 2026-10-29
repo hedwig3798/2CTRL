@@ -1,0 +1,41 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d5011a402fc056d4eb7d1be5b77adb1a, type: 3}
+  m_Name: S30_12
+  m_EditorClassIdentifier: Game.Runtime::WaveData
+  waveID: S30_12
+  spwanArray:
+  - spawnObject: {fileID: 4410402836052769883, guid: 247c2e464fbb99747a7b166f93aa3225, type: 3}
+    count: {x: 1, y: 1}
+    spawnRange: {x: 3, y: 4}
+    spawnInterval: 0.4
+  - spawnObject: {fileID: 2835197232059612484, guid: 906f69b250e20514dbb6d9609fd1c23c, type: 3}
+    count: {x: 1, y: 1}
+    spawnRange: {x: 3, y: 4}
+    spawnInterval: 1.4
+  - spawnObject: {fileID: 4769532583840605374, guid: db64fa7843849d84fa6f328017459dd4, type: 3}
+    count: {x: 1, y: 1}
+    spawnRange: {x: 3, y: 4}
+    spawnInterval: 2.5
+  - spawnObject: {fileID: 6208623570440085606, guid: fdc4e7adeb2fb984aa20c977340b7d5c, type: 3}
+    count: {x: 1, y: 1}
+    spawnRange: {x: 3, y: 4}
+    spawnInterval: 2.5
+  - spawnObject: {fileID: 355824763167936439, guid: ea93310d0ef3ed04d81bc335cfbd7cd2, type: 3}
+    count: {x: 1, y: 1}
+    spawnRange: {x: 3, y: 4}
+    spawnInterval: 6
+  - spawnObject: {fileID: 8535382768754201989, guid: f298ed742d0b26e4c98a157a2a3128b8, type: 3}
+    count: {x: 1, y: 1}
+    spawnRange: {x: 3, y: 4}
+    spawnInterval: 10
+  time: 150

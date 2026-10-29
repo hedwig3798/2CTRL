@@ -53,6 +53,9 @@ public class BlackBoard
 
     public DropManager dropManager;
 
+    // 소환/분열처럼 런타임에 몬스터를 추가로 스폰할 때 쓴다
+    public Spawner spawner;
+
     public void ClearBoard()
     {
         floatDict.Clear();

@@ -28,6 +28,16 @@ public class HealthSystem
     /// </summary>
     public Action<float> OnDamaged;
 
+    /// <summary>
+    /// HP 가 0 이 됐을 때 OnDeath 전에 호출 (단일 소유자)
+    /// true 를 돌려주면 OnDeath 를 부르지 않고 다운 상태(isDead = true, IsDowned = true)가 된다. Revive 로 되살린다
+    /// </summary>
+    public Func<bool> DeathInterceptor;
+
+    private bool isDowned;
+
+    public bool IsDowned => isDowned;
+
     [SerializeField]
     private bool isInvincibility = false;
 
@@ -120,15 +130,67 @@ public class HealthSystem
 
         if (CurrHP <= 0)
         {
-            isDead = true;
-            SetCollidersEnabled(false);
-            OnDeath?.Invoke(gameObject);
+            Die();
         }
+    }
+
+    /// <summary>
+    /// 데미지와 상관없이 즉시 사망시킨다 (자폭 등)
+    /// </summary>
+    public void Kill()
+    {
+        if (true == isDead)
+        {
+            return;
+        }
+
+        CurrHP = 0;
+        Die();
+    }
+
+    /// <summary>
+    /// 다운 상태에서 되살린다. 최대 HP 의 _hpRatio 만큼 채운다
+    /// </summary>
+    public void Revive(float _hpRatio)
+    {
+        if (false == isDowned)
+        {
+            return;
+        }
+
+        isDowned = false;
+        isDead = false;
+        SetCollidersEnabled(true);
+        CurrHP = Mathf.Max(1f, MaxHP * Mathf.Clamp01(_hpRatio));
+    }
+
+    private void Die()
+    {
+        isDead = true;
+        SetCollidersEnabled(false);
+
+        // 가로챘으면 OnDeath(드롭/디졸브) 없이 다운 상태로 남는다
+        // 인터셉터 안에서 상태가 바뀔 때 IsDowned 가 맞게 보이도록 먼저 세운다
+        isDowned = true;
+        if (null != DeathInterceptor && true == DeathInterceptor())
+        {
+            return;
+        }
+
+        isDowned = false;
+
+        // 인터셉터 안에서 되살아났으면 사망 처리하지 않는다
+        if (false == isDead)
+        {
+            return;
+        }
+        OnDeath?.Invoke(gameObject);
     }
 
     public void Initialize(BlackBoard _data)
     {
         isDead = false;
+        isDowned = false;
         SetCollidersEnabled(true);
 
         float rate = 1f;

@@ -1,0 +1,22 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: efae9fcf187bd2e4492f43a92e08bc4f, type: 3}
+  m_Name: Summoner
+  m_EditorClassIdentifier: Game.Runtime::SummonerKeyword
+  minionPrefab: {fileID: 4629255957395271076, guid: e635f0312efdac5489a07079d8c53b88, type: 3}
+  count: 2
+  maxAlive: 4
+  spawnRadius: 1.2
+  telegraphTime: 0.8
+  cooldown: 6
+  keepDistance: 4
+  keepDistanceTolerance: 0.5

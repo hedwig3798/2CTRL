@@ -122,22 +122,79 @@ public class Spawner
                     continue;
                 }
 
-                if (false == poolDict.ContainsKey(sd.spawnObject))
-                {
-                    Spawnable prefab = sd.spawnObject;
-                    poolDict[prefab] = new ObjectPool<Spawnable>
-                        (
-                            createFunc: () => CreateObject(prefab)
-                            , OnSpawn
-                            , OnRelease
-                            , OnDespawn
-                            , true
-                            , 100
-                            , 200
-                        );
-                }
+                GetPool(sd.spawnObject);
             }
         }
+    }
+
+    /// <summary>
+    /// 프리팹의 풀. 없으면 새로 만든다 (웨이브에 없는 소환/분열 몬스터용)
+    /// </summary>
+    private IObjectPool<Spawnable> GetPool(Spawnable _prefab)
+    {
+        if (true == poolDict.TryGetValue(_prefab, out IObjectPool<Spawnable> pool))
+        {
+            return pool;
+        }
+
+        pool = new ObjectPool<Spawnable>
+            (
+                createFunc: () => CreateObject(_prefab)
+                , OnSpawn
+                , OnRelease
+                , OnDespawn
+                , true
+                , 100
+                , 200
+            );
+        poolDict[_prefab] = pool;
+        return pool;
+    }
+
+    /// <summary>
+    /// 지정한 위치에 몬스터를 스폰하고 현재 보정값으로 초기화한다
+    /// 실패하면 null
+    /// </summary>
+    public Spawnable SpawnAt(Spawnable _prefab, Vector2 _position)
+    {
+        if (null == _prefab)
+        {
+            return null;
+        }
+
+        IObjectPool<Spawnable> pool = GetPool(_prefab);
+        Spawnable sa = pool.Get();
+        if (null == sa)
+        {
+            return null;
+        }
+
+        sa.transform.position = _position;
+
+        if (null == sa.blackBoardHandler)
+        {
+            Debug.LogError("it has no BlackBoardHandler");
+            pool.Release(sa);
+            return null;
+        }
+
+        BlackBoard data = sa.blackBoardHandler.GetBlackBoard();
+        if (null == data)
+        {
+            Debug.LogError("BlackBoardHandler has no data");
+            pool.Release(sa);
+            return null;
+        }
+
+        data.dropManager = dropManager;
+        data.spawner = this;
+        data.SetFloat(DATA_TYPE.HPRate, GetRate(SpawnModifierType.HP));
+        data.SetFloat(DATA_TYPE.moveSpeedRate, GetRate(SpawnModifierType.Speed));
+        data.SetFloat(DATA_TYPE.damageRate, GetRate(SpawnModifierType.Damage));
+        data.SetTransform(DATA_TYPE.moveTarget, target);
+        sa.blackBoardHandler.Initialize();
+
+        return sa;
     }
 
     private void Start()
@@ -154,7 +211,7 @@ public class Spawner
     private Spawnable CreateObject(Spawnable _sa)
     {
         Spawnable sa = Instantiate(_sa);
-        sa.SetPool(poolDict[_sa]);
+        sa.SetPool(GetPool(_sa));
 
         Transform[] transforms = sa.gameObject.GetComponentsInChildren<Transform>(true);
         foreach (Transform t in transforms)
@@ -192,7 +249,7 @@ public class Spawner
 
     IEnumerator Spawn(SpawnData _data)
     {
-        if (null == _data.spawnObject || false == poolDict.ContainsKey(_data.spawnObject))
+        if (null == _data.spawnObject)
         {
             yield break;
         }
@@ -210,15 +267,6 @@ public class Spawner
                 flag = new WaitForSeconds(interval);
             }
 
-            Spawnable sa = poolDict[_data.spawnObject].Get();
-            if (null == sa)
-            {
-                yield return flag;
-                continue;
-            }
-
-            GameObject go = sa.gameObject;
-
             float dis = Random.Range(_data.spawnRange.x, _data.spawnRange.y);
             Vector2 dir = Random.insideUnitCircle.normalized;
             if (dir.sqrMagnitude < 0.0001f)
@@ -229,31 +277,7 @@ public class Spawner
             Vector2 spawnPos = origin.position;
             spawnPos += dir * dis;
 
-            go.transform.position = spawnPos;
-
-            if (null == sa.blackBoardHandler)
-            {
-                Debug.LogError("it has no BlackBoardHandler");
-                poolDict[_data.spawnObject].Release(sa);
-                yield return flag;
-                continue;
-            }
-
-            BlackBoard data = sa.blackBoardHandler.GetBlackBoard();
-            if (null == data)
-            {
-                Debug.LogError("BlackBoardHandler has no data");
-                poolDict[_data.spawnObject].Release(sa);
-                yield return flag;
-                continue;
-            }
-
-            data.dropManager = dropManager;
-            data.SetFloat(DATA_TYPE.HPRate, GetRate(SpawnModifierType.HP));
-            data.SetFloat(DATA_TYPE.moveSpeedRate, GetRate(SpawnModifierType.Speed));
-            data.SetFloat(DATA_TYPE.damageRate, GetRate(SpawnModifierType.Damage));
-            data.SetTransform(DATA_TYPE.moveTarget, target);
-            sa.blackBoardHandler.Initialize();
+            SpawnAt(_data.spawnObject, spawnPos);
 
             yield return flag;
         }
