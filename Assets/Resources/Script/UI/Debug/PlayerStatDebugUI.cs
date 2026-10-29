@@ -1,11 +1,11 @@
-#if UNITY_EDITOR || DEVELOPMENT_BUILD
+#if UNITY_EDITOR || DEBUG
 using System.Collections.Generic;
 using System.Text;
 using UnityEngine;
 
 /// <summary>
 /// 디버그 전용 : 각 플레이어의 스텟 / 무기 최종 수치와 몬스터 비율을 화면에 표시한다
-/// - 에디터 / Development Build 에서만 컴파일되며, 씬 로드 시 자동으로 생성되므로 씬에 배치할 필요가 없다
+/// - 에디터 / 디버그(DEBUG) 빌드에서만 컴파일되며, 씬 로드 시 자동으로 생성되므로 씬에 배치할 필요가 없다
 /// - toggleKey(기본 F1) 로 켜고 끈다
 /// - IMGUI(OnGUI) 로 그리므로 Canvas 가 필요 없고, 게임이 일시정지되어도 갱신된다
 /// - 표시 형식 : 스텟 = 최종값 (base + ΣAdd) × (1 + ΣMul), 무기 = 최종값 (무기 + 플레이어)
@@ -43,7 +43,7 @@ public class PlayerStatDebugUI
     [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.AfterSceneLoad)]
     private static void CreateInstance()
     {
-        if (null != FindFirstObjectByType<PlayerStatDebugUI>())
+        if (null != FindAnyObjectByType<PlayerStatDebugUI>())
         {
             return;
         }
@@ -116,7 +116,7 @@ public class PlayerStatDebugUI
 
         if (null == spawner)
         {
-            spawner = FindFirstObjectByType<Spawner>();
+            spawner = FindAnyObjectByType<Spawner>();
         }
     }
 

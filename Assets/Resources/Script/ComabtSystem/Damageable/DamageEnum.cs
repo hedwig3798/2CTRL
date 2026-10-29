@@ -26,6 +26,7 @@ public enum DAMAGE_PIPELINE
     [Pipeline(typeof(HealthSystem))]
     HEALTH,         // 체력 처리
 
+    [Pipeline(typeof(Knockback))]
     KNOCKBACK,      // 넉백 처리
 
     PAYBACK,        // 데미지 페이백 처리

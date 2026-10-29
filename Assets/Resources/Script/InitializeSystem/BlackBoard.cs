@@ -5,6 +5,7 @@ public enum DATA_TYPE
 {
     // position
     startPosition,
+    startPoint,     // vector (startPosition 대신 쓰는 시작 지점. Projectile.LaunchAt 이 기록)
 
     // MovementInitData
     moveTarget,     // transform
@@ -33,6 +34,12 @@ public enum DATA_TYPE
 
     // Hit
     hitCount,       // int
+
+    // Lifetime
+    lifetime,       // float (0 이하는 컴포넌트 기본값)
+
+    // Area
+    areaRadius,     // float
 }
 
 public class BlackBoard
@@ -112,6 +119,27 @@ public class BlackBoard
     public bool TryGetVector(DATA_TYPE _type, out Vector3 _val)
     {
         return vectorDict.TryGetValue(_type, out _val);
+    }
+
+    /// <summary>
+    /// 시작 지점. startPoint(vector) 가 있으면 그 값, 없으면 startPosition(transform) 의 위치
+    /// 둘 다 없으면 false
+    /// </summary>
+    public bool TryGetStartPoint(out Vector3 _val)
+    {
+        if (true == vectorDict.TryGetValue(DATA_TYPE.startPoint, out _val))
+        {
+            return true;
+        }
+
+        Transform t = GetTransform(DATA_TYPE.startPosition);
+        if (null == t)
+        {
+            return false;
+        }
+
+        _val = t.position;
+        return true;
     }
     #endregion
 }

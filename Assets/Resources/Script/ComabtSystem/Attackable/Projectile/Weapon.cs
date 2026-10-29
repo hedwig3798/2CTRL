@@ -60,6 +60,12 @@ public class Weapon
     [Tooltip("방향성 공격의 랜덤 보정 범위. 타겟을 중심으로 반지름 spreadRange 인 원 안의 랜덤한 지점을 향해 산탄처럼 나간다. 0 이면 타겟 정중앙. Straight 가 사용")]
     [Min(0f)]
     public float spreadRange;
+    [Tooltip("발사체 수명 (초). 0 이면 발사체의 Lifetime 기본값. Lifetime 컴포넌트가 사용")]
+    [Min(0f)]
+    public float lifetime;
+    [Tooltip("타격한 적을 밀어내는 힘 (밀려나는 초기 속도). 0 이면 넉백 없음. Knockback 컴포넌트가 사용")]
+    [Min(0f)]
+    public float knockbackForce;
 
     [Header("chain spec")]
     [Tooltip("전이 횟수 (총 방문 수 = 1 + chainCount). ChainMovement 가 사용")]
@@ -67,10 +73,18 @@ public class Weapon
     [Tooltip("이전 타겟 기준 다음 타겟 탐색 범위. ChainMovement 가 사용")]
     public float chainRange;
 
+    [Header("area spec")]
+    [Tooltip("범위 공격(폭발, 장판, 충격파 등)의 반지름. Projectile.ApplyAreaDamage / ScaleOverLifetime 등이 사용")]
+    [Min(0f)]
+    public float areaRadius;
+
     // 플레이어 스텟이 줄어도 공격이 완전히 멈추지 않도록 하는 최소 공격 속도
     private const float MinAttackSpeed = 0.1f;
 
     private IObjectPool<Projectile> projectilePool;
+
+    // FireSub 로 발사하는 보조 발사체 풀 (프리팹별로 처음 쓸 때 만든다)
+    private Dictionary<Projectile, IObjectPool<Projectile>> subPools = new Dictionary<Projectile, IObjectPool<Projectile>>();
 
     private float timer = 0;
 
@@ -149,6 +163,8 @@ public class Weapon
     /// <summary>
     /// 무기 스텟에 더할 주인 스텟을 지정한다 (Awake 에서 부모의 PlayerStats 를 자동으로 찾는다)
     /// </summary>
+    public PlayerStats OwnerStats => ownerStats;
+
     public void SetOwnerStats(PlayerStats _stats)
     {
         ownerStats = _stats;
@@ -226,9 +242,15 @@ public class Weapon
     {
         ownerStats = GetComponentInParent<PlayerStats>();
 
-        projectilePool = new ObjectPool<Projectile>
+        projectilePool = CreatePool(projectile);
+    }
+
+    private IObjectPool<Projectile> CreatePool(Projectile _prefab)
+    {
+        IObjectPool<Projectile> pool = null;
+        pool = new ObjectPool<Projectile>
             (
-                createFunc: () => CreateObject(projectile)
+                createFunc: () => CreateObject(_prefab, pool)
                 , OnSpawn
                 , OnRelease
                 , OnDespawn
@@ -236,6 +258,41 @@ public class Weapon
                 , 100
                 , 200
             );
+        return pool;
+    }
+
+    /// <summary>
+    /// 보조 발사체(분열탄 조각 등)를 _start 에서 _point 를 향해 발사한다
+    /// 타겟 탐색 없이 위치만으로 발사하며 (Projectile.LaunchAt), 이 무기의 스텟과 BlackBoard 정보를 그대로 쓴다
+    /// 데미지는 FinalDamage * _damageRate. 프리팹별로 따로 풀을 만들어 쓴다. 발사하지 못하면 null
+    /// </summary>
+    public Projectile FireSub(Projectile _prefab, Vector3 _start, Vector3 _point, float _damageRate = 1f, int _index = 0, int _count = 1)
+    {
+        if (null == _prefab)
+        {
+            return null;
+        }
+
+        if (false == subPools.TryGetValue(_prefab, out IObjectPool<Projectile> pool))
+        {
+            pool = CreatePool(_prefab);
+            subPools.Add(_prefab, pool);
+        }
+
+        Projectile p = pool.Get();
+        if (null == p)
+        {
+            return null;
+        }
+
+        p.SetFormation(_index, _count);
+        WriteBlackBoard(p, _index, _count);
+        if (false == p.LaunchAt(this, _start, _point, _damageRate))
+        {
+            pool.Release(p);
+            return null;
+        }
+        return p;
     }
 
     private void Update()
@@ -347,6 +404,7 @@ public class Weapon
         }
 
         b.SetTransform(DATA_TYPE.startPosition, transform);
+        b.RemoveVector(DATA_TYPE.startPoint);
         b.SetTransform(DATA_TYPE.moveTarget, null != owner ? owner : transform);
         b.SetFloat(DATA_TYPE.moveSpeedRate, speedRate);
         b.SetFloat(DATA_TYPE.formationIndex, _index);
@@ -355,12 +413,14 @@ public class Weapon
         b.SetInt(DATA_TYPE.hitCount, hitCount);
         b.SetInt(DATA_TYPE.chainCount, chainCount);
         b.SetFloat(DATA_TYPE.chainRange, chainRange);
+        b.SetFloat(DATA_TYPE.lifetime, lifetime);
+        b.SetFloat(DATA_TYPE.areaRadius, areaRadius);
     }
 
-    private Projectile CreateObject(Projectile _projectile)
+    private Projectile CreateObject(Projectile _projectile, IObjectPool<Projectile> _pool)
     {
         Projectile created = Instantiate(_projectile);
-        created.SetPool(projectilePool);
+        created.SetPool(_pool);
         Transform[] transforms = created.gameObject.GetComponentsInChildren<Transform>(true);
         foreach (Transform t in transforms)
         {

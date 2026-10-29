@@ -52,7 +52,7 @@ public class EventManager
         {
             if (null == instance)
             {
-                instance = FindFirstObjectByType<EventManager>();
+                instance = FindAnyObjectByType<EventManager>();
             }
             // 게임 종료 중에는 새로 만들지 않음
             if (null == instance && false == isQuitting)

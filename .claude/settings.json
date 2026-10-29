@@ -1,0 +1,18 @@
+{
+  "permissions": {
+    "deny": [
+      "Read(./Library/**)",
+      "Read(./Temp/**)",
+      "Read(./Obj/**)",
+      "Read(./obj/**)",
+      "Read(./Logs/**)",
+      "Read(./Build/**)",
+      "Read(./Builds/**)",
+      "Read(./UserSettings/**)",
+      "Read(./**/*.meta)",
+      "Read(./Assets/Fonts/**)",
+      "Read(./Assets/_Recovery/**)",
+      "Read(./dumps/**)"
+    ]
+  }
+}

@@ -47,7 +47,25 @@ MonoBehaviour:
   pools:
   - type: 0
     pool:
-      entries: []
+      entries:
+      - item: {fileID: 11400000, guid: 9781b20388e34e228670bc9d81502e06, type: 2}
+        weight: 1
+      - item: {fileID: 11400000, guid: 6d2c5941a6974932a238ef8f1fc6c42d, type: 2}
+        weight: 1
+      - item: {fileID: 11400000, guid: 74e8f0db705e48ceae90d6b430d63585, type: 2}
+        weight: 1
+      - item: {fileID: 11400000, guid: b5fa0b879bc746b4ab8abaf6260f5dd2, type: 2}
+        weight: 1
+      - item: {fileID: 11400000, guid: 849f46d9d1d244e6a959674018e0215a, type: 2}
+        weight: 1
+      - item: {fileID: 11400000, guid: 9f931794e3b34900a4fc20d49d487184, type: 2}
+        weight: 1
+      - item: {fileID: 11400000, guid: 543d8378eaf843dc8a586b7de8f34c82, type: 2}
+        weight: 1
+      - item: {fileID: 11400000, guid: 4d15f3ea9028493484e99cb28d7332dc, type: 2}
+        weight: 1
+      - item: {fileID: 11400000, guid: 47511eda51fc404cb884cb5222a3d585, type: 2}
+        weight: 1
   - type: 1
     pool:
       entries: []

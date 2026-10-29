@@ -6,6 +6,7 @@ using UnityEngine.UI;
 /// - EventManager.OnLevelUp 을 구독하므로, 항상 활성 상태인 Canvas 루트에 붙이고 자식 전체를 On/Off 한다.
 /// - 한 번에 여러 레벨이 오르면 오른 레벨 수만큼 버튼을 눌러야 재개된다.
 /// - 자식 SelectPanelGroup 에서 선택지를 고르기 전에는 재개 버튼이 비활성화된다.
+/// - grantStartReward 가 켜져 있으면 게임 시작 시(Start) 한 번, Weapon 풀에서만 뽑은 보상을 바로 띄운다 (디버프 없음).
 /// </summary>
 public class LevelUpUI
     : MonoBehaviour
@@ -14,8 +15,15 @@ public class LevelUpUI
     [SerializeField]
     private Button resumeButton;
 
+    [Tooltip("게임 시작 시 한 번, 신규 무기 풀에서만 뽑은 레벨업 보상을 바로 받을지 여부")]
+    [SerializeField]
+    private bool grantStartReward = true;
+
     // 아직 처리하지 않은 레벨업 횟수
     private int pendingCount = 0;
+
+    // 게임 시작 보상을 아직 받지 않았는지 (열려 있는 동안 true)
+    private bool isStartRewardPending = false;
 
     private bool isOpen = false;
 
@@ -36,6 +44,40 @@ public class LevelUpUI
         }
 
         SetChildrenActive(false);
+    }
+
+    private void Start()
+    {
+        if (true == grantStartReward)
+        {
+            OpenStartReward();
+        }
+    }
+
+    /// <summary>
+    /// 게임 시작 보상을 연다 (Weapon 풀에서만 뽑고 디버프는 없음)
+    /// - 고를 수 있는 무기가 하나도 없으면 열지 않는다
+    /// </summary>
+    private void OpenStartReward()
+    {
+        bool hasSelectable = false;
+        foreach (SelectPanelGroup group in selectPanelGroups)
+        {
+            group.RefreshStartRewards();
+            hasSelectable |= group.HasSelectablePanel;
+        }
+
+        if (false == hasSelectable)
+        {
+            Debug.LogWarning($"[LevelUpUI] Weapon 풀이 비어 있어 게임 시작 보상을 건너뜁니다. ({name})", this);
+            return;
+        }
+
+        isStartRewardPending = true;
+        if (false == IsOpen)
+        {
+            Open();
+        }
     }
 
     /// <summary>
@@ -116,6 +158,16 @@ public class LevelUpUI
 
         pendingCount += _amount;
 
+        // 그룹이 레벨업을 받아 일반 보상으로 바꿨으므로, 시작 보상이 열려 있으면 다시 무기 보상으로 채운다
+        if (true == isStartRewardPending)
+        {
+            foreach (SelectPanelGroup group in selectPanelGroups)
+            {
+                group.RefreshStartRewards();
+            }
+            UpdateResumeButton();
+        }
+
         if (false == IsOpen)
         {
             Open();
@@ -132,7 +184,15 @@ public class LevelUpUI
 
         ApplySelectedRewards();
 
-        pendingCount--;
+        // 시작 보상을 먼저 처리하고, 그 뒤 쌓인 레벨업을 처리한다
+        if (true == isStartRewardPending)
+        {
+            isStartRewardPending = false;
+        }
+        else
+        {
+            pendingCount--;
+        }
 
         if (pendingCount <= 0)
         {
@@ -226,6 +286,7 @@ public class LevelUpUI
     private void Close()
     {
         pendingCount = 0;
+        isStartRewardPending = false;
 
         SetChildrenActive(false);
         isOpen = false;

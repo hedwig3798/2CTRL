@@ -10,6 +10,7 @@ using UnityEngine;
 ///   - 첫 번째 데이터 : Weapon / PassiveBuff / WeaponUpgrade 풀 중 하나
 ///   - 두 번째 데이터 : PassiveNerf(디버프) 풀 중 하나
 ///   뽑힌 보상이 모자라면 해당 데이터는 비워 두고, 두 데이터가 모두 없는 패널은 숨긴다.
+/// - 게임 시작 보상(RefreshStartRewards) 은 첫 번째 데이터를 Weapon 풀에서만 뽑고, 두 번째 데이터는 비워 둔다.
 /// - 고른 보상의 첫 번째 데이터(버프) 는 side 쪽, 두 번째 데이터(디버프) 는 반대쪽 플레이어에게 적용된다 (LevelUpUI 가 재개할 때 적용)
 /// - 비활성 상태에서도 레벨업을 받아야 하므로 OnEnable 이 아닌 Initialize(Awake) / OnDestroy 에서 구독한다.
 ///   LevelUpUI 가 자식을 끄기 전에 Initialize 를 호출해 준다.
@@ -67,6 +68,15 @@ public class SelectPanelGroup
         RewardPoolType.PassiveNerf,
     };
 
+    // 게임 시작 보상에서 첫 번째 데이터를 뽑을 풀 (신규 무기만)
+    private static readonly RewardPoolType[] StartPoolTypes =
+    {
+        RewardPoolType.Weapon,
+    };
+
+    // 게임 시작 보상에는 디버프를 붙이지 않는다
+    private static readonly RewardPoolType[] NoPoolTypes = { };
+
     // 뽑은 보상을 받는 버퍼
     private readonly List<RewardData> mainBuffer = new List<RewardData>();
     private readonly List<RewardData> debuffBuffer = new List<RewardData>();
@@ -118,13 +128,30 @@ public class SelectPanelGroup
     /// </summary>
     public void RefreshRewards()
     {
+        RefreshRewards(MainPoolTypes, DebuffPoolTypes);
+    }
+
+    /// <summary>
+    /// 게임 시작 보상용으로 패널마다 Weapon 풀에서만 하나씩 뽑아 채운다 (디버프 없음)
+    /// </summary>
+    public void RefreshStartRewards()
+    {
+        RefreshRewards(StartPoolTypes, NoPoolTypes);
+    }
+
+    /// <summary>
+    /// 패널마다 첫 번째 데이터는 _mainTypes 풀에서, 두 번째 데이터는 _debuffTypes 풀에서 하나씩 뽑아 채운다
+    /// 없는 데이터는 비워 두고, 두 데이터가 모두 없는 패널은 숨긴다
+    /// </summary>
+    private void RefreshRewards(IReadOnlyList<RewardPoolType> _mainTypes, IReadOnlyList<RewardPoolType> _debuffTypes)
+    {
         int mainCount = 0;
         int debuffCount = 0;
         RewardManager rewardManager = RewardManager.Instance;
         if (null != rewardManager)
         {
-            mainCount = rewardManager.GetRandomUnique(selectPanels.Count, MainPoolTypes, mainBuffer);
-            debuffCount = rewardManager.GetRandomUnique(selectPanels.Count, DebuffPoolTypes, debuffBuffer);
+            mainCount = rewardManager.GetRandomUnique(selectPanels.Count, _mainTypes, mainBuffer);
+            debuffCount = rewardManager.GetRandomUnique(selectPanels.Count, _debuffTypes, debuffBuffer);
         }
         else
         {

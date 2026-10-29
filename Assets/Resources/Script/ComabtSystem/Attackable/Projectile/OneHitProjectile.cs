@@ -27,6 +27,18 @@ public class OneHitProjectile
     }
 
     /// <summary>
+    /// _dp 를 이미 타격한 대상으로 기록해 타격하지 않게 한다 (타격 수에는 세지 않는다)
+    /// 분열탄 조각이 원래 탄이 맞힌 적을 다시 맞히지 않도록 발사 직후에 쓴다
+    /// </summary>
+    public void IgnoreTarget(DamagePipeline _dp)
+    {
+        if (null != _dp)
+        {
+            hitTargets.Add(_dp);
+        }
+    }
+
+    /// <summary>
     /// 공격한 적에 대한 정보를 초기화한다
     /// </summary>
     public void ResetHitTargets()
@@ -38,21 +50,12 @@ public class OneHitProjectile
     protected override bool OnLaunch()
     {
         ResetHitTargets();
+        return AimAtNearest();
+    }
 
-        BlackBoard b = GetBlackBoard();
-        if (null == b)
-        {
-            return false;
-        }
-
-        Transform target = FindNearest(weapon.transform.position, weapon.FinalRange);
-        if (null == target)
-        {
-            return false;
-        }
-
-        // 무기가 기록한 기본 이동 대상(주인) 대신 가장 가까운 적을 향한다
-        b.SetTransform(DATA_TYPE.moveTarget, target);
+    protected override bool OnLaunchAt()
+    {
+        ResetHitTargets();
         return true;
     }
 
@@ -79,8 +82,7 @@ public class OneHitProjectile
         }
 
         hitTargets.Add(dp);
-        DamageMassage duplicateMassage = damageMassage;
-        dp.ProcessDamage(ref duplicateMassage);
+        ApplyDamage(dp);
 
         ++currHitCount;
         if (currHitCount >= hitCount)

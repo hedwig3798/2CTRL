@@ -19,7 +19,7 @@ public class ExpSystem
         {
             if (null == instance)
             {
-                instance = FindFirstObjectByType<ExpSystem>();
+                instance = FindAnyObjectByType<ExpSystem>();
             }
             return instance;
         }

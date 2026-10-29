@@ -41,10 +41,9 @@ public class ChainMovement
 
     public void Initialize(BlackBoard _data)
     {
-        Transform pos = _data.GetTransform(DATA_TYPE.startPosition);
-        if (null != pos)
+        if (true == _data.TryGetStartPoint(out Vector3 start))
         {
-            transform.position = pos.position;
+            transform.position = start;
         }
 
         target = _data.GetTransform(DATA_TYPE.moveTarget);

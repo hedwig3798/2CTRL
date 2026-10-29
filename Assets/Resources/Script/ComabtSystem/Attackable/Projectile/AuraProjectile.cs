@@ -23,10 +23,25 @@ public struct AuraTarget
 public class AuraProjectile
     : Projectile
 {
+    [Header("aura")]
+    [Tooltip("켜면 발사 시 무기 범위 안의 가장 가까운 적을 이동 대상으로 삼는다 (적이 없으면 발사하지 않음). 끄면 이동 대상은 주인")]
+    [SerializeField]
+    private bool aimAtNearest;
+
     private Dictionary<DamagePipeline, AuraTarget> targets = new Dictionary<DamagePipeline, AuraTarget>();
     private List<DamagePipeline> buffer = new List<DamagePipeline>();
 
     protected override bool OnLaunch()
+    {
+        targets.Clear();
+        if (true == aimAtNearest)
+        {
+            return AimAtNearest();
+        }
+        return true;
+    }
+
+    protected override bool OnLaunchAt()
     {
         targets.Clear();
         return true;
@@ -119,8 +134,7 @@ public class AuraProjectile
 
     private void Hit(DamagePipeline _dp)
     {
-        DamageMassage duplicateMassage = damageMassage;
-        _dp.ProcessDamage(ref duplicateMassage);
+        ApplyDamage(_dp);
     }
 
     private bool IsTargetLayer(int _layer)

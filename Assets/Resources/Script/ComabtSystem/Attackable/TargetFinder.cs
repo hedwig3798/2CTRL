@@ -66,6 +66,62 @@ public static class TargetFinder
     }
 
     /// <summary>
+    /// 범위 안의 살아있는 적을 모두 찾아 _result 에 담는다 (기존 내용은 지운다)
+    /// 콜라이더가 여러 개인 대상도 한 번만 담으며, _exclude 에 포함된 대상과 _ignoreA / _ignoreB 는 제외한다
+    /// 찾은 수를 반환한다
+    /// </summary>
+    public static int FindAll(
+        Vector3 _center
+        , float _range
+        , LayerMask _layer
+        , List<Transform> _result
+        , HashSet<Transform> _exclude = null
+        , Transform _ignoreA = null
+        , Transform _ignoreB = null)
+    {
+        _result.Clear();
+
+        filter.useLayerMask = true;
+        filter.useTriggers = true;
+        filter.SetLayerMask(_layer);
+
+        int hitCount = Physics2D.OverlapCircle(
+            _center
+            , _range
+            , filter
+            , candinate
+        );
+
+        for (int i = 0; i < hitCount; ++i)
+        {
+            Transform curr = candinate[i].transform;
+            if ((null != _ignoreA && curr == _ignoreA) || (null != _ignoreB && curr == _ignoreB))
+            {
+                continue;
+            }
+
+            if (null != _exclude && true == _exclude.Contains(curr))
+            {
+                continue;
+            }
+
+            if (true == _result.Contains(curr))
+            {
+                continue;
+            }
+
+            if (false == IsAlive(curr))
+            {
+                continue;
+            }
+
+            _result.Add(curr);
+        }
+
+        return _result.Count;
+    }
+
+    /// <summary>
     /// 데미지를 받을 수 있고 죽지 않은 대상인지
     /// </summary>
     public static bool IsAlive(Transform _target)

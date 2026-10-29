@@ -1,0 +1,67 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!1 &8785579576869862400
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 8050236432474299392}
+  - component: {fileID: 1143293158503042432}
+  m_Layer: 0
+  m_Name: Sweep
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &8050236432474299392
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8785579576869862400}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1143293158503042432
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8785579576869862400}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a560788116cfc344d8aeec35ed40ede3, type: 3}
+  m_Name:
+  m_EditorClassIdentifier: Assembly-CSharp::Weapon
+  owner: {fileID: 0}
+  weaponType: 0
+  preLoadCount: 3
+  projectile: {fileID: 6614249242845133824, guid: c185a08886454f87b79ff643ca2308d0,
+    type: 3}
+  targetLayer:
+    serializedVersion: 2
+    m_Bits: 0
+  damage: 15
+  attackSpeed: 1.2
+  range: 3
+  fireCount: 1
+  speedRate: 1
+  hitCount: 1
+  fireDelay: 0
+  spreadRange: 0
+  lifetime: 0.25
+  knockbackForce: 4
+  chainCount: 0
+  chainRange: 0
+  areaRadius: 0

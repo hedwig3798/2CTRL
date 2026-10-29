@@ -126,9 +126,21 @@ public class PlayerStats
         if (null != reference)
         {
             weapon.targetLayer = reference.targetLayer;
-            foreach (Transform t in weapon.GetComponentsInChildren<Transform>(true))
+            LayerUtils.SetLayer(weapon.gameObject, reference.gameObject.layer);
+        }
+        else
+        {
+            // 가진 무기가 없으면 side 로 레이어를 정한다 (무기 프리팹은 Default / targetLayer 0 이라 그대로 두면 공격하지 않는다)
+            int attackLayer = LayerMask.NameToLayer(PlayerSide.Left == side ? "LAttack" : "RAttack");
+            int monsterLayer = LayerMask.NameToLayer(PlayerSide.Left == side ? "LMonster" : "RMonster");
+            if (attackLayer < 0 || monsterLayer < 0)
             {
-                t.gameObject.layer = reference.gameObject.layer;
+                Debug.LogWarning($"[PlayerStats] {side} 무기 레이어를 찾지 못했습니다. (Attack {attackLayer}, Monster {monsterLayer})", this);
+            }
+            else
+            {
+                weapon.targetLayer = 1 << monsterLayer;
+                LayerUtils.SetLayer(weapon.gameObject, attackLayer);
             }
         }
 

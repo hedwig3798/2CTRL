@@ -97,3 +97,11 @@ InitTestScene*.unity*
 
 # Auto-generated scenes by play mode tests
 /[Aa]ssets/[Ii]nit[Tt]est[Ss]cene*.unity*
+
+# Claude Code (개인 설정·임시 파일만 제외, agents/settings.json/agent-memory는 공유)
+.claude/tmp/
+.claude/worktrees/
+.claude/settings.local.json
+.claude/*.local.json
+CLAUDE.local.md
+**/CLAUDE.local.md

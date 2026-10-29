@@ -1,0 +1,23 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9bc5b6c958c092042aacceca90abbb8b, type: 3}
+  m_Name: ShockwaveReward
+  m_EditorClassIdentifier: Assembly-CSharp::RewardData
+  image: {fileID: -2413806693520163455, guid: 0b0c64724ca45ea4ba5a2ffc1cb6ffea, type: 3}
+  rewardName: "\uCDA9\uACA9\uD30C"
+  hasKey: 0
+  key: 0
+  hasValue: 0
+  value: 0
+  explain1: "\uC8FC\uAE30\uC801\uC73C\uB85C \uC8FC\uBCC0\uC5D0 \uCDA9\uACA9\uD30C\uB97C \uD37C\uB728\uB824 \uB2FF\uC740 \uC801\uC5D0\uAC8C \uD53C\uD574\uB97C \uC8FC\uACE0 \uBA40\uB9AC \uBC00\uCCD0\uB0C5\uB2C8\uB2E4."
+  explain2: 
+  effect: {fileID: 11400000, guid: c02170e609dc4e34becdee704a9844fd, type: 2}

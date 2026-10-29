@@ -27,7 +27,7 @@ public class RewardManager
         {
             if (null == instance)
             {
-                instance = FindFirstObjectByType<RewardManager>();
+                instance = FindAnyObjectByType<RewardManager>();
             }
             return instance;
         }
@@ -57,7 +57,7 @@ public class RewardManager
 
         if (null == spawner)
         {
-            spawner = FindFirstObjectByType<Spawner>();
+            spawner = FindAnyObjectByType<Spawner>();
         }
 
         RewardContext context = new RewardContext
@@ -66,7 +66,6 @@ public class RewardManager
             Spawner = spawner,
         };
 
-        Debug.Log($"[RewardManager] 보상 적용 : {_data.name} → {_side} ({(null != context.Player ? context.Player.name : "플레이어 없음")})", this);
         _data.Apply(context);
     }
 

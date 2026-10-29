@@ -88,11 +88,7 @@ public abstract class Projectile
     /// </summary>
     public bool Launch(Weapon _weapon)
     {
-        weapon = _weapon;
-
-        damageMassage.damage = weapon.FinalDamage;
-        damageMassage.isReflected = false;
-        damageMassage.attacker = null;
+        SetupDamage(_weapon);
 
         if (false == OnLaunch())
         {
@@ -102,6 +98,48 @@ public abstract class Projectile
         WriteMoveTargetPoint();
         InitializeBlackBoard();
         return true;
+    }
+
+    /// <summary>
+    /// 타겟 탐색 없이 _start 에서 _point 를 향해 발사한다 (분열탄 조각 등 보조 발사체용, Weapon.FireSub 가 호출)
+    /// OnLaunch 대신 OnLaunchAt 을 부르며, BlackBoard 에 startPoint / moveTargetPoint 를 기록하고 moveTarget 은 비운다
+    /// 데미지는 Weapon.FinalDamage * _damageRate. OnLaunchAt 이 false 면 발사하지 않는다
+    /// </summary>
+    public bool LaunchAt(Weapon _weapon, Vector3 _start, Vector3 _point, float _damageRate = 1f)
+    {
+        SetupDamage(_weapon);
+        damageMassage.damage *= Mathf.Max(0f, _damageRate);
+
+        if (false == OnLaunchAt())
+        {
+            return false;
+        }
+
+        BlackBoard b = GetBlackBoard();
+        if (null != b)
+        {
+            b.SetTransform(DATA_TYPE.startPosition, null);
+            b.SetTransform(DATA_TYPE.moveTarget, null);
+            b.SetVector(DATA_TYPE.startPoint, _start);
+            b.SetVector(DATA_TYPE.moveTargetPoint, _point);
+        }
+
+        transform.position = _start;
+        InitializeBlackBoard();
+        return true;
+    }
+
+    /// <summary>
+    /// 데미지는 무기 스텟 + 플레이어 스텟 (Weapon.FinalDamage)
+    /// </summary>
+    private void SetupDamage(Weapon _weapon)
+    {
+        weapon = _weapon;
+
+        damageMassage.damage = weapon.FinalDamage;
+        damageMassage.isReflected = false;
+        damageMassage.attacker = null;
+        damageMassage.knockbackForce = weapon.knockbackForce;
     }
 
     /// <summary>
@@ -133,7 +171,87 @@ public abstract class Projectile
 
     protected abstract bool OnLaunch();
 
+    /// <summary>
+    /// LaunchAt 으로 발사될 때 호출된다. 타격 기록 초기화 등을 하고, false 면 발사하지 않는다
+    /// 기본은 아무것도 하지 않고 발사한다
+    /// </summary>
+    protected virtual bool OnLaunchAt()
+    {
+        return true;
+    }
+
+    #region Damage
+    // 발사체마다 따로 둬서 데미지 처리 중 다른 발사체가 범위 공격을 해도 섞이지 않게 한다
+    private List<Transform> areaBuffer = new List<Transform>();
+
+    /// <summary>
+    /// 발사 시 정해진 데미지 메시지를 복사해 대상에게 보낸다
+    /// 타격 지점은 발사체의 현재 위치 (넉백 방향 기준)
+    /// </summary>
+    protected void ApplyDamage(DamagePipeline _dp)
+    {
+        SendDamage(_dp, transform.position);
+    }
+
+    /// <summary>
+    /// _center 를 중심으로 반지름 _radius 안의 살아있는 적 모두에게 데미지를 준다 (폭발 등)
+    /// 넉백은 _center 에서 바깥쪽으로 밀어낸다. _exclude 에 포함된 대상은 제외한다
+    /// 맞은 적 수를 반환한다
+    /// </summary>
+    protected int ApplyAreaDamage(Vector2 _center, float _radius, HashSet<Transform> _exclude = null)
+    {
+        if (_radius <= 0f)
+        {
+            return 0;
+        }
+
+        int count = FindAll(_center, _radius, areaBuffer, _exclude);
+        for (int i = 0; i < count; ++i)
+        {
+            if (areaBuffer[i].TryGetComponent(out DamagePipeline dp))
+            {
+                SendDamage(dp, _center);
+            }
+        }
+        areaBuffer.Clear();
+        return count;
+    }
+
+    /// <summary>
+    /// 데미지 메시지를 복사해 타격 지점(넉백 방향 기준)만 바꿔 대상에게 보낸다
+    /// </summary>
+    protected void SendDamage(DamagePipeline _dp, Vector2 _hitPoint)
+    {
+        DamageMassage duplicateMassage = damageMassage;
+        duplicateMassage.hitPoint = _hitPoint;
+        _dp.ProcessDamage(ref duplicateMassage);
+    }
+    #endregion
+
     #region Target
+    /// <summary>
+    /// 무기 범위(FinalRange) 안의 가장 가까운 적을 이동 대상(moveTarget)으로 기록한다
+    /// 적이 없거나 BlackBoard 가 없으면 false
+    /// </summary>
+    protected bool AimAtNearest()
+    {
+        BlackBoard b = GetBlackBoard();
+        if (null == b)
+        {
+            return false;
+        }
+
+        Transform target = FindNearest(weapon.transform.position, weapon.FinalRange);
+        if (null == target)
+        {
+            return false;
+        }
+
+        // 무기가 기록한 기본 이동 대상(주인) 대신 가장 가까운 적을 향한다
+        b.SetTransform(DATA_TYPE.moveTarget, target);
+        return true;
+    }
+
     /// <summary>
     /// 범위 안에서 가장 가까운 살아있는 적을 찾는다
     /// </summary>
@@ -143,6 +261,22 @@ public abstract class Projectile
             _center
             , _range
             , weapon.targetLayer
+            , _exclude
+            , weapon.transform
+            , weapon.owner
+        );
+    }
+
+    /// <summary>
+    /// 범위 안의 살아있는 적을 모두 찾아 _result 에 담는다
+    /// </summary>
+    protected int FindAll(Vector3 _center, float _range, List<Transform> _result, HashSet<Transform> _exclude = null)
+    {
+        return TargetFinder.FindAll(
+            _center
+            , _range
+            , weapon.targetLayer
+            , _result
             , _exclude
             , weapon.transform
             , weapon.owner
