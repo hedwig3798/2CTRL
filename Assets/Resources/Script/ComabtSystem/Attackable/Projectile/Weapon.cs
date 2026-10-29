@@ -242,8 +242,321 @@ public class Weapon
     {
         ownerStats = GetComponentInParent<PlayerStats>();
 
+        EnsureBaseValues();
+
         projectilePool = CreatePool(projectile);
     }
+
+    #region Upgrade
+    // 업그레이드 누적치 (WeaponParam 값을 인덱스로 쓴다)
+    private readonly float[] paramAdd = new float[WeaponParamUtils.SlotCount];
+    private readonly float[] paramMultiply = new float[WeaponParamUtils.SlotCount];
+
+    // 프리팹 기본값 (업그레이드 계산 기준)
+    private bool isBaseCached;
+    private float baseDamage;
+    private float baseAttackSpeed;
+    private float baseRange;
+    private int baseFireCount;
+    private int baseHitCount;
+    private float baseAreaRadius;
+    private float baseLifetime;
+    private float baseKnockbackForce;
+    private float baseSpeedRate;
+    private float baseFireDelay;
+    private int baseChainCount;
+    private float baseChainRange;
+
+    private int upgradeLevel;
+    private int upgradeVersion;
+
+    // 유지형 발사체에 바뀐 값을 다시 기록해야 하는지
+    private bool isUpgradeDirty;
+
+    /// <summary>
+    /// 적용한 업그레이드 단계 수
+    /// </summary>
+    public int UpgradeLevel => upgradeLevel;
+
+    /// <summary>
+    /// 업그레이드 누적치가 바뀔 때마다 1 씩 오른다 (발사체가 바뀐 값을 다시 읽을지 판단할 때 쓴다)
+    /// </summary>
+    public int UpgradeVersion => upgradeVersion;
+
+    /// <summary>
+    /// 업그레이드 한 단계를 적용한다 (수정 목록을 누적하고 UpgradeLevel 을 1 올린다)
+    /// </summary>
+    public void ApplyUpgrade(WeaponUpgradeStep _step)
+    {
+        if (null == _step)
+        {
+            return;
+        }
+
+        WeaponModifier[] modifiers = _step.Modifiers;
+        if (null != modifiers)
+        {
+            foreach (WeaponModifier m in modifiers)
+            {
+                AccumulateModifier(m.param, m.mode, m.value);
+            }
+        }
+
+        ++upgradeLevel;
+        MarkUpgradeChanged();
+    }
+
+    /// <summary>
+    /// 수정 하나를 누적한다
+    /// Add 는 기본값에 그대로 더하고, Multiply 는 기본값 대비 비율을 더한다
+    /// </summary>
+    public void AddModifier(WeaponParam _param, StatModifierMode _mode, float _value)
+    {
+        if (false == AccumulateModifier(_param, _mode, _value))
+        {
+            return;
+        }
+        MarkUpgradeChanged();
+    }
+
+    /// <summary>
+    /// 누적치를 _add / _multiply 로 덮어쓴다 (드론이 자식 무기에 값을 넘길 때 쓴다)
+    /// 값이 같으면 아무것도 하지 않는다
+    /// </summary>
+    public void SetModifier(WeaponParam _param, float _add, float _multiply)
+    {
+        int i = (int)_param;
+        if (false == IsValidSlot(i))
+        {
+            return;
+        }
+
+        if (paramAdd[i] == _add && paramMultiply[i] == _multiply)
+        {
+            return;
+        }
+
+        paramAdd[i] = _add;
+        paramMultiply[i] = _multiply;
+        RefreshParam(_param);
+        MarkUpgradeChanged();
+    }
+
+    /// <summary>
+    /// 모든 업그레이드를 지우고 공통값을 프리팹 기본값으로 되돌린다
+    /// </summary>
+    public void ResetUpgrades()
+    {
+        EnsureBaseValues();
+
+        System.Array.Clear(paramAdd, 0, paramAdd.Length);
+        System.Array.Clear(paramMultiply, 0, paramMultiply.Length);
+        foreach (WeaponParam p in WeaponParamUtils.CommonParams)
+        {
+            RefreshParam(p);
+        }
+
+        upgradeLevel = 0;
+        MarkUpgradeChanged();
+    }
+
+    /// <summary>
+    /// Add 누적치
+    /// </summary>
+    public float GetParamAdd(WeaponParam _param)
+    {
+        int i = (int)_param;
+        return IsValidSlot(i) ? paramAdd[i] : 0f;
+    }
+
+    /// <summary>
+    /// Multiply 누적치 (기본값 대비 비율)
+    /// </summary>
+    public float GetParamMultiply(WeaponParam _param)
+    {
+        int i = (int)_param;
+        return IsValidSlot(i) ? paramMultiply[i] : 0f;
+    }
+
+    /// <summary>
+    /// 공통값은 현재 Weapon 필드 값, 그 외(발사체 고유값 / 플래그)는 기본값 0 기준의 값 (= Add 누적치)
+    /// 발사체 고유값은 기본값을 넘기는 GetParam(_param, _baseValue) 를 쓴다
+    /// </summary>
+    public float GetParam(WeaponParam _param)
+    {
+        switch (_param)
+        {
+            case WeaponParam.Damage: return damage;
+            case WeaponParam.AttackSpeed: return attackSpeed;
+            case WeaponParam.Range: return range;
+            case WeaponParam.FireCount: return fireCount;
+            case WeaponParam.HitCount: return hitCount;
+            case WeaponParam.AreaRadius: return areaRadius;
+            case WeaponParam.Lifetime: return lifetime;
+            case WeaponParam.Knockback: return knockbackForce;
+            case WeaponParam.SpeedRate: return speedRate;
+            case WeaponParam.FireDelay: return fireDelay;
+            case WeaponParam.ChainCount: return chainCount;
+            case WeaponParam.ChainRange: return chainRange;
+        }
+        return GetParam(_param, 0f);
+    }
+
+    /// <summary>
+    /// _baseValue(발사체 프리팹 기본값) 에 누적치를 적용한 값 = 기본값 + 기본값 * ΣMultiply + ΣAdd
+    /// </summary>
+    public float GetParam(WeaponParam _param, float _baseValue)
+    {
+        int i = (int)_param;
+        if (false == IsValidSlot(i))
+        {
+            return _baseValue;
+        }
+        return _baseValue + _baseValue * paramMultiply[i] + paramAdd[i];
+    }
+
+    /// <summary>
+    /// GetParam(_param, _baseValue) 를 반올림한 정수 (조각 수 등)
+    /// </summary>
+    public int GetParamInt(WeaponParam _param, int _baseValue)
+    {
+        return Mathf.RoundToInt(GetParam(_param, (float)_baseValue));
+    }
+
+    /// <summary>
+    /// ★ 플래그가 켜졌는지 (누적값이 0 보다 크면 켜진다)
+    /// </summary>
+    public bool HasFlag(WeaponParam _param)
+    {
+        int i = (int)_param;
+        return IsValidSlot(i) && paramAdd[i] + paramMultiply[i] > 0f;
+    }
+
+    private bool HasModifier(int _slot)
+    {
+        return 0f != paramAdd[_slot] || 0f != paramMultiply[_slot];
+    }
+
+    private static bool IsValidSlot(int _slot)
+    {
+        return 0 <= _slot && _slot < WeaponParamUtils.SlotCount;
+    }
+
+    /// <returns>잘못된 값이면 false</returns>
+    private bool AccumulateModifier(WeaponParam _param, StatModifierMode _mode, float _value)
+    {
+        int i = (int)_param;
+        if (false == IsValidSlot(i))
+        {
+            return false;
+        }
+
+        if (StatModifierMode.Multiply == _mode)
+        {
+            paramMultiply[i] += _value;
+        }
+        else
+        {
+            paramAdd[i] += _value;
+        }
+
+        RefreshParam(_param);
+        return true;
+    }
+
+    private void MarkUpgradeChanged()
+    {
+        ++upgradeVersion;
+        isUpgradeDirty = true;
+    }
+
+    /// <summary>
+    /// 프리팹 기본값을 한 번만 저장한다
+    /// </summary>
+    private void EnsureBaseValues()
+    {
+        if (true == isBaseCached)
+        {
+            return;
+        }
+        isBaseCached = true;
+
+        baseDamage = damage;
+        baseAttackSpeed = attackSpeed;
+        baseRange = range;
+        baseFireCount = fireCount;
+        baseHitCount = hitCount;
+        baseAreaRadius = areaRadius;
+        baseLifetime = lifetime;
+        baseKnockbackForce = knockbackForce;
+        baseSpeedRate = speedRate;
+        baseFireDelay = fireDelay;
+        baseChainCount = chainCount;
+        baseChainRange = chainRange;
+    }
+
+    /// <summary>
+    /// 공통값이면 기본값 + 누적치로 Weapon 필드를 다시 계산한다 (발사체 고유값 / 플래그는 아무것도 하지 않는다)
+    /// 수정이 없는 값은 기본값 그대로 둔다
+    /// </summary>
+    private void RefreshParam(WeaponParam _param)
+    {
+        if (false == _param.IsCommon())
+        {
+            return;
+        }
+
+        EnsureBaseValues();
+
+        switch (_param)
+        {
+            case WeaponParam.Damage:
+                damage = Mathf.Max(0f, CalcParam(_param, baseDamage));
+                break;
+            case WeaponParam.AttackSpeed:
+                attackSpeed = Mathf.Max(0f, CalcParam(_param, baseAttackSpeed));
+                break;
+            case WeaponParam.Range:
+                range = Mathf.Max(0f, CalcParam(_param, baseRange));
+                break;
+            case WeaponParam.FireCount:
+                fireCount = Mathf.Max(0, Mathf.RoundToInt(CalcParam(_param, baseFireCount)));
+                break;
+            case WeaponParam.HitCount:
+                hitCount = Mathf.Max(0, Mathf.RoundToInt(CalcParam(_param, baseHitCount)));
+                break;
+            case WeaponParam.AreaRadius:
+                areaRadius = Mathf.Max(0f, CalcParam(_param, baseAreaRadius));
+                break;
+            case WeaponParam.Lifetime:
+                lifetime = Mathf.Max(0f, CalcParam(_param, baseLifetime));
+                break;
+            case WeaponParam.Knockback:
+                knockbackForce = Mathf.Max(0f, CalcParam(_param, baseKnockbackForce));
+                break;
+            case WeaponParam.SpeedRate:
+                // 0 이하는 이동 컴포넌트가 1 로 보므로, 수정이 있으면 1 을 기준으로 계산한다
+                float speedBase = baseSpeedRate <= 0f && true == HasModifier((int)_param) ? 1f : baseSpeedRate;
+                speedRate = Mathf.Max(0f, CalcParam(_param, speedBase));
+                break;
+            case WeaponParam.FireDelay:
+                fireDelay = Mathf.Max(0f, CalcParam(_param, baseFireDelay));
+                break;
+            case WeaponParam.ChainCount:
+                chainCount = Mathf.Max(0, Mathf.RoundToInt(CalcParam(_param, baseChainCount)));
+                break;
+            case WeaponParam.ChainRange:
+                chainRange = Mathf.Max(0f, CalcParam(_param, baseChainRange));
+                break;
+        }
+    }
+
+    private float CalcParam(WeaponParam _param, float _baseValue)
+    {
+        int i = (int)_param;
+        return _baseValue + _baseValue * paramMultiply[i] + paramAdd[i];
+    }
+    #endregion
 
     private IObjectPool<Projectile> CreatePool(Projectile _prefab)
     {
@@ -376,6 +689,13 @@ public class Weapon
             Projectile p = persistentProjectiles[last];
             persistentProjectiles.RemoveAt(last);
             p.gameObject.SetActive(false);
+            changed = true;
+        }
+
+        // 업그레이드로 값이 바뀌면 유지 중인 발사체에도 다시 기록한다
+        if (true == isUpgradeDirty)
+        {
+            isUpgradeDirty = false;
             changed = true;
         }
 

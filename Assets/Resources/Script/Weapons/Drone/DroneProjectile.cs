@@ -16,12 +16,37 @@ public class DroneProjectile
     [Tooltip("드론이 들고 있는 무기 (Repeat). 비어 있으면 자식에서 찾는다")]
     [SerializeField]
     private Weapon childWeapon;
+    [Tooltip("공전 이동. 비어 있으면 같은 오브젝트에서 찾는다 (OrbitRadius 업그레이드가 radius 를 바꾼다)")]
+    [SerializeField]
+    private OrbitMovement orbitMovement;
+
+    private float baseOrbitRadius;
+
+    // 자식 무기 / 공전 반경에 반영한 부모 무기의 UpgradeVersion
+    private int appliedUpgradeVersion = -1;
 
     private void Awake()
     {
         if (null == childWeapon)
         {
             childWeapon = GetComponentInChildren<Weapon>(true);
+        }
+        if (null == orbitMovement)
+        {
+            orbitMovement = GetComponent<OrbitMovement>();
+        }
+        if (null != orbitMovement)
+        {
+            baseOrbitRadius = orbitMovement.radius;
+        }
+    }
+
+    private void Update()
+    {
+        // 유지형 드론은 다시 발사되지 않으므로 업그레이드가 바뀌면 여기서 다시 반영한다
+        if (null != weapon && weapon.UpgradeVersion != appliedUpgradeVersion)
+        {
+            ApplyUpgrade();
         }
     }
 
@@ -53,5 +78,40 @@ public class DroneProjectile
         childWeapon.owner = transform;
         childWeapon.targetLayer = weapon.targetLayer;
         childWeapon.SetOwnerStats(weapon.OwnerStats);
+
+        ApplyUpgrade();
+    }
+
+    /// <summary>
+    /// 부모 무기의 드론 업그레이드를 반영한다
+    /// - Child* 누적치를 자식 무기의 공통값 누적치로 그대로 넘긴다 (비율은 자식 무기 프리팹 기본값 기준)
+    /// - OrbitRadius 는 공전 반경 (프리팹 기본값 기준)
+    /// </summary>
+    private void ApplyUpgrade()
+    {
+        if (null == weapon)
+        {
+            return;
+        }
+        appliedUpgradeVersion = weapon.UpgradeVersion;
+
+        if (null != childWeapon)
+        {
+            CopyModifier(WeaponParam.ChildDamage, WeaponParam.Damage);
+            CopyModifier(WeaponParam.ChildAttackSpeed, WeaponParam.AttackSpeed);
+            CopyModifier(WeaponParam.ChildFireCount, WeaponParam.FireCount);
+            CopyModifier(WeaponParam.ChildHitCount, WeaponParam.HitCount);
+            CopyModifier(WeaponParam.ChildRange, WeaponParam.Range);
+        }
+
+        if (null != orbitMovement)
+        {
+            orbitMovement.radius = Mathf.Max(0f, weapon.GetParam(WeaponParam.OrbitRadius, baseOrbitRadius));
+        }
+    }
+
+    private void CopyModifier(WeaponParam _from, WeaponParam _to)
+    {
+        childWeapon.SetModifier(_to, weapon.GetParamAdd(_from), weapon.GetParamMultiply(_from));
     }
 }

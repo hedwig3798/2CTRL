@@ -150,8 +150,8 @@ public class SelectPanelGroup
         RewardManager rewardManager = RewardManager.Instance;
         if (null != rewardManager)
         {
-            mainCount = rewardManager.GetRandomUnique(selectPanels.Count, _mainTypes, mainBuffer);
-            debuffCount = rewardManager.GetRandomUnique(selectPanels.Count, _debuffTypes, debuffBuffer);
+            mainCount = rewardManager.GetRandomUnique(selectPanels.Count, _mainTypes, side, mainBuffer);
+            debuffCount = rewardManager.GetRandomUnique(selectPanels.Count, _debuffTypes, side, debuffBuffer);
         }
         else
         {

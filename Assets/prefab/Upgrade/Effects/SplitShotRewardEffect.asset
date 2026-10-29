@@ -13,3 +13,4 @@ MonoBehaviour:
   m_Name: SplitShotRewardEffect
   m_EditorClassIdentifier: Assembly-CSharp::WeaponRewardEffect
   weaponPrefab: {fileID: 6578139319317758734, guid: adf238321391433ea0a7c8e4cc84ea0e, type: 3}
+  upgradeTable: {fileID: 11400000, guid: a85b97b3043d432438ff2b845f056eed, type: 2}

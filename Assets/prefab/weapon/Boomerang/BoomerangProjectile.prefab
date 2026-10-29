@@ -14,6 +14,7 @@ GameObject:
   - component: {fileID: 3738543396606932142}
   - component: {fileID: 825000503613356245}
   - component: {fileID: 4412907731655216810}
+  - component: {fileID: 7999787743692184686}
   m_Layer: 0
   m_Name: BoomerangProjectile
   m_TagString: Untagged
@@ -90,23 +91,9 @@ MonoBehaviour:
   overshoot: 1.5
   minDistance: 3
   returnSpeedRate: 1.5
-  catchDistance: 0.4
   resetHitsOnReturn: 1
   spinTransform: {fileID: 6973653630017259748}
   spinSpeed: 900
---- !u!114 &4412907731655216810
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1593987621232428614}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 3835cd9e9a6d4324945ae772f447d065, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::Lifetime
-  lifetime: 5
 --- !u!114 &3738543396606932142
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -132,6 +119,33 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e76df251cee9fac4c85dd8019a799a14, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::BlackBoardHandler
+--- !u!114 &4412907731655216810
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1593987621232428614}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3835cd9e9a6d4324945ae772f447d065, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::Lifetime
+  lifetime: 5
+--- !u!114 &7999787743692184686
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1593987621232428614}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6515ab2eb4db9c145b5d1b0ff19413c0, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Game.Runtime::BoomerangUpgrade
+  scaleTarget: {fileID: 0}
+  returnDamageRate: 2
 --- !u!1 &3052150163120734737
 GameObject:
   m_ObjectHideFlags: 0
@@ -166,6 +180,7 @@ Transform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: -90}
 --- !u!212 &6213102893633870422
 SpriteRenderer:
+  serializedVersion: 3
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
@@ -211,8 +226,8 @@ SpriteRenderer:
   m_SortingLayerID: -105541197
   m_SortingLayer: 4
   m_SortingOrder: 0
-  m_Sprite: {fileID: -2413806693520163455, guid: 0b0c64724ca45ea4ba5a2ffc1cb6ffea,
-    type: 3}
+  m_MaskInteraction: 0
+  m_Sprite: {fileID: -2413806693520163455, guid: 0b0c64724ca45ea4ba5a2ffc1cb6ffea, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
   m_FlipY: 0
@@ -221,5 +236,5 @@ SpriteRenderer:
   m_AdaptiveModeThreshold: 0.5
   m_SpriteTileMode: 0
   m_WasSpriteAssigned: 1
-  m_MaskInteraction: 0
   m_SpriteSortPoint: 0
+  m_BlendShapeWeights: []

@@ -18,12 +18,35 @@ public class OneHitProjectile
     private HashSet<DamagePipeline> hitTargets = new HashSet<DamagePipeline>();
     private int currHitCount;
 
+    // 같은 오브젝트의 타격 데미지 배율 / 타격 알림 컴포넌트
+    private IHitDamageModifier[] damageModifiers;
+    private IProjectileHitListener[] hitListeners;
+
+    /// <summary>
+    /// 이 발사체를 발사한 무기 (발사 전이면 null)
+    /// </summary>
+    public Weapon OwnerWeapon => weapon;
+
+    private void Awake()
+    {
+        damageModifiers = GetComponents<IHitDamageModifier>();
+        hitListeners = GetComponents<IProjectileHitListener>();
+    }
+
     /// <summary>
     /// 타격 수만 갱신한다 (타격 기록은 OnLaunch / OnDisable 에서만 초기화)
     /// </summary>
     public void Initialize(BlackBoard _data)
     {
         hitCount = Mathf.Max(1, _data.GetInt(DATA_TYPE.hitCount));
+    }
+
+    /// <summary>
+    /// 타격 수를 덮어쓴다 (보조 발사체를 관통형으로 만들 때 등, 발사 직후에 쓴다)
+    /// </summary>
+    public void SetHitCount(int _count)
+    {
+        hitCount = Mathf.Max(1, _count);
     }
 
     /// <summary>
@@ -82,12 +105,47 @@ public class OneHitProjectile
         }
 
         hitTargets.Add(dp);
-        ApplyDamage(dp);
+        HitTarget(dp, currHitCount);
 
         ++currHitCount;
         if (currHitCount >= hitCount)
         {
             gameObject.SetActive(false);
+        }
+    }
+
+    /// <summary>
+    /// 데미지 배율 컴포넌트의 배율을 곱해 타격하고, 타격 알림 컴포넌트에 알린다
+    /// </summary>
+    private void HitTarget(DamagePipeline _dp, int _hitIndex)
+    {
+        float rate = 1f;
+        if (null != damageModifiers)
+        {
+            foreach (IHitDamageModifier m in damageModifiers)
+            {
+                rate *= m.GetHitDamageRate(this, _hitIndex);
+            }
+        }
+
+        if (1f == rate)
+        {
+            ApplyDamage(_dp);
+        }
+        else
+        {
+            float baseDamage = damageMassage.damage;
+            damageMassage.damage = baseDamage * Mathf.Max(0f, rate);
+            ApplyDamage(_dp);
+            damageMassage.damage = baseDamage;
+        }
+
+        if (null != hitListeners)
+        {
+            foreach (IProjectileHitListener l in hitListeners)
+            {
+                l.OnProjectileHit(this, _dp, _hitIndex);
+            }
         }
     }
 

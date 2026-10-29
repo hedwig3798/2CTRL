@@ -13,3 +13,4 @@ MonoBehaviour:
   m_Name: MineRewardEffect
   m_EditorClassIdentifier: Assembly-CSharp::WeaponRewardEffect
   weaponPrefab: {fileID: 76705273114334461, guid: cf14849d689c4a1f9bce6ef75b994e4c, type: 3}
+  upgradeTable: {fileID: 11400000, guid: 2ca4cc172901dfe46a928a423522133b, type: 2}

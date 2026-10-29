@@ -214,6 +214,14 @@ public class RewardData
         explain2 = _explain;
     }
 
+    /// <summary>
+    /// 골랐을 때 실행할 효과를 바꾼다 (런타임에 만든 보상 데이터용)
+    /// </summary>
+    public void SetEffect(RewardEffect _effect)
+    {
+        effect = _effect;
+    }
+
     public void ClearImage()
     {
         image = null;

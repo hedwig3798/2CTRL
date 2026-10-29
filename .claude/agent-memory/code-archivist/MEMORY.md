@@ -8,3 +8,4 @@
 - [editor.md](editor.md) — Editor, asmdef
 - [monster.md](monster.md) — MonsterBrain 상태머신, 키워드 SO/Runtime 훅, 키워드 10종, HazardZone
 오타 폴더/클래스: ComabtSystem, DamageMassage, ArrowMovemnt, DissolveEffectContorller (그대로 유지). 파일명≠클래스명: StraightMovement.cs=Straight, FollowMovement.cs=Follow.
+- [weapon-upgrade.md](weapon-upgrade.md) — 무기 업그레이드, 플레이어별 보상 풀, Chain, 무기 ★, ReturnMovement, 몬스터 둔화

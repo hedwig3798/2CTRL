@@ -1,0 +1,79 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b3795bac8328aef4fb7b53deef8d8087, type: 3}
+  m_Name: MineUpgradeTable
+  m_EditorClassIdentifier: Game.Runtime::WeaponUpgradeTable
+  rewardWeight: 1
+  steps:
+  - title: "\uB370\uBBF8\uC9C0 +20%"
+    description: "\uB370\uBBF8\uC9C0 +20%"
+    modifiers:
+    - param: 0
+      mode: 1
+      value: 0.2
+  - title: "\uD3ED\uBC1C \uBC18\uACBD +20%"
+    description: "\uD3ED\uBC1C \uBC18\uACBD +20%"
+    modifiers:
+    - param: 5
+      mode: 1
+      value: 0.2
+  - title: "\uC9C0\uB8B0 +1"
+    description: "\uC9C0\uB8B0 +1"
+    modifiers:
+    - param: 3
+      mode: 0
+      value: 1
+  - title: "\uD65C\uC131\uD654 \uC9C0\uC5F0 -50%"
+    description: "\uD65C\uC131\uD654 \uC9C0\uC5F0 -50%"
+    modifiers:
+    - param: 109
+      mode: 1
+      value: -0.5
+  - title: "\u2605 \uD3ED\uBC1C \uBC18\uACBD +40%, \uB109\uBC31 +50%"
+    description: "\uD3ED\uBC1C \uBC18\uACBD +40%, \uB109\uBC31 +50%"
+    modifiers:
+    - param: 5
+      mode: 1
+      value: 0.4
+    - param: 7
+      mode: 1
+      value: 0.5
+  - title: "\uACF5\uC18D +15%"
+    description: "\uACF5\uACA9 \uC18D\uB3C4 +15%"
+    modifiers:
+    - param: 1
+      mode: 1
+      value: 0.15
+  - title: "\uB370\uBBF8\uC9C0 +20%"
+    description: "\uB370\uBBF8\uC9C0 +20%"
+    modifiers:
+    - param: 0
+      mode: 1
+      value: 0.2
+  - title: "\uC9C0\uB8B0 \uC218\uBA85 +5\uCD08"
+    description: "\uC9C0\uB8B0 \uC218\uBA85 +5\uCD08"
+    modifiers:
+    - param: 6
+      mode: 0
+      value: 5
+  - title: "\uC9C0\uB8B0 +1"
+    description: "\uC9C0\uB8B0 +1"
+    modifiers:
+    - param: 3
+      mode: 0
+      value: 1
+  - title: "\u2605 \uC5F0\uC1C4 \uD3ED\uBC1C"
+    description: "\uD3ED\uBC1C \uBC94\uC704 \uC548\uC758 \uD65C\uC131 \uC9C0\uB8B0\uB3C4 \uD130\uC9C4\uB2E4"
+    modifiers:
+    - param: 202
+      mode: 0
+      value: 1

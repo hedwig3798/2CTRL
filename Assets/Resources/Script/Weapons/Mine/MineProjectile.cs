@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using UnityEngine;
 
 /// <summary>
@@ -6,6 +7,8 @@ using UnityEngine;
 /// 폭발은 지뢰 위치를 중심으로 무기 areaRadius 안의 적 모두에게 데미지를 주고 바깥쪽으로 밀어낸다
 /// 터지지 않은 지뢰는 Lifetime 이 끝나면 사라진다
 /// 유지형(Persistent) 무기는 발사체 수가 바뀔 때 위치를 다시 초기화하므로 반복형(Repeat) 무기에 붙여 쓴다
+/// - 업그레이드 : 활성화 지연 = weapon.GetParam(ArmDelay, armDelay) (설치할 때마다 다시 읽는다)
+/// - ★ FlagChainExplosion : 폭발 범위 안의 같은 무기의 활성화된 지뢰도 함께 터진다 (연쇄)
 /// </summary>
 public class MineProjectile
     : Projectile
@@ -49,6 +52,15 @@ public class MineProjectile
     private bool isArmed;
     private bool isExploded;
 
+    // 연쇄 폭발 탐색용 활성 지뢰 목록
+    private static readonly List<MineProjectile> activeMines = new List<MineProjectile>();
+
+    [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
+    private static void ResetStatics()
+    {
+        activeMines.Clear();
+    }
+
     protected override bool OnLaunch()
     {
         if (true == requireEnemyInRange
@@ -83,7 +95,8 @@ public class MineProjectile
     /// </summary>
     private void ResetMine()
     {
-        armTime = Time.time + armDelay;
+        float delay = null != weapon ? weapon.GetParam(WeaponParam.ArmDelay, armDelay) : armDelay;
+        armTime = Time.time + Mathf.Max(0f, delay);
         isArmed = false;
         isExploded = false;
         ApplyColor();
@@ -104,6 +117,8 @@ public class MineProjectile
         isArmed = false;
         isExploded = false;
         ApplyColor();
+
+        activeMines.Add(this);
     }
 
     private void Update()
@@ -166,6 +181,7 @@ public class MineProjectile
 
     /// <summary>
     /// 지뢰 위치를 중심으로 areaRadius 안의 적을 모두 타격하고 사라진다
+    /// ★ 연쇄 폭발이 켜져 있으면 폭발 범위 안의 활성화된 지뢰를 차례로 함께 터뜨린다
     /// </summary>
     private void Explode()
     {
@@ -175,13 +191,75 @@ public class MineProjectile
         }
         isExploded = true;
 
+        if (null == weapon || false == weapon.HasFlag(WeaponParam.FlagChainExplosion))
+        {
+            Detonate();
+            gameObject.SetActive(false);
+            return;
+        }
+
+        // 연쇄 중 다른 지뢰가 다시 연쇄를 시작하지 않도록 대기열로 한 번에 처리한다
+        // 데미지 처리 중 다른 연쇄가 시작돼도 섞이지 않도록 대기열은 연쇄마다 따로 만든다 (★ 연쇄 폭발 때만 할당)
+        List<MineProjectile> queue = new List<MineProjectile>();
+        queue.Add(this);
+        for (int i = 0; i < queue.Count; ++i)
+        {
+            MineProjectile mine = queue[i];
+            mine.Detonate();
+            mine.CollectChainTargets(queue);
+        }
+
+        for (int i = 0; i < queue.Count; ++i)
+        {
+            if (null != queue[i])
+            {
+                queue[i].gameObject.SetActive(false);
+            }
+        }
+    }
+
+    /// <summary>
+    /// 폭발 데미지와 연출만 처리한다 (비활성화는 호출한 쪽이 한다)
+    /// </summary>
+    private void Detonate()
+    {
         Vector2 center = transform.position;
         float radius = weapon.areaRadius;
 
         ApplyAreaDamage(center, radius);
         EffectPool.Spawn(explosionEffect, center, radius);
+    }
 
-        gameObject.SetActive(false);
+    /// <summary>
+    /// 폭발 범위 안의 같은 무기의 활성화된 (아직 터지지 않은) 지뢰를 연쇄 대기열에 넣는다
+    /// </summary>
+    private void CollectChainTargets(List<MineProjectile> _queue)
+    {
+        float radius = weapon.areaRadius;
+        float sqrRadius = radius * radius;
+        Vector2 center = transform.position;
+
+        for (int i = 0; i < activeMines.Count; ++i)
+        {
+            MineProjectile other = activeMines[i];
+            if (null == other || other == this || other.weapon != weapon)
+            {
+                continue;
+            }
+
+            if (false == other.isArmed || true == other.isExploded)
+            {
+                continue;
+            }
+
+            if (((Vector2)other.transform.position - center).sqrMagnitude > sqrRadius)
+            {
+                continue;
+            }
+
+            other.isExploded = true;
+            _queue.Add(other);
+        }
     }
 
     private float GetTriggerRadius()
@@ -235,6 +313,8 @@ public class MineProjectile
 
     protected override void OnDisable()
     {
+        activeMines.Remove(this);
+
         isArmed = false;
         isExploded = false;
 

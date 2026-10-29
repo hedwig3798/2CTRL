@@ -13,3 +13,4 @@ MonoBehaviour:
   m_Name: LaserRewardEffect
   m_EditorClassIdentifier: Assembly-CSharp::WeaponRewardEffect
   weaponPrefab: {fileID: 5536439645276528640, guid: 384bb9388fa9441a852324600bf99205, type: 3}
+  upgradeTable: {fileID: 11400000, guid: 51018c98c9b766c41a3d9d1f09ec9e6a, type: 2}

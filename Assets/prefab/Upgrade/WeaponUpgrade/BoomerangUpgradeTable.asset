@@ -1,0 +1,79 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b3795bac8328aef4fb7b53deef8d8087, type: 3}
+  m_Name: BoomerangUpgradeTable
+  m_EditorClassIdentifier: Game.Runtime::WeaponUpgradeTable
+  rewardWeight: 1
+  steps:
+  - title: "\uB370\uBBF8\uC9C0 +20%"
+    description: "\uB370\uBBF8\uC9C0 +20%"
+    modifiers:
+    - param: 0
+      mode: 1
+      value: 0.2
+  - title: "\uAC1C\uC218 +1"
+    description: "\uAC1C\uC218 +1"
+    modifiers:
+    - param: 3
+      mode: 0
+      value: 1
+  - title: "\uD22C\uC0AC\uCCB4 \uC18D\uB3C4 +20%"
+    description: "\uD22C\uC0AC\uCCB4 \uC18D\uB3C4 +20%"
+    modifiers:
+    - param: 8
+      mode: 1
+      value: 0.2
+  - title: "\uB370\uBBF8\uC9C0 +20%"
+    description: "\uB370\uBBF8\uC9C0 +20%"
+    modifiers:
+    - param: 0
+      mode: 1
+      value: 0.2
+  - title: "\u2605 \uD06C\uAE30 +40%, \uD0C0\uACA9 \uC218 +10"
+    description: "\uBD80\uBA54\uB791 \uD06C\uAE30 +40%, \uD0C0\uACA9 \uC218 +10"
+    modifiers:
+    - param: 100
+      mode: 1
+      value: 0.4
+    - param: 4
+      mode: 0
+      value: 10
+  - title: "\uACF5\uC18D +15%"
+    description: "\uACF5\uACA9 \uC18D\uB3C4 +15%"
+    modifiers:
+    - param: 1
+      mode: 1
+      value: 0.15
+  - title: "\uAC1C\uC218 +1"
+    description: "\uAC1C\uC218 +1"
+    modifiers:
+    - param: 3
+      mode: 0
+      value: 1
+  - title: "\uB370\uBBF8\uC9C0 +20%"
+    description: "\uB370\uBBF8\uC9C0 +20%"
+    modifiers:
+    - param: 0
+      mode: 1
+      value: 0.2
+  - title: "\uC0AC\uAC70\uB9AC +1.5"
+    description: "\uC0AC\uAC70\uB9AC +1.5"
+    modifiers:
+    - param: 2
+      mode: 0
+      value: 1.5
+  - title: "\u2605 \uADC0\uD658 \uAC15\uD0C0"
+    description: "\uB3CC\uC544\uC62C \uB54C \uB370\uBBF8\uC9C0 2\uBC30"
+    modifiers:
+    - param: 200
+      mode: 0
+      value: 1

@@ -13,3 +13,4 @@ MonoBehaviour:
   m_Name: SweepRewardEffect
   m_EditorClassIdentifier: Assembly-CSharp::WeaponRewardEffect
   weaponPrefab: {fileID: 1143293158503042432, guid: e405b693010d48ab983005cc8068c943, type: 3}
+  upgradeTable: {fileID: 11400000, guid: fde4f9b6892d2d744862f3da9311cfb1, type: 2}

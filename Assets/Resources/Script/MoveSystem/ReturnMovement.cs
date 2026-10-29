@@ -1,8 +1,9 @@
 using UnityEngine;
 
 /// <summary>
-/// 부메랑처럼 목표 지점을 향해 감속하며 날아가다가, 멈춘 지점에서 출발한 곳(startPosition)으로 가속하며 돌아온다
-/// 돌아오는 동안은 출발한 곳을 계속 따라가며, 붙잡히면(catchDistance) 비활성화된다
+/// 부메랑처럼 목표 지점을 향해 감속하며 날아가다가, 멈춘 지점에서 출발한 곳(startPosition)을 향해 가속하며 돌아온다
+/// 돌아오는 방향은 되돌아서는 순간 한 번만 정하고 끝까지 그 방향으로 날아간다 (주인을 따라가지 않고, 주인에게 닿아도 사라지지 않는다)
+/// 소멸은 Lifetime 등 다른 컴포넌트가 담당한다
 /// 되돌아서는 순간 OneHitProjectile 의 타격 기록을 지워 돌아오는 길에 같은 적을 다시 타격할 수 있다
 /// 타격은 하지 않는다 (OneHitProjectile 등 타격 컴포넌트가 담당)
 /// </summary>
@@ -19,12 +20,9 @@ public class ReturnMovement
     [Tooltip("목표가 가까워도 최소 이 거리만큼은 날아간다")]
     [Min(0.1f)]
     public float minDistance = 2f;
-    [Tooltip("돌아올 때의 최고 속도 배율. 주인이 움직여도 따라잡을 수 있도록 1 보다 크게 둔다")]
+    [Tooltip("돌아올 때의 최고 속도 배율")]
     [Min(0.1f)]
     public float returnSpeedRate = 1.5f;
-    [Tooltip("돌아오는 중 출발한 곳과의 거리가 이 값 이하가 되면 비활성화")]
-    [Min(0f)]
-    public float catchDistance = 0.3f;
 
     [Header("hit value")]
     [Tooltip("되돌아설 때 타격 기록을 지워 돌아오는 길에 같은 적을 다시 타격한다")]
@@ -46,6 +44,11 @@ public class ReturnMovement
     private float deceleration;
     private float currSpeed;
     private bool returning;
+
+    /// <summary>
+    /// 되돌아오는 중인지 (BoomerangUpgrade 가 귀환 데미지 배율에 쓴다)
+    /// </summary>
+    public bool IsReturning => returning;
 
     private void Awake()
     {
@@ -114,6 +117,7 @@ public class ReturnMovement
 
         currSpeed = 0f;
         returning = true;
+        direction = GetReturnDirection();
         if (true == resetHitsOnReturn && null != oneHitProjectile)
         {
             oneHitProjectile.ResetHitTargets();
@@ -122,23 +126,24 @@ public class ReturnMovement
 
     private void UpdateReturn()
     {
-        // 돌아갈 곳이 사라지면 그 자리에서 사라진다
+        currSpeed = Mathf.Min(currSpeed + deceleration * Time.deltaTime, speed * returnSpeedRate);
+        transform.position += currSpeed * Time.deltaTime * direction;
+    }
+
+    /// <summary>
+    /// 되돌아서는 순간의 출발한 곳 방향. 출발한 곳이 사라졌거나 너무 가까우면 날아온 반대 방향
+    /// </summary>
+    private Vector3 GetReturnDirection()
+    {
         if (null == returnTarget || false == returnTarget.gameObject.activeInHierarchy)
         {
-            gameObject.SetActive(false);
-            return;
+            return -direction;
         }
 
-        currSpeed = Mathf.Min(currSpeed + deceleration * Time.deltaTime, speed * returnSpeedRate);
-
-        Vector3 goal = returnTarget.position;
-        goal.z = transform.position.z;
-        transform.position = Vector3.MoveTowards(transform.position, goal, currSpeed * Time.deltaTime);
-
-        if ((goal - transform.position).sqrMagnitude <= catchDistance * catchDistance)
-        {
-            gameObject.SetActive(false);
-        }
+        Vector3 toTarget = returnTarget.position - transform.position;
+        toTarget.z = 0f;
+        float distance = toTarget.magnitude;
+        return distance < 0.0001f ? -direction : toTarget / distance;
     }
 
     private void Spin()

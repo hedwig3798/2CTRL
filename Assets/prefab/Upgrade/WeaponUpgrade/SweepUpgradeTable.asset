@@ -1,0 +1,76 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b3795bac8328aef4fb7b53deef8d8087, type: 3}
+  m_Name: SweepUpgradeTable
+  m_EditorClassIdentifier: Game.Runtime::WeaponUpgradeTable
+  rewardWeight: 1
+  steps:
+  - title: "\uB370\uBBF8\uC9C0 +20%"
+    description: "\uB370\uBBF8\uC9C0 +20%"
+    modifiers:
+    - param: 0
+      mode: 1
+      value: 0.2
+  - title: "\uCE7C\uB0A0 \uAE38\uC774 +20%"
+    description: "\uCE7C\uB0A0 \uAE38\uC774 +20%"
+    modifiers:
+    - param: 114
+      mode: 1
+      value: 0.2
+  - title: "\uACF5\uC18D +15%"
+    description: "\uACF5\uACA9 \uC18D\uB3C4 +15%"
+    modifiers:
+    - param: 1
+      mode: 1
+      value: 0.15
+  - title: "\uB109\uBC31 +25%"
+    description: "\uB109\uBC31 +25%"
+    modifiers:
+    - param: 7
+      mode: 1
+      value: 0.25
+  - title: "\u2605 \uC591\uBC29\uD5A5"
+    description: "\uBC18\uB300 \uBC29\uD5A5\uC73C\uB85C\uB3C4 \uB3D9\uC2DC\uC5D0 \uD718\uB450\uB978\uB2E4"
+    modifiers:
+    - param: 3
+      mode: 0
+      value: 1
+  - title: "\uB370\uBBF8\uC9C0 +20%"
+    description: "\uB370\uBBF8\uC9C0 +20%"
+    modifiers:
+    - param: 0
+      mode: 1
+      value: 0.2
+  - title: "\uCE7C\uB0A0 \uAE38\uC774 +20%"
+    description: "\uCE7C\uB0A0 \uAE38\uC774 +20%"
+    modifiers:
+    - param: 114
+      mode: 1
+      value: 0.2
+  - title: "\uACF5\uC18D +15%"
+    description: "\uACF5\uACA9 \uC18D\uB3C4 +15%"
+    modifiers:
+    - param: 1
+      mode: 1
+      value: 0.15
+  - title: "\uB370\uBBF8\uC9C0 +20%"
+    description: "\uB370\uBBF8\uC9C0 +20%"
+    modifiers:
+    - param: 0
+      mode: 1
+      value: 0.2
+  - title: "\u2605 \uAC80\uAE30"
+    description: "\uD718\uB450\uB97C \uB54C \uC870\uC900 \uBC29\uD5A5\uC73C\uB85C \uB370\uBBF8\uC9C0 60% \uAD00\uD1B5 \uAC80\uAE30 \uBC1C\uC0AC"
+    modifiers:
+    - param: 206
+      mode: 0
+      value: 1

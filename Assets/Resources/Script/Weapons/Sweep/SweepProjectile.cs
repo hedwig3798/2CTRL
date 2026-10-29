@@ -9,6 +9,8 @@ using UnityEngine;
 /// - 넉백은 칼날 위치가 아니라 휘두르는 중심(무기 = 플레이어) 에서 바깥쪽으로 밀어낸다
 /// - 칼날 길이(areaRadius) 를 무기의 최종 범위에 맞춰 BlackBoard 에 기록한다 (SweepMovement 가 사용)
 /// 이동 / 회전은 SweepMovement 가 담당한다
+/// - 업그레이드 : 칼날 길이 = weapon.GetParam(Reach, 기본 칼날 길이). 양방향은 fireCount +1 이면 SweepMovement 가 formation 으로 반대 방향에 배치한다
+/// - ★ FlagSlashWave : 첫 번째 칼날(formation 0)을 휘두를 때 조준 방향으로 관통 투사체(slashPrefab)를 데미지 slashDamageRate 배로 쏜다
 /// </summary>
 public class SweepProjectile
     : Projectile
@@ -18,6 +20,23 @@ public class SweepProjectile
     [Min(0f)]
     [SerializeField]
     private float reachPadding = 0.3f;
+
+    [Header("slash wave (★)")]
+    [Tooltip("검기 발사체 프리팹 (OneHitProjectile + Straight 등). 비어 있으면 검기를 쏘지 않는다")]
+    [SerializeField]
+    private Projectile slashPrefab;
+    [Tooltip("검기 데미지 = 무기 최종 데미지 * 이 값")]
+    [Min(0f)]
+    [SerializeField]
+    private float slashDamageRate = 0.6f;
+    [Tooltip("검기가 관통해 타격할 적 수 (OneHitProjectile 일 때)")]
+    [Min(1)]
+    [SerializeField]
+    private int slashHitCount = 99;
+    [Tooltip("검기 수명 (초). 0 이면 무기 lifetime / 프리팹 Lifetime 기본값 그대로 (Sweep 무기 lifetime 은 휘두르는 시간이므로 따로 지정한다)")]
+    [Min(0f)]
+    [SerializeField]
+    private float slashLifetime = 0.8f;
 
     private HashSet<DamagePipeline> hitTargets = new HashSet<DamagePipeline>();
 
@@ -30,6 +49,7 @@ public class SweepProjectile
         }
 
         WriteReach();
+        TryFireSlash();
         return true;
     }
 
@@ -52,7 +72,49 @@ public class SweepProjectile
         }
 
         float reach = weapon.areaRadius > 0f ? weapon.areaRadius : weapon.FinalRange + reachPadding;
-        b.SetFloat(DATA_TYPE.areaRadius, reach);
+        reach = weapon.GetParam(WeaponParam.Reach, reach);
+        b.SetFloat(DATA_TYPE.areaRadius, Mathf.Max(0.1f, reach));
+    }
+
+    /// <summary>
+    /// ★ 검기 : 첫 번째 칼날만 무기 위치에서 조준 대상(moveTarget) 방향으로 관통 투사체를 쏜다
+    /// </summary>
+    private void TryFireSlash()
+    {
+        if (0 != formationIndex || null == slashPrefab || false == weapon.HasFlag(WeaponParam.FlagSlashWave))
+        {
+            return;
+        }
+
+        BlackBoard b = GetBlackBoard();
+        Transform target = null != b ? b.GetTransform(DATA_TYPE.moveTarget) : null;
+        if (null == target)
+        {
+            return;
+        }
+
+        Vector3 start = weapon.transform.position;
+        Vector3 point = target.position;
+        if ((point - start).sqrMagnitude < 0.0001f)
+        {
+            point = start + Vector3.right;
+        }
+
+        Projectile p = weapon.FireSub(slashPrefab, start, point, slashDamageRate);
+        if (null == p)
+        {
+            return;
+        }
+
+        if (p is OneHitProjectile oneHit)
+        {
+            oneHit.SetHitCount(slashHitCount);
+        }
+
+        if (slashLifetime > 0f && p.TryGetComponent(out Lifetime lifetime))
+        {
+            lifetime.lifetime = slashLifetime;
+        }
     }
 
     private void OnTriggerEnter2D(Collider2D other)

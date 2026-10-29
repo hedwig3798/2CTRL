@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using UnityEngine;
 
 /// <summary>
@@ -9,6 +10,8 @@ using UnityEngine;
 /// - 무기의 공격 간격(1 / FinalAttackSpeed)은 장판 생성 간격으로만 쓰인다
 ///   (AuraProjectile 처럼 FinalCoolTime 을 틱으로 쓰면 틱을 빠르게 할수록 장판이 너무 많이 깔리므로 둘을 분리한다)
 /// - 소멸은 Lifetime 이 담당한다
+/// - 업그레이드 : 틱 간격 기본값 = weapon.GetParam(TickInterval, tickInterval)
+/// - ★ FlagSlowZone : 틱마다 장판 안의 적을 slowRate 만큼 둔화시킨다 (다음 틱 + slowLinger 초까지 유지)
 /// </summary>
 public class PoisonZoneProjectile
     : Projectile
@@ -25,6 +28,18 @@ public class PoisonZoneProjectile
     public float minHitRadius = 0.2f;
     [Tooltip("비워두면 같은 오브젝트의 PoisonZoneLandMovement. 없으면 발사 즉시 착지한 것으로 본다")]
     public PoisonZoneLandMovement landMovement;
+
+    [Header("slow (★)")]
+    [Tooltip("FlagSlowZone 이 켜졌을 때 장판 위 적의 이동 속도 감소 비율 (0.4 = -40%)")]
+    [Range(0f, 1f)]
+    [SerializeField]
+    private float slowRate = 0.4f;
+    [Tooltip("둔화가 다음 틱 이후로 더 유지되는 시간 (초). 장판을 벗어나면 이 시간 뒤에 풀린다")]
+    [Min(0f)]
+    [SerializeField]
+    private float slowLinger = 0.15f;
+
+    private List<Transform> slowBuffer = new List<Transform>();
 
     private bool landed;
     private float nextTickTime;
@@ -46,13 +61,14 @@ public class PoisonZoneProjectile
                 return tickInterval;
             }
 
+            float interval = Mathf.Max(0.05f, weapon.GetParam(WeaponParam.TickInterval, tickInterval));
             float speed = weapon.FinalAttackSpeed;
             if (weapon.attackSpeed <= 0f || speed <= 0f)
             {
-                return tickInterval;
+                return interval;
             }
 
-            return Mathf.Max(0.05f, tickInterval * (weapon.attackSpeed / speed));
+            return Mathf.Max(0.05f, interval * (weapon.attackSpeed / speed));
         }
     }
 
@@ -107,7 +123,31 @@ public class PoisonZoneProjectile
         }
 
         ApplyAreaDamage(transform.position, radius);
-        nextTickTime = Time.time + FinalTickInterval;
+
+        float interval = FinalTickInterval;
+        if (true == weapon.HasFlag(WeaponParam.FlagSlowZone))
+        {
+            ApplySlow(radius, interval + slowLinger);
+        }
+
+        nextTickTime = Time.time + interval;
+    }
+
+    /// <summary>
+    /// 장판 안의 몬스터를 _duration 초 동안 둔화시킨다
+    /// </summary>
+    private void ApplySlow(float _radius, float _duration)
+    {
+        int count = FindAll(transform.position, _radius, slowBuffer);
+        for (int i = 0; i < count; ++i)
+        {
+            MonsterBrain brain = slowBuffer[i].GetComponentInParent<MonsterBrain>();
+            if (null != brain && null != brain.Context)
+            {
+                brain.Context.ApplySlow(slowRate, _duration);
+            }
+        }
+        slowBuffer.Clear();
     }
 
     protected override void OnDisable()

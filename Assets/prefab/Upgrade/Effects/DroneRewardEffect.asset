@@ -13,3 +13,4 @@ MonoBehaviour:
   m_Name: DroneRewardEffect
   m_EditorClassIdentifier: Assembly-CSharp::WeaponRewardEffect
   weaponPrefab: {fileID: 6602184377150928473, guid: 0887418b6cdb4a3ab8ede9c7fbc29d56, type: 3}
+  upgradeTable: {fileID: 11400000, guid: fe171b1abe076e749ae24c86dd49210f, type: 2}

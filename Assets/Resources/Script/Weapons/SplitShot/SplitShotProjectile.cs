@@ -6,6 +6,9 @@ using UnityEngine;
 /// 그 자리에서 조각 fragmentCount 개를 사방(균등한 각도 + 랜덤 회전)으로 흩뿌린 뒤 사라진다
 /// 조각은 Weapon.FireSub 로 발사하며, 본탄이 맞힌 적은 다시 맞히지 않는다
 /// 이동은 BlackBoard 로 초기화되는 이동 컴포넌트(Straight)가 담당한다
+/// - 업그레이드 : 조각 수 / 데미지 비율 / 거리는 weapon.GetParam(FragmentCount / FragmentDamageRate / FragmentDistance, 인스펙터 값) 으로 분열할 때마다 읽는다
+///   조각 거리가 늘어난 비율만큼 조각의 Lifetime 도 늘린다
+/// - ★ FlagResplit : 조각에 SplitFragmentResplit 이 있으면 처음 맞힌 적 자리에서 한 번 더 분열하도록 켠다
 /// </summary>
 public class SplitShotProjectile
     : Projectile
@@ -94,32 +97,82 @@ public class SplitShotProjectile
             EffectPool.Spawn(burstEffect, _hitPoint, burstRadius);
         }
 
-        if (null == weapon || null == fragmentPrefab || fragmentCount <= 0)
+        if (null == weapon || null == fragmentPrefab)
         {
             return;
         }
 
-        _hitPoint.z = 0f;
-        float step = 360f / fragmentCount;
+        int count = Mathf.Max(0, weapon.GetParamInt(WeaponParam.FragmentCount, fragmentCount));
+        if (count <= 0)
+        {
+            return;
+        }
+
+        float damageRate = Mathf.Max(0f, weapon.GetParam(WeaponParam.FragmentDamageRate, fragmentDamageRate));
+        float distance = Mathf.Max(0.1f, weapon.GetParam(WeaponParam.FragmentDistance, fragmentDistance));
+        float lifetimeRate = fragmentDistance > 0f ? distance / fragmentDistance : 1f;
+        bool resplit = weapon.HasFlag(WeaponParam.FlagResplit);
+
+        FireFragments(weapon, fragmentPrefab, _hitPoint, _hitTarget, count, damageRate, distance, lifetimeRate, resplit);
+    }
+
+    /// <summary>
+    /// _point 에서 조각 _count 개를 균등한 각도(전체 각도에 랜덤 회전)로 흩뿌린다
+    /// - 조각은 _ignoreTarget 을 타격하지 않는다
+    /// - _lifetimeRate 가 1 이 아니면 조각 Lifetime 을 그 비율만큼 바꾼다 (실제 비행 거리 = 속도 * 수명)
+    /// - _armResplit 이 켜져 있으면 조각의 SplitFragmentResplit 을 켠다 (재분열 조각은 끈 채로 쏴 다시 분열하지 않는다)
+    /// </summary>
+    public static void FireFragments(
+        Weapon _weapon
+        , Projectile _prefab
+        , Vector3 _point
+        , DamagePipeline _ignoreTarget
+        , int _count
+        , float _damageRate
+        , float _distance
+        , float _lifetimeRate
+        , bool _armResplit)
+    {
+        if (null == _weapon || null == _prefab || _count <= 0)
+        {
+            return;
+        }
+
+        _point.z = 0f;
+        float step = 360f / _count;
         float offset = Random.Range(0f, step);
 
-        for (int i = 0; i < fragmentCount; ++i)
+        for (int i = 0; i < _count; ++i)
         {
             float angle = (offset + step * i) * Mathf.Deg2Rad;
             Vector3 dir = new Vector3(Mathf.Cos(angle), Mathf.Sin(angle), 0f);
 
-            Projectile p = weapon.FireSub(
-                fragmentPrefab
-                , _hitPoint
-                , _hitPoint + dir * fragmentDistance
-                , fragmentDamageRate
+            Projectile p = _weapon.FireSub(
+                _prefab
+                , _point
+                , _point + dir * _distance
+                , _damageRate
                 , i
-                , fragmentCount
+                , _count
             );
+            if (null == p)
+            {
+                continue;
+            }
 
             if (p is OneHitProjectile oneHit)
             {
-                oneHit.IgnoreTarget(_hitTarget);
+                oneHit.IgnoreTarget(_ignoreTarget);
+            }
+
+            if (1f != _lifetimeRate && p.TryGetComponent(out Lifetime lifetime))
+            {
+                lifetime.lifetime *= Mathf.Max(0f, _lifetimeRate);
+            }
+
+            if (true == _armResplit && p.TryGetComponent(out SplitFragmentResplit resplit))
+            {
+                resplit.Arm(_prefab, _damageRate, _distance, _lifetimeRate);
             }
         }
     }

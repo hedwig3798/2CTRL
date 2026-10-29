@@ -25,9 +25,46 @@ public class MonsterContext
     public bool isDefaultLeft = true;
 
     /// <summary>
-    /// baseMoveSpeed × moveSpeedRate
+    /// baseMoveSpeed × moveSpeedRate × SlowMultiplier
     /// </summary>
-    public float MoveSpeed => (null != data ? data.baseMoveSpeed : 0f) * moveSpeedRate;
+    public float MoveSpeed => (null != data ? data.baseMoveSpeed : 0f) * moveSpeedRate * SlowMultiplier;
+
+    // 둔화 (독 장판 등). slowEndTime 이 지나면 풀린다
+    private float slowRate;
+    private float slowEndTime;
+
+    /// <summary>
+    /// 둔화가 반영된 이동 속도 배율 (둔화 중이 아니면 1)
+    /// </summary>
+    public float SlowMultiplier => Time.time < slowEndTime ? 1f - slowRate : 1f;
+
+    /// <summary>
+    /// _duration 초 동안 이동 속도를 _rate 만큼 줄인다 (0.4 = -40%)
+    /// 이미 둔화 중이면 더 강한 비율과 더 늦은 종료 시간을 쓴다
+    /// </summary>
+    public void ApplySlow(float _rate, float _duration)
+    {
+        _rate = Mathf.Clamp01(_rate);
+        float endTime = Time.time + Mathf.Max(0f, _duration);
+        if (Time.time >= slowEndTime)
+        {
+            slowRate = _rate;
+            slowEndTime = endTime;
+            return;
+        }
+
+        slowRate = Mathf.Max(slowRate, _rate);
+        slowEndTime = Mathf.Max(slowEndTime, endTime);
+    }
+
+    /// <summary>
+    /// 둔화를 바로 푼다 (스폰 시 초기화)
+    /// </summary>
+    public void ClearSlow()
+    {
+        slowRate = 0f;
+        slowEndTime = 0f;
+    }
 
     /// <summary>
     /// data.targetLayer 중 이 몬스터 레이어와 충돌하는 레이어만 (좌·우 진영이 서로의 플레이어를 때리지 않도록)

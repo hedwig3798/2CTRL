@@ -7,6 +7,10 @@ using UnityEngine;
 /// - 풀은 private 이지만 인스펙터에서 항목과 가중치를 채울 수 있다
 /// - 항목은 RewardData 이며, Get / GetAny 로 가중치 랜덤으로 꺼낸다
 /// - RewardPoolType 으로 풀에 접근해서 추가 / 삭제 / 가중치 조절을 한다
+/// - 플레이어별 풀 상태
+///   - ExcludeFor : 공유 풀의 항목을 그 플레이어에게만 숨긴다 (예: 얻은 무기)
+///   - AddFor / RemoveFor : 그 플레이어에게만 보이는 항목을 추가 / 삭제한다 (예: 무기 업그레이드)
+///   - side 를 받는 GetRandomUnique 가 둘을 반영해 후보를 모은다
 /// </summary>
 [DisallowMultipleComponent]
 public class RewardManager
@@ -45,6 +49,24 @@ public class RewardManager
     private Dictionary<RewardPoolType, RandomPool<RewardData>> poolMap;
 
     /// <summary>
+    /// 한 플레이어에게만 적용되는 풀 상태
+    /// </summary>
+    private class SideState
+    {
+        /// <summary>
+        /// 공유 풀에 있지만 이 플레이어에게는 숨기는 항목
+        /// </summary>
+        public readonly HashSet<RewardData> excluded = new HashSet<RewardData>();
+
+        /// <summary>
+        /// 이 플레이어에게만 보이는 항목
+        /// </summary>
+        public readonly Dictionary<RewardPoolType, RandomPool<RewardData>> pools = new Dictionary<RewardPoolType, RandomPool<RewardData>>();
+    }
+
+    private readonly Dictionary<PlayerSide, SideState> sideStates = new Dictionary<PlayerSide, SideState>();
+
+    /// <summary>
     /// 보상을 적용한다 (보상이 비어 있거나 effect 가 없으면 무시)
     /// </summary>
     /// <param name="_side">플레이어 보상을 받을 쪽</param>
@@ -63,6 +85,8 @@ public class RewardManager
         RewardContext context = new RewardContext
         {
             Player = PlayerStats.Find(_side),
+            Side = _side,
+            Manager = this,
             Spawner = spawner,
         };
 
@@ -115,6 +139,86 @@ public class RewardManager
         RandomPool<RewardData> pool = GetPool(_type);
         return null != pool ? pool.Count : 0;
     }
+
+    #region Side
+    private SideState GetSideState(PlayerSide _side)
+    {
+        if (false == sideStates.TryGetValue(_side, out SideState state))
+        {
+            state = new SideState();
+            sideStates.Add(_side, state);
+        }
+        return state;
+    }
+
+    /// <summary>
+    /// 공유 풀의 _item 을 _side 플레이어에게만 숨긴다 (공유 풀에서는 빼지 않는다)
+    /// </summary>
+    public void ExcludeFor(PlayerSide _side, RewardData _item)
+    {
+        if (null != _item)
+        {
+            GetSideState(_side).excluded.Add(_item);
+        }
+    }
+
+    public bool IsExcludedFor(PlayerSide _side, RewardData _item)
+    {
+        return null != _item && sideStates.TryGetValue(_side, out SideState state) && state.excluded.Contains(_item);
+    }
+
+    /// <summary>
+    /// _side 플레이어에게만 보이는 항목을 _type 풀에 추가한다
+    /// </summary>
+    public void AddFor(PlayerSide _side, RewardPoolType _type, RewardData _item, float _weight)
+    {
+        if (null == _item)
+        {
+            return;
+        }
+
+        SideState state = GetSideState(_side);
+        if (false == state.pools.TryGetValue(_type, out RandomPool<RewardData> pool))
+        {
+            pool = new RandomPool<RewardData>();
+            state.pools.Add(_type, pool);
+        }
+        pool.Add(_item, _weight);
+    }
+
+    /// <summary>
+    /// AddFor 로 넣은 _side 플레이어 전용 항목을 뺀다
+    /// </summary>
+    public bool RemoveFor(PlayerSide _side, RewardPoolType _type, RewardData _item)
+    {
+        return null != _item
+            && sideStates.TryGetValue(_side, out SideState state)
+            && state.pools.TryGetValue(_type, out RandomPool<RewardData> pool)
+            && pool.Remove(_item);
+    }
+
+    /// <summary>
+    /// _side 플레이어 전용 _type 풀 (없으면 null)
+    /// </summary>
+    public RandomPool<RewardData> GetPoolFor(PlayerSide _side, RewardPoolType _type)
+    {
+        if (false == sideStates.TryGetValue(_side, out SideState state))
+        {
+            return null;
+        }
+
+        state.pools.TryGetValue(_type, out RandomPool<RewardData> pool);
+        return pool;
+    }
+
+    /// <summary>
+    /// _side 플레이어의 숨김 / 전용 항목을 모두 지운다
+    /// </summary>
+    public void ClearFor(PlayerSide _side)
+    {
+        sideStates.Remove(_side);
+    }
+    #endregion
 
     /// <summary>
     /// type 풀에서 가중치 랜덤으로 하나를 가져온다 (풀에서 빼지 않는다)
@@ -278,9 +382,43 @@ public class RewardManager
     }
 
     /// <summary>
+    /// _side 플레이어 기준으로 _types 의 풀에서 가중치를 무시하고 균등 랜덤으로 중복 없이 최대 _count 개를 가져온다 (풀에서 빼지 않는다)
+    /// - 공유 풀에서 ExcludeFor 로 숨긴 항목은 빼고, AddFor 로 넣은 그 플레이어 전용 항목을 더한다
+    /// - null 항목, weight 가 0 인 항목은 제외하고, 같은 데이터는 한 번만 뽑힌다
+    /// </summary>
+    /// <param name="_types">후보를 모을 풀 목록</param>
+    /// <param name="_side">보상을 받을 플레이어</param>
+    /// <param name="_result">결과를 담을 리스트 (먼저 비운다)</param>
+    /// <returns>가져온 개수</returns>
+    public int GetRandomUnique(int _count, IReadOnlyList<RewardPoolType> _types, PlayerSide _side, List<RewardData> _result)
+    {
+        _result.Clear();
+        if (_count <= 0 || null == _types)
+        {
+            return 0;
+        }
+
+        sideStates.TryGetValue(_side, out SideState state);
+
+        candidates.Clear();
+        candidateSet.Clear();
+        foreach (RewardPoolType type in _types)
+        {
+            AddCandidates(GetPool(type), null != state ? state.excluded : null);
+            if (null != state && true == state.pools.TryGetValue(type, out RandomPool<RewardData> sidePool))
+            {
+                AddCandidates(sidePool, null);
+            }
+        }
+
+        return PickCandidates(_count, _result);
+    }
+
+    /// <summary>
     /// 풀의 유효한 항목을 중복 없이 후보에 추가한다
     /// </summary>
-    private void AddCandidates(RandomPool<RewardData> _pool)
+    /// <param name="_excluded">후보에서 뺄 항목 (null 이면 빼지 않는다)</param>
+    private void AddCandidates(RandomPool<RewardData> _pool, HashSet<RewardData> _excluded = null)
     {
         if (null == _pool)
         {
@@ -290,7 +428,9 @@ public class RewardManager
         for (int i = 0; i < _pool.Count; ++i)
         {
             RewardData item = _pool.GetItem(i);
-            if (null == item || _pool.GetWeight(i) <= 0f || false == candidateSet.Add(item))
+            if (null == item || _pool.GetWeight(i) <= 0f
+                || (null != _excluded && true == _excluded.Contains(item))
+                || false == candidateSet.Add(item))
             {
                 continue;
             }
@@ -311,8 +451,6 @@ public class RewardManager
             (candidates[i], candidates[pick]) = (candidates[pick], candidates[i]);
             _result.Add(candidates[i]);
         }
-
-        Debug.Log($"[RewardManager] 보상 {count}/{_count} 개 뽑음 (후보 {candidates.Count}) : {string.Join(", ", _result.ConvertAll(_data => _data.name))}", this);
 
         candidates.Clear();
         candidateSet.Clear();

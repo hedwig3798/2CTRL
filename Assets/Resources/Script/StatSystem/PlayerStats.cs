@@ -96,7 +96,6 @@ public class PlayerStats
                 break;
         }
 
-        Debug.Log($"[PlayerStats] {name}({side}) {_type.ToDisplayName()} {_mode} {_value:+0.##;-0.##} → {Get(_type):0.##}", this);
         OnStatChanged?.Invoke(this);
     }
     #endregion
@@ -152,6 +151,18 @@ public class PlayerStats
     public bool HasWeapon(Weapon _prefab)
     {
         return null != _prefab && acquiredWeapons.ContainsKey(_prefab);
+    }
+
+    /// <summary>
+    /// AddWeapon 으로 _prefab 에서 생성한 무기 (없거나 파괴됐으면 null)
+    /// </summary>
+    public Weapon GetWeapon(Weapon _prefab)
+    {
+        if (null == _prefab || false == acquiredWeapons.TryGetValue(_prefab, out Weapon weapon))
+        {
+            return null;
+        }
+        return null != weapon ? weapon : null;
     }
     #endregion
 

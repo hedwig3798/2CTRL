@@ -1,3 +1,4 @@
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -8,6 +9,8 @@ using UnityEngine;
 /// - 직접 맞은 적도 폭발 데미지만 한 번 받는다 (직격 + 폭발 중복 타격 없음)
 /// - 적에게 닿지 못해도 목표 지점(moveTargetPoint)을 지나면 그 자리에서 폭발한다 (explodeAtTargetPoint)
 /// - Lifetime 은 안전장치이며, 수명이 먼저 끝나면 폭발하지 않고 사라진다
+/// - ★ FlagSecondaryExplosion : secondaryDelay 뒤 같은 자리에서 반지름 secondaryRadiusRate 배, 데미지 secondaryDamageRate 배로 한 번 더 폭발한다
+///   (발사체는 바로 풀로 돌아가므로 2차 폭발은 무기의 코루틴이 처리한다)
 /// 이동은 BlackBoard 로 초기화되는 이동 컴포넌트(Straight 등)가 담당한다
 /// </summary>
 public class ExplosiveProjectile
@@ -24,6 +27,27 @@ public class ExplosiveProjectile
     [Header("target point")]
     [Tooltip("켜면 적에게 닿지 않아도 목표 지점에 도착하면 그 자리에서 폭발한다")]
     public bool explodeAtTargetPoint = true;
+
+    [Header("secondary explosion (★)")]
+    [Tooltip("1차 폭발 후 2차 폭발까지의 시간 (초)")]
+    [Min(0f)]
+    [SerializeField]
+    private float secondaryDelay = 0.3f;
+    [Tooltip("2차 폭발 반지름 = 1차 반지름 * 이 값")]
+    [Min(0f)]
+    [SerializeField]
+    private float secondaryRadiusRate = 0.6f;
+    [Tooltip("2차 폭발 데미지 = 1차 데미지 * 이 값")]
+    [Min(0f)]
+    [SerializeField]
+    private float secondaryDamageRate = 0.5f;
+
+    // 2차 폭발 범위 탐색용 (코루틴은 한 번에 하나씩만 실행되므로 공유한다)
+    private static readonly List<Transform> secondaryBuffer = new List<Transform>();
+
+    // 2차 폭발 대기 (secondaryDelay 가 같으면 재사용)
+    private WaitForSeconds secondaryWait;
+    private float secondaryWaitDelay = -1f;
 
     /// <summary>
     /// 폭발 반지름. BlackBoard 로 받는다
@@ -133,7 +157,86 @@ public class ExplosiveProjectile
 
         EffectPool.Spawn(explosionEffect, _center, radius);
 
+        TryStartSecondaryExplosion(_center);
+
         gameObject.SetActive(false);
+    }
+
+    /// <summary>
+    /// ★ 2차 폭발을 무기의 코루틴으로 예약한다 (발사체는 곧 풀로 돌아가 재사용될 수 있으므로 필요한 값을 복사해 넘긴다)
+    /// </summary>
+    private void TryStartSecondaryExplosion(Vector2 _center)
+    {
+        if (null == weapon
+            || false == weapon.isActiveAndEnabled
+            || false == weapon.HasFlag(WeaponParam.FlagSecondaryExplosion))
+        {
+            return;
+        }
+
+        DamageMassage message = damageMassage;
+        message.damage *= secondaryDamageRate;
+        weapon.StartCoroutine(SecondaryExplosionRoutine(
+            weapon
+            , explosionEffect
+            , _center
+            , radius * secondaryRadiusRate
+            , message
+            , GetSecondaryWait()
+        ));
+    }
+
+    /// <summary>
+    /// secondaryDelay 대기 객체 (0 이하면 null = 대기 없음). 값이 바뀔 때만 새로 만든다
+    /// </summary>
+    private WaitForSeconds GetSecondaryWait()
+    {
+        if (secondaryDelay <= 0f)
+        {
+            return null;
+        }
+
+        if (null == secondaryWait || secondaryWaitDelay != secondaryDelay)
+        {
+            secondaryWait = new WaitForSeconds(secondaryDelay);
+            secondaryWaitDelay = secondaryDelay;
+        }
+        return secondaryWait;
+    }
+
+    private static IEnumerator SecondaryExplosionRoutine(Weapon _weapon, PooledEffect _effect, Vector2 _center, float _radius, DamageMassage _message, WaitForSeconds _wait)
+    {
+        if (null != _wait)
+        {
+            yield return _wait;
+        }
+
+        if (null == _weapon || _radius <= 0f)
+        {
+            yield break;
+        }
+
+        int count = TargetFinder.FindAll(
+            _center
+            , _radius
+            , _weapon.targetLayer
+            , secondaryBuffer
+            , null
+            , _weapon.transform
+            , _weapon.owner
+        );
+        for (int i = 0; i < count; ++i)
+        {
+            if (secondaryBuffer[i].TryGetComponent(out DamagePipeline dp))
+            {
+                DamageMassage message = _message;
+                message.hitPoint = _center;
+                dp.ProcessDamage(ref message);
+            }
+        }
+        secondaryBuffer.Clear();
+
+        EffectPool.Spawn(_effect, _center, _radius);
     }
 
     private bool IsTargetLayer(int _layer)

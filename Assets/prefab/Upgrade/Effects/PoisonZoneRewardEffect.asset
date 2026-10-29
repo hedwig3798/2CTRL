@@ -13,3 +13,4 @@ MonoBehaviour:
   m_Name: PoisonZoneRewardEffect
   m_EditorClassIdentifier: Assembly-CSharp::WeaponRewardEffect
   weaponPrefab: {fileID: 7651606874026120192, guid: be440b095820487e8bcb844511d9e6c6, type: 3}
+  upgradeTable: {fileID: 11400000, guid: fbe581a3a3b87b74581946b6a430f349, type: 2}

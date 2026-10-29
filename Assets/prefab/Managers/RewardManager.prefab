@@ -66,6 +66,8 @@ MonoBehaviour:
         weight: 1
       - item: {fileID: 11400000, guid: 47511eda51fc404cb884cb5222a3d585, type: 2}
         weight: 1
+      - item: {fileID: 11400000, guid: 37c043b0366fd8e46a6db77a839962c0, type: 2}
+        weight: 1
   - type: 1
     pool:
       entries: []
@@ -75,3 +77,4 @@ MonoBehaviour:
   - type: 3
     pool:
       entries: []
+  spawner: {fileID: 0}

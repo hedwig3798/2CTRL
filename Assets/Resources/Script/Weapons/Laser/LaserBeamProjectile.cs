@@ -8,6 +8,7 @@ using UnityEngine;
 /// 발사 후에는 아무것도 따라가지 않으며, 광선 모양은 Lifetime 동안 남아 가늘어지고 흐려진 뒤 사라진다
 /// - 여러 발(fireCount > 1)을 쏘면 formation 순서에 따라 fanAngle 간격의 부채꼴로 퍼진다 (spreadRange 랜덤 보정도 함께 적용)
 /// - 목표 지점은 Launch 가 OnLaunch 이후에 기록하므로, 실제 발사는 Initialize(BlackBoard) 에서 한다
+/// - 업그레이드 : 두께 = weapon.GetParam(LaserWidth, width), 부채꼴 각도 = weapon.GetParam(FanAngle, fanAngle) (발사할 때마다 다시 읽는다)
 /// </summary>
 public class LaserBeamProjectile
     : Projectile
@@ -46,6 +47,10 @@ public class LaserBeamProjectile
     private float beamLength;
     private Color baseColor = Color.white;
 
+    // 이번 발사에 쓰는 두께 / 부채꼴 각도 (업그레이드 반영. 인스펙터 값은 프리팹 기본값으로 남는다)
+    private float currWidth;
+    private float currFanAngle;
+
     /// <summary>
     /// 발사 지점과 목표 지점이 BlackBoard 에 모두 기록된 뒤 호출된다. 이때 광선을 쏜다
     /// </summary>
@@ -66,6 +71,9 @@ public class LaserBeamProjectile
             gameObject.SetActive(false);
             return;
         }
+
+        currWidth = Mathf.Max(0.01f, weapon.GetParam(WeaponParam.LaserWidth, width));
+        currFanAngle = Mathf.Max(0f, weapon.GetParam(WeaponParam.FanAngle, fanAngle));
 
         Vector2 dir = (Vector2)(point - start);
         dir = dir.sqrMagnitude < 0.0001f ? Vector2.right : dir.normalized;
@@ -116,12 +124,12 @@ public class LaserBeamProjectile
     /// </summary>
     private Vector2 ApplyFormationAngle(Vector2 _dir)
     {
-        if (formationCount <= 1 || fanAngle <= 0f)
+        if (formationCount <= 1 || currFanAngle <= 0f)
         {
             return _dir;
         }
 
-        float offset = (formationIndex - (formationCount - 1) * 0.5f) * fanAngle;
+        float offset = (formationIndex - (formationCount - 1) * 0.5f) * currFanAngle;
         return (Vector2)(Quaternion.Euler(0f, 0f, offset) * _dir);
     }
 
@@ -151,7 +159,7 @@ public class LaserBeamProjectile
 
         int count = Physics2D.CircleCast(
             _start
-            , width * 0.5f
+            , currWidth * 0.5f
             , _dir
             , castFilter
             , castBuffer
@@ -216,7 +224,7 @@ public class LaserBeamProjectile
         float remain = null != lifetime ? lifetime.RemainRate : 1f;
 
         visual.localPosition = new Vector3(beamLength * 0.5f, 0f, 0f);
-        visual.localScale = new Vector3(beamLength, width * remain, 1f);
+        visual.localScale = new Vector3(beamLength, currWidth * remain, 1f);
 
         if (null != visualRenderer)
         {
@@ -240,6 +248,8 @@ public class LaserBeamProjectile
         {
             baseColor = visualRenderer.color;
         }
+        currWidth = width;
+        currFanAngle = fanAngle;
     }
 
     protected override void OnEnable()

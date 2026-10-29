@@ -148,6 +148,7 @@ public class MonsterBrain
         ctx.moveSpeedRate = 1f;
         ctx.damageRate = 1f;
         ctx.spawner = null;
+        ctx.ClearSlow();
 
         if (null != _data)
         {
