@@ -145,7 +145,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::ChainMovement
   target: {fileID: 0}
-  speed: 1
+  speed: 9
   switchDistance: 0.2
 --- !u!114 &4803801878435851661
 MonoBehaviour:

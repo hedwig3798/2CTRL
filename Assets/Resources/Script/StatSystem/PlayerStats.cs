@@ -144,7 +144,6 @@ public class PlayerStats
         }
 
         acquiredWeapons.Add(_prefab, weapon);
-        Debug.Log($"[PlayerStats] {name}({side}) 무기 획득 : {_prefab.name}", this);
         return true;
     }
 

@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 using UnityEngine;
+using UnityEngine.InputSystem;
 
 /// <summary>
 /// 디버그 전용 : 각 플레이어의 스텟 / 무기 최종 수치와 몬스터 비율을 화면에 표시한다
@@ -15,7 +16,7 @@ public class PlayerStatDebugUI
 {
     [Tooltip("표시를 켜고 끄는 키")]
     [SerializeField]
-    private KeyCode toggleKey = KeyCode.F1;
+    private Key toggleKey = Key.F1;
 
     [SerializeField]
     private bool isVisible = true;
@@ -55,7 +56,8 @@ public class PlayerStatDebugUI
 
     private void Update()
     {
-        if (true == Input.GetKeyDown(toggleKey))
+        Keyboard keyboard = Keyboard.current;
+        if (null != keyboard && Key.None != toggleKey && true == keyboard[toggleKey].wasPressedThisFrame)
         {
             isVisible = !isVisible;
         }

@@ -9,11 +9,11 @@ metadata:
 ## WeaponUpgradeSystem/
 - `WeaponParam.cs`: enum WeaponParam(공통: Damage/AttackSpeed/Range/FireCount/HitCount/AreaRadius/Lifetime/Knockback/SpeedRate/FireDelay/ChainCount/ChainRange/ProjectileScale, 100~ 투사체 계열: Child*/OrbitRadius/LaserWidth/FanAngle/ArmDelay/TickInterval/Fragment*/Reach, 200~ 플래그 Flag*). WeaponParamUtils: IsCommon, IsFlag, SlotCount.
 - 플래그: ReturnDamage, SecondaryExplosion, ChainExplosion, SlowZone, ContractWave, Resplit, SlashWave, ChainAmplify (값>0이면 ON).
-- `WeaponUpgradeTable.cs`: WeaponModifier(param,mode,value), WeaponUpgradeStep(title,description,Modifiers), WeaponUpgradeTable(StepCount, GetStep(level), RewardWeight, SetSteps).
+- `WeaponUpgradeTable.cs`: WeaponModifier(param,mode,value), WeaponUpgradeStep(title,description,Modifiers), WeaponUpgradeTable(StepCount, GetStep(level: 1부터, 범위 밖 null; 다음 단계 = UpgradeLevel+1), RewardWeight, SetSteps).
 - Multiply = 기본값 대비 비율(0.2=+20%, 비율끼리 합산), Add = 그대로 가산.
 
 ## Weapon 런타임 수정치 (ComabtSystem/Attackable/Projectile/Weapon.cs)
-UpgradeLevel/UpgradeVersion, UpgradeTable, WeaponPrefab, ApplyUpgrade(step), AddModifier, SetModifier, ResetUpgrades, GetParamAdd/Multiply, GetParam(param[,base]), GetParamInt, HasFlag. 각 *Projectile이 발사 시 GetParam으로 수치를 읽음.
+UpgradeLevel/UpgradeVersion (UpgradeTable/WeaponPrefab은 Weapon에 없음 -> WeaponRewardEffect.WeaponPrefab/UpgradeTable 프로퍼티), ApplyUpgrade(step), AddModifier, SetModifier, ResetUpgrades, GetParamAdd/Multiply, GetParam(param[,base]), GetParamInt, HasFlag. 각 *Projectile이 발사 시 GetParam으로 수치를 읽음.
 
 ## 보상 연동 (RewardSystem/)
 - `Effects/WeaponUpgradeRewardEffect.cs`: static CreateRewardData(table,prefab,name,sprite..), ResolveManager(ctx), Apply: 선택 시 해당 무기 ApplyUpgrade -> RemoveFor 현재단계 -> 다음 단계 AddFor(10단계 이후 없음). Table/WeaponPrefab/Level.

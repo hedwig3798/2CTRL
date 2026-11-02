@@ -1,4 +1,5 @@
 using UnityEngine;
+using UnityEngine.InputSystem;
 
 public class ArrowMovemnt
     : MonoBehaviour
@@ -7,10 +8,10 @@ public class ArrowMovemnt
     public float speed = 5.0f;
 
     [Header("key code bind")]
-    public KeyCode right;
-    public KeyCode left;
-    public KeyCode up;
-    public KeyCode down;
+    public Key right;
+    public Key left;
+    public Key up;
+    public Key down;
 
     [Header("sprite value")]
     [SerializeField]
@@ -66,26 +67,42 @@ public class ArrowMovemnt
         spriteRenderer.flipX = isDefaultLeft ^ isLeft;
     }
 
+    private static bool IsPressed(Keyboard _keyboard, Key _key)
+    {
+        return Key.None != _key && _keyboard[_key].isPressed;
+    }
+
     void Update()
     {
-        if (Input.GetKey(right))
+        Keyboard keyboard = Keyboard.current;
+        if (null == keyboard)
+        {
+            return;
+        }
+
+        bool isRightPressed = IsPressed(keyboard, right);
+        bool isLeftPressed = IsPressed(keyboard, left);
+        bool isUpPressed = IsPressed(keyboard, up);
+        bool isDownPressed = IsPressed(keyboard, down);
+
+        if (isRightPressed)
         {
             transform.Translate(Vector2.right * speed * Time.deltaTime);
             isLeft = false;
         }
 
-        if (Input.GetKey(left))
+        if (isLeftPressed)
         {
             transform.Translate(Vector2.left * speed * Time.deltaTime);
             isLeft = true;
         }
 
-        if (Input.GetKey(up))
+        if (isUpPressed)
         {
             transform.Translate(Vector2.up * speed * Time.deltaTime);
         }
 
-        if (Input.GetKey(down))
+        if (isDownPressed)
         {
             transform.Translate(Vector2.down * speed * Time.deltaTime);
         }
@@ -97,10 +114,10 @@ public class ArrowMovemnt
         else if (SPRITE_ROTATE_MODE.ROTATE == rotateMode)
         {
             Vector2 move = Vector2.zero;
-            if (Input.GetKey(right)) move.x += 1f;
-            if (Input.GetKey(left)) move.x -= 1f;
-            if (Input.GetKey(up)) move.y += 1f;
-            if (Input.GetKey(down)) move.y -= 1f;
+            if (isRightPressed) move.x += 1f;
+            if (isLeftPressed) move.x -= 1f;
+            if (isUpPressed) move.y += 1f;
+            if (isDownPressed) move.y -= 1f;
             if (move.sqrMagnitude > 0.0001f)
             {
                 float angle = Mathf.Atan2(move.y, move.x) * Mathf.Rad2Deg + rotateOffset;
