@@ -1,6 +1,6 @@
 # 2CTRL
 
-Unity 6000.6.7f1 / URP 2D Renderer / uGUI + TMP / 구 Input Manager / 2D 물리 / DOTS 미사용.
+Unity 6000.6.7f1 / URP 2D Renderer / uGUI + TMP / new Input System (`Keyboard.current`) / 2D 물리 / DOTS 미사용.
 Unity 제어: Unity CLI(`unity`, Pipeline 패키지). 열린 에디터는 `unity command`, 없으면 `unity run`/`unity test`. Unity MCP는 쓰지 않는다.
 
 ## 폴더

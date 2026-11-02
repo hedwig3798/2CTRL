@@ -1,0 +1,39 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f28bc59546b359e4685b706a3d741f0f, type: 3}
+  m_Name: Factory
+  m_EditorClassIdentifier: Game.Runtime::DimensionData
+  displayName: "\uACF5\uC7A5"
+  previewSprite: {fileID: 132210538, guid: f387b2b9ac8b14f4c9f65f6c2df761a4, type: 3}
+  themeColor: {r: 0.85, g: 0.55, b: 0.2, a: 1}
+  startWeapon: {fileID: 5536439645276528640, guid: 384bb9388fa9441a852324600bf99205, type: 3}
+  weaponRewards:
+  - {fileID: 11400000, guid: 9f931794e3b34900a4fc20d49d487184, type: 2}
+  - {fileID: 11400000, guid: 47511eda51fc404cb884cb5222a3d585, type: 2}
+  - {fileID: 11400000, guid: 849f46d9d1d244e6a959674018e0215a, type: 2}
+  waves:
+  - {fileID: 11400000, guid: f1ac7c48d62ff054384edc8fa3d65b79, type: 2}
+  - {fileID: 11400000, guid: 157c8af25b125d54f872618273f71b8d, type: 2}
+  - {fileID: 11400000, guid: a847705fb4472a447bdbaa016d1e6bd3, type: 2}
+  - {fileID: 11400000, guid: 44f9717ab640850458fe12ffd54909ff, type: 2}
+  - {fileID: 11400000, guid: 2572d1e642efdf049b46043ef37bb5f7, type: 2}
+  - {fileID: 11400000, guid: 29d955d8ad864774fbecd0c5bb4f2158, type: 2}
+  - {fileID: 11400000, guid: ef48fa0e2e8b1f14a977b6c73914e71a, type: 2}
+  - {fileID: 11400000, guid: 32122853d3a5ee4488e9829243fa3e45, type: 2}
+  - {fileID: 11400000, guid: cac3b1abb321e89419ff8115c6e293f0, type: 2}
+  - {fileID: 11400000, guid: 8ac86b62d47dd834ab9d9eeabdd4e9ef, type: 2}
+  - {fileID: 11400000, guid: 928dd0de3eae8924b922656c98adb656, type: 2}
+  - {fileID: 11400000, guid: 38c968e776c97e944ae529fe0bacc66b, type: 2}
+  monsterSkins: []
+  chunkLoaderPrefab: {fileID: 7287097152152248050, guid: 2c517fbd785d9544cbf3ca97777a9431, type: 3}
+  playerAnimator: {fileID: 22100000, guid: 877b0d512f3e20947b997821f3e7325b, type: 2}
+  playerSprite: {fileID: 978012912, guid: 5e4ab4838a9d922438adeab9ad22c3e9, type: 3}

@@ -38,6 +38,23 @@ public class Spawner
     private Dictionary<Spawnable, IObjectPool<Spawnable>> poolDict
         = new Dictionary<Spawnable, IObjectPool<Spawnable>>();
 
+    /// <summary>
+    /// 생성한 몬스터의 외형 대상과 프리팹 기본 외형 (외형을 되돌릴 때 사용)
+    /// </summary>
+    private class SkinTarget
+    {
+        public MonsterData data;
+        public Animator animator;
+        public SpriteRenderer spriteRenderer;
+        public RuntimeAnimatorController originalController;
+        public Sprite originalSprite;
+        public bool isSkinned;
+    }
+
+    // MonsterData -> 이 스포너에서 쓸 외형 (SetMonsterSkins)
+    private readonly Dictionary<MonsterData, MonsterSkin> skinMap = new Dictionary<MonsterData, MonsterSkin>();
+    private readonly Dictionary<Spawnable, SkinTarget> skinTargets = new Dictionary<Spawnable, SkinTarget>();
+
     //
     [Header("Spawn Data")]
     public Transform target;
@@ -102,6 +119,57 @@ public class Spawner
     }
 
     private void Awake()
+    {
+        PreparePools();
+    }
+
+    /// <summary>
+    /// 웨이브를 바꾼다 (Start 전에 호출해야 첫 웨이브부터 적용된다)
+    /// - 비어 있으면 기존 웨이브를 유지한다
+    /// </summary>
+    public void SetWaves(WaveData[] _waves)
+    {
+        if (null == _waves || 0 == _waves.Length)
+        {
+            Debug.LogWarning($"[Spawner] 넣을 웨이브가 비어 있어 기존 웨이브를 유지합니다. ({name})", this);
+            return;
+        }
+
+        waveArray = _waves;
+        PreparePools();
+    }
+
+    /// <summary>
+    /// 이 스포너에서 나오는 몬스터의 외형을 바꾼다 (MonsterData 기준, 이후 스폰부터 적용)
+    /// - 목록에 없는 몬스터는 프리팹 기본 외형을 쓴다
+    /// </summary>
+    public void SetMonsterSkins(MonsterSkin[] _skins)
+    {
+        skinMap.Clear();
+        if (null == _skins)
+        {
+            return;
+        }
+
+        foreach (MonsterSkin skin in _skins)
+        {
+            if (null == skin.monster)
+            {
+                continue;
+            }
+
+            if (true == skinMap.ContainsKey(skin.monster))
+            {
+                Debug.LogWarning($"[Spawner] {skin.monster.name} 의 외형이 중복되어 뒤의 값을 씁니다.", this);
+            }
+            skinMap[skin.monster] = skin;
+        }
+    }
+
+    /// <summary>
+    /// 웨이브에 있는 프리팹의 풀을 미리 만든다
+    /// </summary>
+    private void PreparePools()
     {
         if (null == waveArray)
         {
@@ -170,6 +238,7 @@ public class Spawner
         }
 
         sa.transform.position = _position;
+        ApplySkin(sa);
 
         if (null == sa.blackBoardHandler)
         {
@@ -195,6 +264,65 @@ public class Spawner
         sa.blackBoardHandler.Initialize();
 
         return sa;
+    }
+
+    /// <summary>
+    /// MonsterData 에 맞는 외형을 적용한다. 외형이 없으면 프리팹 기본값으로 되돌린다
+    /// - 본체(SpriteRenderer 오브젝트) 에 Animator 가 있으면 컨트롤러만 바꾸고 스프라이트는 건드리지 않는다 (애니메이션이 덮어쓰므로)
+    /// - Animator 가 없으면 스프라이트를 바꾼다
+    /// </summary>
+    private void ApplySkin(Spawnable _object)
+    {
+        if (false == skinTargets.TryGetValue(_object, out SkinTarget target))
+        {
+            return;
+        }
+
+        bool hasSkin = skinMap.TryGetValue(target.data, out MonsterSkin skin);
+        if (false == hasSkin && false == target.isSkinned)
+        {
+            return;
+        }
+        target.isSkinned = hasSkin;
+
+        if (null != target.animator)
+        {
+            RuntimeAnimatorController controller = null != skin.animator ? skin.animator : target.originalController;
+            // 같은 컨트롤러를 다시 넣으면 애니메이터 상태가 초기화되므로 바뀔 때만 넣는다
+            if (controller != target.animator.runtimeAnimatorController)
+            {
+                target.animator.runtimeAnimatorController = controller;
+            }
+        }
+        else if (null != target.spriteRenderer)
+        {
+            target.spriteRenderer.sprite = null != skin.sprite ? skin.sprite : target.originalSprite;
+        }
+    }
+
+    /// <summary>
+    /// 생성한 몬스터의 외형 대상과 기본 외형을 기억한다 (MonsterData 가 없으면 외형을 바꾸지 않는다)
+    /// </summary>
+    private void RegisterSkinTarget(Spawnable _object)
+    {
+        MonsterBrain brain = _object.GetComponentInChildren<MonsterBrain>(true);
+        if (null == brain || null == brain.Data)
+        {
+            return;
+        }
+
+        SkinTarget target = new SkinTarget();
+        target.data = brain.Data;
+        target.spriteRenderer = null != brain.Context ? brain.Context.spriteRenderer : null;
+        if (null == target.spriteRenderer)
+        {
+            target.spriteRenderer = _object.GetComponentInChildren<SpriteRenderer>(true);
+        }
+        // 다른 자식의 Animator 를 잡지 않도록 본체(SpriteRenderer) 오브젝트의 Animator 만 쓴다
+        target.animator = null != target.spriteRenderer ? target.spriteRenderer.GetComponent<Animator>() : null;
+        target.originalController = null != target.animator ? target.animator.runtimeAnimatorController : null;
+        target.originalSprite = null != target.spriteRenderer ? target.spriteRenderer.sprite : null;
+        skinTargets[_object] = target;
     }
 
     private void Start()
@@ -225,6 +353,8 @@ public class Spawner
             data.dropManager = dropManager;
         }
 
+        RegisterSkinTarget(sa);
+
         return sa;
     }
 
@@ -244,6 +374,7 @@ public class Spawner
 
     private void OnDespawn(Spawnable _object)
     {
+        skinTargets.Remove(_object);
         Destroy(_object.gameObject);
     }
 

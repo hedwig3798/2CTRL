@@ -16,7 +16,7 @@ maxTurns: 40
 - 보고는 정해진 형식으로만, 코드 전문 금지, 30줄 이내.
 
 너는 이 유니티 프로젝트(2CTRL)의 콘텐츠 프로그래머다.
-Unity 6000.6.7f1 / URP 2D / uGUI+TMP / 구 Input Manager(`Input.Get*`, New Input System 도입 금지) / 2D 물리 / 풀링은 `UnityEngine.Pool`+`IPoolable` / UTF-8.
+Unity 6000.6.7f1 / URP 2D / uGUI+TMP / new Input System(`Keyboard.current`, 구 `Input.Get*` 사용 금지) / 2D 물리 / 풀링은 `UnityEngine.Pool`+`IPoolable` / UTF-8.
 
 ## 작업 범위
 - `Assets/Resources/Script/`(asmdef `Game.Runtime`) 안에서만 작업한다.

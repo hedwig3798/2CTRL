@@ -10,7 +10,10 @@ using UnityEngine;
 /// - 플레이어별 풀 상태
 ///   - ExcludeFor : 공유 풀의 항목을 그 플레이어에게만 숨긴다 (예: 얻은 무기)
 ///   - AddFor / RemoveFor : 그 플레이어에게만 보이는 항목을 추가 / 삭제한다 (예: 무기 업그레이드)
+///   - SetPoolFor : 그 플레이어의 type 풀을 전용 항목으로 바꾼다. 공유 풀은 그 플레이어에게 쓰이지 않는다 (예: 차원 무기)
 ///   - side 를 받는 GetRandomUnique 가 둘을 반영해 후보를 모은다
+/// - 몬스터 보정 보상은 보상을 받는 진영의 플레이어를 노리는 스포너에 적용한다 (RegisterSpawner)
+///   등록이 없으면 spawner 필드 -> 씬에서 찾은 스포너를 쓴다
 /// </summary>
 [DisallowMultipleComponent]
 public class RewardManager
@@ -42,9 +45,12 @@ public class RewardManager
     [SerializeField]
     private List<PoolSlot> pools = new List<PoolSlot>();
 
-    [Tooltip("몬스터 보상을 적용할 스포너 (비어 있으면 씬에서 찾음)")]
+    [Tooltip("RegisterSpawner 로 등록된 스포너가 없을 때 몬스터 보상을 적용할 스포너 (비어 있으면 씬에서 찾음)")]
     [SerializeField]
     private Spawner spawner;
+
+    // 진영 -> 그 진영 플레이어를 노리는 스포너
+    private readonly Dictionary<PlayerSide, Spawner> sideSpawners = new Dictionary<PlayerSide, Spawner>();
 
     private Dictionary<RewardPoolType, RandomPool<RewardData>> poolMap;
 
@@ -62,6 +68,11 @@ public class RewardManager
         /// 이 플레이어에게만 보이는 항목
         /// </summary>
         public readonly Dictionary<RewardPoolType, RandomPool<RewardData>> pools = new Dictionary<RewardPoolType, RandomPool<RewardData>>();
+
+        /// <summary>
+        /// 공유 풀 대신 전용 풀만 쓰는 type
+        /// </summary>
+        public readonly HashSet<RewardPoolType> overridden = new HashSet<RewardPoolType>();
     }
 
     private readonly Dictionary<PlayerSide, SideState> sideStates = new Dictionary<PlayerSide, SideState>();
@@ -77,20 +88,46 @@ public class RewardManager
             return;
         }
 
-        if (null == spawner)
-        {
-            spawner = FindAnyObjectByType<Spawner>();
-        }
-
         RewardContext context = new RewardContext
         {
             Player = PlayerStats.Find(_side),
             Side = _side,
             Manager = this,
-            Spawner = spawner,
+            Spawner = GetSpawnerFor(_side),
         };
 
         _data.Apply(context);
+    }
+
+    /// <summary>
+    /// _targetSide 진영의 플레이어를 노리는 스포너를 등록한다 (null 이면 등록 해제)
+    /// </summary>
+    public void RegisterSpawner(PlayerSide _targetSide, Spawner _spawner)
+    {
+        if (null == _spawner)
+        {
+            sideSpawners.Remove(_targetSide);
+            return;
+        }
+        sideSpawners[_targetSide] = _spawner;
+    }
+
+    /// <summary>
+    /// _side 진영이 받은 몬스터 보상을 적용할 스포너
+    /// 등록된 스포너가 없으면 spawner 필드, 그것도 없으면 씬에서 찾은 스포너 (없으면 null)
+    /// </summary>
+    public Spawner GetSpawnerFor(PlayerSide _side)
+    {
+        if (true == sideSpawners.TryGetValue(_side, out Spawner registered) && null != registered)
+        {
+            return registered;
+        }
+
+        if (null == spawner)
+        {
+            spawner = FindAnyObjectByType<Spawner>();
+        }
+        return spawner;
     }
 
     /// <summary>
@@ -212,7 +249,65 @@ public class RewardManager
     }
 
     /// <summary>
+    /// _side 플레이어의 _type 풀을 _items 로 바꾼다 (기존 전용 항목은 지운다)
+    /// - 이후 그 플레이어에게는 공유 _type 풀이 쓰이지 않는다
+    /// - ExcludeFor 로 숨긴 항목은 전용 풀에서도 숨긴다
+    /// - 유효한 항목이 없으면 아무것도 바꾸지 않는다 (공유 풀을 계속 쓴다)
+    /// </summary>
+    public void SetPoolFor(PlayerSide _side, RewardPoolType _type, IReadOnlyList<RewardData> _items, float _weight)
+    {
+        if (false == HasAnyItem(_items))
+        {
+            Debug.LogWarning($"[RewardManager] {_side} 의 {_type} 풀에 넣을 항목이 없어 공유 풀을 그대로 씁니다.", this);
+            return;
+        }
+
+        SideState state = GetSideState(_side);
+        if (false == state.pools.TryGetValue(_type, out RandomPool<RewardData> pool))
+        {
+            pool = new RandomPool<RewardData>();
+            state.pools.Add(_type, pool);
+        }
+        pool.Clear();
+        state.overridden.Add(_type);
+
+        foreach (RewardData item in _items)
+        {
+            if (null != item)
+            {
+                pool.Add(item, _weight);
+            }
+        }
+    }
+
+    private static bool HasAnyItem(IReadOnlyList<RewardData> _items)
+    {
+        if (null == _items)
+        {
+            return false;
+        }
+
+        foreach (RewardData item in _items)
+        {
+            if (null != item)
+            {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    /// <summary>
+    /// _side 플레이어가 _type 에서 공유 풀 대신 전용 풀만 쓰는지
+    /// </summary>
+    public bool IsPoolOverriddenFor(PlayerSide _side, RewardPoolType _type)
+    {
+        return sideStates.TryGetValue(_side, out SideState state) && state.overridden.Contains(_type);
+    }
+
+    /// <summary>
     /// _side 플레이어의 숨김 / 전용 항목을 모두 지운다
+    /// - SetPoolFor 로 바꾼 풀 설정도 지워지므로, 이후 그 플레이어는 다시 공유 풀을 쓴다
     /// </summary>
     public void ClearFor(PlayerSide _side)
     {
@@ -384,6 +479,7 @@ public class RewardManager
     /// <summary>
     /// _side 플레이어 기준으로 _types 의 풀에서 가중치를 무시하고 균등 랜덤으로 중복 없이 최대 _count 개를 가져온다 (풀에서 빼지 않는다)
     /// - 공유 풀에서 ExcludeFor 로 숨긴 항목은 빼고, AddFor 로 넣은 그 플레이어 전용 항목을 더한다
+    /// - SetPoolFor 로 바꾼 type 은 공유 풀을 쓰지 않는다. ExcludeFor 로 숨긴 항목은 전용 풀에서도 뺀다
     /// - null 항목, weight 가 0 인 항목은 제외하고, 같은 데이터는 한 번만 뽑힌다
     /// </summary>
     /// <param name="_types">후보를 모을 풀 목록</param>
@@ -404,10 +500,14 @@ public class RewardManager
         candidateSet.Clear();
         foreach (RewardPoolType type in _types)
         {
-            AddCandidates(GetPool(type), null != state ? state.excluded : null);
+            HashSet<RewardData> excluded = null != state ? state.excluded : null;
+            if (null == state || false == state.overridden.Contains(type))
+            {
+                AddCandidates(GetPool(type), excluded);
+            }
             if (null != state && true == state.pools.TryGetValue(type, out RandomPool<RewardData> sidePool))
             {
-                AddCandidates(sidePool, null);
+                AddCandidates(sidePool, excluded);
             }
         }
 

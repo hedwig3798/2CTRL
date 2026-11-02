@@ -1,0 +1,39 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f28bc59546b359e4685b706a3d741f0f, type: 3}
+  m_Name: Storm
+  m_EditorClassIdentifier: Game.Runtime::DimensionData
+  displayName: "\uD3ED\uD48D"
+  previewSprite: {fileID: 132210538, guid: f387b2b9ac8b14f4c9f65f6c2df761a4, type: 3}
+  themeColor: {r: 0.45, g: 0.55, b: 1, a: 1}
+  startWeapon: {fileID: 7092167963846720789, guid: 66053baba310708419383e1369626dd8, type: 3}
+  weaponRewards:
+  - {fileID: 11400000, guid: 37c043b0366fd8e46a6db77a839962c0, type: 2}
+  - {fileID: 11400000, guid: 543d8378eaf843dc8a586b7de8f34c82, type: 2}
+  - {fileID: 11400000, guid: b5fa0b879bc746b4ab8abaf6260f5dd2, type: 2}
+  waves:
+  - {fileID: 11400000, guid: 65257a1f9875c524e83c97264bd8d172, type: 2}
+  - {fileID: 11400000, guid: e5d7d79e27ac1f1429495cecb471f3d6, type: 2}
+  - {fileID: 11400000, guid: c53468976fba8414090797eb8f4e6d5d, type: 2}
+  - {fileID: 11400000, guid: 3a3abeca7560ef04d9e8662c3aa0c4d6, type: 2}
+  - {fileID: 11400000, guid: f64d4dda553072c489947796da6a322d, type: 2}
+  - {fileID: 11400000, guid: 3b8f489c1f339e841ae046fdc2634117, type: 2}
+  - {fileID: 11400000, guid: 31a5338abd636ea429e7c24e7394e86b, type: 2}
+  - {fileID: 11400000, guid: 1ed916e1c79d73749b8e40d5403ab97c, type: 2}
+  - {fileID: 11400000, guid: ba32df4527715f349b71644bc23f1856, type: 2}
+  - {fileID: 11400000, guid: b788bf1a924da4943b008bbcc1a28714, type: 2}
+  - {fileID: 11400000, guid: cab6cffad0dbfb640a20b7eebeb8d548, type: 2}
+  - {fileID: 11400000, guid: e9d975144ea2eae4a8819e76193c7e3b, type: 2}
+  monsterSkins: []
+  chunkLoaderPrefab: {fileID: 7287097152152248050, guid: 2c517fbd785d9544cbf3ca97777a9431, type: 3}
+  playerAnimator: {fileID: 22100000, guid: cb43a72c613e4da4cbe03941a97d1ca3, type: 2}
+  playerSprite: {fileID: 978012912, guid: 5e4ab4838a9d922438adeab9ad22c3e9, type: 3}

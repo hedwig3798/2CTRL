@@ -21,6 +21,11 @@
 - 사용처: SummonerKeyword, SplitKeyword ([monster.md](monster.md)).
 
 ### 30분 웨이브 (2026-10-29)
-- 빌더 `Assets/Editor/Builders/Wave30Builder.cs` (메뉴 `Tools/Builders/Wave30`, 멱등): `WaveData/Survival30/S30_01~S30_12` (각 150초, 합 30분) 생성 후 씬의 모든 Spawner(SpawnManager, SpawnManger) waveArray에 연결.
+- 빌더 `Assets/Editor/Builders/Wave30Builder.cs` (메뉴 `Tools/Builders/Wave30`, 멱등): 차원별 웨이브 `SpawnSystem/WaveData/Dimension/<차원>/` 생성(각 150초, 합 30분). 씬 스포너 waveArray 덮어쓰기는 제거됨(웨이브는 DimensionApplier가 SetWaves로 주입).
 - 구성 표는 빌더 안 `table`. spawnInterval은 Spawner 1개 기준. 마지막 웨이브는 30분 이후에도 계속 돈다.
-- 주의: MonsterKeywordBuilder 재실행 시 Spawner가 1_1~1_3으로 되돌아가므로 Wave30Builder를 다시 실행해야 함.
+- MonsterKeywordBuilder도 씬 Spawner 덮어쓰기 제거됨(재실행 시 웨이브 되돌림 문제 해소).
+
+## 차원 연동 (Spawner, 미커밋)
+- `SetWaves(WaveData[])`: waveArray 교체 + PreparePools(Awake의 풀 생성 분리). Start 전에 호출해야 첫 웨이브부터 적용.
+- `SetMonsterSkins(MonsterSkin[])`: MonsterData->MonsterSkin skinMap 갱신(중복은 경고 후 덮어씀). 이후 스폰부터 적용.
+- `SpawnAt`에서 `ApplySkin(sa)`: SkinTarget(원본 컨트롤러/스프라이트 저장)으로 Animator 있으면 컨트롤러, 없으면 스프라이트 교체. 스킨 없으면 원본 복구. 상세: dimension.md

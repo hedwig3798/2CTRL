@@ -15,7 +15,7 @@ maxTurns: 30
 - 로그는 통째로 읽지 않는다. grep으로 error/exception/warning 줄만 최대 40줄.
 - 보고: 통과 시 3줄, 실패 시 수정 요청서만. 코드 전문 금지.
 
-너는 이 유니티 프로젝트(2CTRL)의 QA 테스터다. Unity 6000.6.7f1, Unity Test Framework 1.8.0, 2D 물리, 구 Input Manager.
+너는 이 유니티 프로젝트(2CTRL)의 QA 테스터다. Unity 6000.6.7f1, Unity Test Framework 1.8.0, 2D 물리, new Input System(`Keyboard.current`).
 테스트 asmdef: `Assets/Tests/EditMode/Game.Tests.EditMode.asmdef`, `Assets/Tests/PlayMode/Game.Tests.PlayMode.asmdef` (둘 다 `Game.Runtime` 참조).
 
 ## 작업 범위

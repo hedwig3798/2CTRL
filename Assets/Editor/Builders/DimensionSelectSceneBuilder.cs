@@ -1,0 +1,304 @@
+using System.IO;
+using System.Linq;
+using System.Text;
+using TMPro;
+using UnityEditor;
+using UnityEditor.SceneManagement;
+using UnityEngine;
+using UnityEngine.EventSystems;
+using UnityEngine.InputSystem.UI;
+using UnityEngine.SceneManagement;
+using UnityEngine.UI;
+
+namespace Builders
+{
+    /// <summary>
+    /// Assets/Scenes/DimensionSelectScene.unity 를 새로 만든다 (멱등, 매번 빈 씬으로 재생성)
+    /// - Main Camera, EventSystem(InputSystemUIInputModule), Canvas
+    ///   [좌·우 카드(DimensionSelectView: 테마 배경 / 미리보기 / 이름 / 확정 표시 / 잠금 표시), 하단 키 안내] + DimensionSelectController
+    /// - 레이아웃은 기능 확인 수준 (연출은 visual-designer)
+    /// - TitleScene 의 TitleMenu.gameSceneName 을 이 씬으로, Build Settings 를 Title(0) / DimensionSelect(1) / Game(2) 로 맞춘다
+    /// - 확인용으로 .claude/tmp/dimensionselect.png 캡처
+    /// </summary>
+    public static class DimensionSelectSceneBuilder
+    {
+        public const string SCENE_PATH = "Assets/Scenes/DimensionSelectScene.unity";
+        private const string TITLE_SCENE_PATH = "Assets/Scenes/TitleScene.unity";
+        private const string GAME_SCENE_PATH = "Assets/Scenes/GameScene.unity";
+        private const string FONT_PATH = "Assets/Fonts/NotoSansKR-Regular SDF.asset";
+        private const string CAPTURE_PATH = ".claude/tmp/dimensionselect.png";
+        private static readonly string[] DIMENSIONS = { "Forest", "Factory", "Storm" };
+
+        private static TMP_FontAsset font;
+
+        [MenuItem("Tools/Builders/DimensionSelectScene")]
+        public static void BuildMenu()
+        {
+            Debug.Log(Build());
+        }
+
+        public static string Build()
+        {
+            var sb = new StringBuilder();
+            sb.AppendLine("[DimensionSelectSceneBuilder]");
+
+            font = AssetDatabase.LoadAssetAtPath<TMP_FontAsset>(FONT_PATH);
+            if (null == font)
+            {
+                sb.AppendLine("경고: 폰트 없음 " + FONT_PATH);
+            }
+
+            DimensionData[] dims = DIMENSIONS
+                .Select(d => AssetDatabase.LoadAssetAtPath<DimensionData>(DimensionDataBuilder.DATA_DIR + "/" + d + ".asset"))
+                .Where(d => null != d).ToArray();
+            if (dims.Length < 2)
+            {
+                return sb.AppendLine("오류: DimensionData 부족 (" + dims.Length + "). DimensionDataBuilder 를 먼저 실행").ToString();
+            }
+
+            Scene scene = EditorSceneManager.NewScene(NewSceneSetup.EmptyScene, NewSceneMode.Single);
+            // 새 씬을 열면 쓰지 않는 에셋이 내려가므로 다시 불러온다
+            font = AssetDatabase.LoadAssetAtPath<TMP_FontAsset>(FONT_PATH);
+            dims = DIMENSIONS
+                .Select(d => AssetDatabase.LoadAssetAtPath<DimensionData>(DimensionDataBuilder.DATA_DIR + "/" + d + ".asset"))
+                .Where(d => null != d).ToArray();
+
+            // 1. Camera
+            var camGo = new GameObject("Main Camera", typeof(Camera), typeof(AudioListener));
+            camGo.tag = "MainCamera";
+            System.Type urpCam = System.Type.GetType("UnityEngine.Rendering.Universal.UniversalAdditionalCameraData, Unity.RenderPipelines.Universal.Runtime");
+            if (null != urpCam)
+            {
+                camGo.AddComponent(urpCam);
+            }
+            camGo.transform.position = new Vector3(0f, 0f, -10f);
+            var cam = camGo.GetComponent<Camera>();
+            cam.orthographic = true;
+            cam.clearFlags = CameraClearFlags.SolidColor;
+            cam.backgroundColor = new Color(0.06f, 0.06f, 0.08f, 1f);
+
+            // 2. EventSystem
+            new GameObject("EventSystem", typeof(EventSystem), typeof(InputSystemUIInputModule));
+
+            // 3. Canvas
+            var canvasGo = new GameObject("DimensionSelectCanvas", typeof(RectTransform), typeof(Canvas), typeof(CanvasScaler), typeof(GraphicRaycaster));
+            canvasGo.layer = LayerMask.NameToLayer("UI");
+            canvasGo.GetComponent<Canvas>().renderMode = RenderMode.ScreenSpaceOverlay;
+            var scaler = canvasGo.GetComponent<CanvasScaler>();
+            scaler.uiScaleMode = CanvasScaler.ScaleMode.ScaleWithScreenSize;
+            scaler.referenceResolution = new Vector2(1920f, 1080f);
+            scaler.matchWidthOrHeight = 0.5f;
+
+            DimensionSelectView leftView = CreateCard("LeftCard", canvasGo.transform, 0.25f);
+            DimensionSelectView rightView = CreateCard("RightCard", canvasGo.transform, 0.75f);
+
+            // 하단 키 안내 (조작 키만)
+            CreateKeyHint("LeftKeyHint", canvasGo.transform, 0.25f, "A / D   ·   Space");
+            CreateKeyHint("RightKeyHint", canvasGo.transform, 0.75f, "← / →   ·   Enter");
+
+            // 4. Controller
+            var controller = canvasGo.AddComponent<DimensionSelectController>();
+            var so = new SerializedObject(controller);
+            var arr = so.FindProperty("dimensions");
+            arr.arraySize = dims.Length;
+            for (int i = 0; i < dims.Length; i++)
+            {
+                arr.GetArrayElementAtIndex(i).objectReferenceValue = dims[i];
+            }
+            so.FindProperty("gameSceneName").stringValue = "GameScene";
+            so.FindProperty("leftView").objectReferenceValue = leftView;
+            so.FindProperty("rightView").objectReferenceValue = rightView;
+            so.ApplyModifiedPropertiesWithoutUndo();
+
+            // 캡처용 미리 표시 (실행 중에는 Controller 가 다시 그림)
+            leftView.Show(dims[0], false, false);
+            rightView.Show(dims[1], false, false);
+
+            EditorSceneManager.SaveScene(scene, SCENE_PATH);
+            sb.AppendLine("저장: " + SCENE_PATH + " 차원=" + string.Join(",", dims.Select(d => d.name)));
+
+            sb.AppendLine(Capture(cam, canvasGo.GetComponent<Canvas>()));
+            sb.AppendLine(RegisterBuildScenes());
+            sb.AppendLine(SetTitleTarget());
+
+            string result = sb.ToString();
+            Debug.Log(result);
+            return result;
+        }
+
+        /// <summary>
+        /// 카드 하나: 테마 배경(themeGraphic) / 미리보기 / 이름 / 확정 표시 / 잠금 표시
+        /// </summary>
+        private static DimensionSelectView CreateCard(string _name, Transform _parent, float _anchorX)
+        {
+            var cardGo = new GameObject(_name, typeof(RectTransform), typeof(Image));
+            cardGo.layer = _parent.gameObject.layer;
+            var rt = cardGo.GetComponent<RectTransform>();
+            rt.SetParent(_parent, false);
+            rt.anchorMin = rt.anchorMax = new Vector2(_anchorX, 0.55f);
+            rt.sizeDelta = new Vector2(560f, 720f);
+            var theme = cardGo.GetComponent<Image>();
+            theme.color = Color.gray;
+            theme.raycastTarget = false;
+
+            var previewGo = new GameObject("Preview", typeof(RectTransform), typeof(Image));
+            var prt = Child(previewGo, cardGo.transform);
+            prt.anchorMin = prt.anchorMax = new Vector2(0.5f, 0.6f);
+            prt.sizeDelta = new Vector2(420f, 420f);
+            var preview = previewGo.GetComponent<Image>();
+            preview.preserveAspect = true;
+            preview.raycastTarget = false;
+
+            var nameGo = new GameObject("Name", typeof(RectTransform), typeof(TextMeshProUGUI));
+            var nrt = Child(nameGo, cardGo.transform);
+            nrt.anchorMin = nrt.anchorMax = new Vector2(0.5f, 0.12f);
+            nrt.sizeDelta = new Vector2(520f, 120f);
+            var nameText = nameGo.GetComponent<TextMeshProUGUI>();
+            SetupText(nameText, "", 72f);
+
+            // 확정 표시: 카드 뒤의 노란 테두리 (플레이스홀더). 카드보다 먼저 그려야 하므로 카드의 형제로 둔다
+            var confirmGo = new GameObject(_name + "_ConfirmedMark", typeof(RectTransform), typeof(Image));
+            var crt = Child(confirmGo, _parent);
+            crt.anchorMin = crt.anchorMax = rt.anchorMin;
+            crt.sizeDelta = rt.sizeDelta + new Vector2(32f, 32f);
+            confirmGo.transform.SetSiblingIndex(cardGo.transform.GetSiblingIndex());
+            var cimg = confirmGo.GetComponent<Image>();
+            cimg.color = new Color(1f, 0.9f, 0.3f, 1f);
+            cimg.raycastTarget = false;
+            confirmGo.SetActive(false);
+
+            // 잠금 표시: 어두운 덮개 (상대가 확정한 차원)
+            var lockGo = new GameObject("LockedMark", typeof(RectTransform), typeof(Image));
+            var lrt = Child(lockGo, cardGo.transform);
+            lrt.anchorMin = Vector2.zero;
+            lrt.anchorMax = Vector2.one;
+            lrt.offsetMin = Vector2.zero;
+            lrt.offsetMax = Vector2.zero;
+            var limg = lockGo.GetComponent<Image>();
+            limg.color = new Color(0f, 0f, 0f, 0.7f);
+            limg.raycastTarget = false;
+            lockGo.SetActive(false);
+
+            var view = cardGo.AddComponent<DimensionSelectView>();
+            var so = new SerializedObject(view);
+            so.FindProperty("nameText").objectReferenceValue = nameText;
+            so.FindProperty("previewImage").objectReferenceValue = preview;
+            so.FindProperty("themeGraphic").objectReferenceValue = theme;
+            so.FindProperty("confirmedMark").objectReferenceValue = confirmGo;
+            so.FindProperty("lockedMark").objectReferenceValue = lockGo;
+            so.ApplyModifiedPropertiesWithoutUndo();
+            return view;
+        }
+
+        private static void CreateKeyHint(string _name, Transform _parent, float _anchorX, string _text)
+        {
+            var go = new GameObject(_name, typeof(RectTransform), typeof(TextMeshProUGUI));
+            var rt = Child(go, _parent);
+            rt.anchorMin = rt.anchorMax = new Vector2(_anchorX, 0.07f);
+            rt.sizeDelta = new Vector2(600f, 80f);
+            var tmp = go.GetComponent<TextMeshProUGUI>();
+            SetupText(tmp, _text, 40f);
+            tmp.color = new Color(1f, 1f, 1f, 0.75f);
+        }
+
+        private static RectTransform Child(GameObject _go, Transform _parent)
+        {
+            _go.layer = _parent.gameObject.layer;
+            var rt = _go.GetComponent<RectTransform>();
+            rt.SetParent(_parent, false);
+            return rt;
+        }
+
+        private static void SetupText(TextMeshProUGUI _tmp, string _text, float _size)
+        {
+            if (null != font)
+            {
+                _tmp.font = font;
+            }
+            _tmp.text = _text;
+            _tmp.fontSize = _size;
+            _tmp.alignment = TextAlignmentOptions.Center;
+            _tmp.color = Color.white;
+            _tmp.raycastTarget = false;
+        }
+
+        /// <summary>
+        /// Title(0) / DimensionSelect(1) / Game(2), 나머지 기존 등록은 뒤에 유지
+        /// </summary>
+        public static string RegisterBuildScenes()
+        {
+            string[] head = { TITLE_SCENE_PATH, SCENE_PATH, GAME_SCENE_PATH };
+            var scenes = head.Where(p => File.Exists(p)).Select(p => new EditorBuildSettingsScene(p, true)).ToList();
+            scenes.AddRange(EditorBuildSettings.scenes.Where(s => false == head.Contains(s.path)));
+            EditorBuildSettings.scenes = scenes.ToArray();
+            return "Build Settings: " + string.Join(", ", scenes.Select(s => s.path));
+        }
+
+        /// <summary>
+        /// TitleScene 의 TitleMenu 가 이 씬을 로드하도록 (씬을 열어 값만 바꾸고 저장)
+        /// </summary>
+        private static string SetTitleTarget()
+        {
+            if (false == File.Exists(TITLE_SCENE_PATH))
+            {
+                return "경고: TitleScene 없음";
+            }
+            Scene title = EditorSceneManager.OpenScene(TITLE_SCENE_PATH, OpenSceneMode.Single);
+            TitleMenu menu = Object.FindFirstObjectByType<TitleMenu>(FindObjectsInactive.Include);
+            if (null == menu)
+            {
+                return "경고: TitleScene 에 TitleMenu 없음";
+            }
+            var so = new SerializedObject(menu);
+            so.FindProperty("gameSceneName").stringValue = "DimensionSelectScene";
+            so.ApplyModifiedPropertiesWithoutUndo();
+            EditorSceneManager.MarkSceneDirty(title);
+            EditorSceneManager.SaveScene(title);
+            EditorSceneManager.OpenScene(SCENE_PATH, OpenSceneMode.Single);
+            return "TitleMenu.gameSceneName = DimensionSelectScene";
+        }
+
+        /// <summary>
+        /// Overlay 캔버스는 카메라 렌더에 안 잡히므로 캡처 동안만 ScreenSpaceCamera 로 바꾼다 (저장 후라 씬에는 영향 없음)
+        /// </summary>
+        private static string Capture(Camera _cam, Canvas _canvas)
+        {
+            const int W = 1920, H = 1080;
+            var rt = new RenderTexture(W, H, 24);
+            try
+            {
+                _canvas.renderMode = RenderMode.ScreenSpaceCamera;
+                _canvas.worldCamera = _cam;
+                _canvas.planeDistance = 5f;
+                _cam.targetTexture = rt;
+                Canvas.ForceUpdateCanvases();
+                _cam.Render();
+
+                RenderTexture prevActive = RenderTexture.active;
+                RenderTexture.active = rt;
+                var tex = new Texture2D(W, H, TextureFormat.RGB24, false);
+                tex.ReadPixels(new Rect(0, 0, W, H), 0, 0);
+                tex.Apply();
+                RenderTexture.active = prevActive;
+
+                string full = Path.GetFullPath(CAPTURE_PATH);
+                Directory.CreateDirectory(Path.GetDirectoryName(full));
+                File.WriteAllBytes(full, tex.EncodeToPNG());
+                Object.DestroyImmediate(tex);
+                return "캡처: " + CAPTURE_PATH;
+            }
+            catch (System.Exception e)
+            {
+                return "캡처 실패: " + e.Message;
+            }
+            finally
+            {
+                _cam.targetTexture = null;
+                _canvas.renderMode = RenderMode.ScreenSpaceOverlay;
+                _canvas.worldCamera = null;
+                rt.Release();
+                Object.DestroyImmediate(rt);
+            }
+        }
+    }
+}

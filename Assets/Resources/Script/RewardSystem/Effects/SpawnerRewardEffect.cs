@@ -2,7 +2,8 @@ using UnityEngine;
 
 /// <summary>
 /// 몬스터 개체수 / HP / 데미지 / 속도 비율을 RewardData 의 value 만큼 바꾼다
-/// - 플레이어와 무관하게 Spawner(전역) 에 적용된다
+/// - 보상을 받는 진영(RewardContext.Side) 의 플레이어를 노리는 스포너에 적용된다 (RewardManager.GetSpawnerFor)
+///   버프로 받으면 내 쪽 몬스터, 디버프로 받으면(반대쪽에 적용) 상대 쪽 몬스터가 바뀐다
 /// - key 는 쓰지 않으므로 RewardData 의 hasKey 는 꺼 두고, 설명은 explain 에 직접 쓴다
 /// </summary>
 [CreateAssetMenu(fileName = "SpawnerRewardEffect", menuName = "Scriptable Objects/Reward Effect/Spawner")]

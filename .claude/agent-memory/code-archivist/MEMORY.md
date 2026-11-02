@@ -8,4 +8,9 @@
 - [editor.md](editor.md) — Editor, asmdef
 - [monster.md](monster.md) — MonsterBrain 상태머신, 키워드 SO/Runtime 훅, 키워드 10종, HazardZone
 오타 폴더/클래스: ComabtSystem, DamageMassage, ArrowMovemnt, DissolveEffectContorller (그대로 유지). 파일명≠클래스명: StraightMovement.cs=Straight, FollowMovement.cs=Follow.
+- [weapon-test.md](weapon-test.md) — UI/Debug/WeaponTest 무기 테스트 컨트롤러, DPS 미터, 더미 배치
 - [weapon-upgrade.md](weapon-upgrade.md) — 무기 업그레이드, 플레이어별 보상 풀, Chain, 무기 ★, ReturnMovement, 몬스터 둔화
+
+- [statistics.md](statistics.md) — StatisticsManager/GameOverManager/GameOverUI, 통계 이벤트 흐름
+- [title.md](title.md) — TitleMenu, TitleSceneBuilder, 씬 순서 Title(0)/Game(1)
+- [dimension.md](dimension.md) — DimensionData/Applier/Selection, 차원 선택 UI, Spawner/RewardManager 연동

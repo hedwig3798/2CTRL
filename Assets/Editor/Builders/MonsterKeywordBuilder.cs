@@ -2,7 +2,6 @@ using System.Collections.Generic;
 using System.IO;
 using System.Text;
 using UnityEditor;
-using UnityEditor.SceneManagement;
 using UnityEngine;
 
 namespace Builders
@@ -19,7 +18,6 @@ namespace Builders
         private const string BAT_PATH = "Assets/prefab/Monster/bat/bat.prefab";
         private const string DUMMY_PATH = "Assets/prefab/Monster/Dummy/Dummy.prefab";
         private const string CIRCLE_PATH = "Assets/Resources/Image/Dummy/DummyCircle.png";
-        private const string SCENE_PATH = "Assets/Scenes/SampleScene.unity";
 
         private struct MonsterSpec
         {
@@ -273,28 +271,6 @@ namespace Builders
             EditorUtility.SetDirty(w3);
             sb.AppendLine("1_3: " + Describe(w3));
 
-            // 씬 Spawner 에 웨이브 연결
-            var scene = EditorSceneManager.GetActiveScene();
-            if (scene.path != SCENE_PATH)
-            {
-                scene = EditorSceneManager.OpenScene(SCENE_PATH, OpenSceneMode.Single);
-            }
-            var waves = new WaveData[] { w1, w2, w3 };
-            foreach (var spawner in Object.FindObjectsByType<Spawner>(FindObjectsInactive.Include))
-            {
-                var so = new SerializedObject(spawner);
-                var arr = so.FindProperty("waveArray");
-                arr.arraySize = waves.Length;
-                for (int i = 0; i < waves.Length; i++)
-                {
-                    arr.GetArrayElementAtIndex(i).objectReferenceValue = waves[i];
-                }
-                so.ApplyModifiedPropertiesWithoutUndo();
-                EditorUtility.SetDirty(spawner);
-                sb.AppendLine("spawner " + spawner.name + " waves=1_1,1_2,1_3");
-            }
-            EditorSceneManager.MarkSceneDirty(scene);
-            EditorSceneManager.SaveScene(scene);
             return sb.ToString();
         }
 

@@ -1,0 +1,40 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f28bc59546b359e4685b706a3d741f0f, type: 3}
+  m_Name: Forest
+  m_EditorClassIdentifier: Game.Runtime::DimensionData
+  displayName: "\uC232"
+  previewSprite: {fileID: 7428657513330879355, guid: 19e0a7bfbeb6cad47bf4899311bd56f8, type: 3}
+  themeColor: {r: 0.35, g: 0.75, b: 0.35, a: 1}
+  startWeapon: {fileID: 2378375243013374915, guid: 51032cf65ded45d8ad5215dfe58623f5, type: 3}
+  weaponRewards:
+  - {fileID: 11400000, guid: 9781b20388e34e228670bc9d81502e06, type: 2}
+  - {fileID: 11400000, guid: 6d2c5941a6974932a238ef8f1fc6c42d, type: 2}
+  - {fileID: 11400000, guid: 74e8f0db705e48ceae90d6b430d63585, type: 2}
+  - {fileID: 11400000, guid: 4d15f3ea9028493484e99cb28d7332dc, type: 2}
+  waves:
+  - {fileID: 11400000, guid: cb8c47a35ff823c40b7eadc22c7bcccb, type: 2}
+  - {fileID: 11400000, guid: d554bbae773fbc44dac91deba9cb1ca6, type: 2}
+  - {fileID: 11400000, guid: 71ffbefac5ea2b04c843a1f09c2e4ffa, type: 2}
+  - {fileID: 11400000, guid: 0baeee0dbb374a34f9c63716a2a491ea, type: 2}
+  - {fileID: 11400000, guid: 713563c2218194e46bb0137beb99d898, type: 2}
+  - {fileID: 11400000, guid: 0806c81da1cce424c9f34d7a0b744459, type: 2}
+  - {fileID: 11400000, guid: 730236b536fb3204cbca98be1b14e09e, type: 2}
+  - {fileID: 11400000, guid: c4b122a9085a59746be9aac9da13814b, type: 2}
+  - {fileID: 11400000, guid: 3405ebf551c3ccd4f9bea7daa944359d, type: 2}
+  - {fileID: 11400000, guid: 0c454f9cf5c204b4482c0ab439232727, type: 2}
+  - {fileID: 11400000, guid: 627cd50a40839d2428c77952954946b6, type: 2}
+  - {fileID: 11400000, guid: b4b13d5905be4d0419a5d4a44c66e9ef, type: 2}
+  monsterSkins: []
+  chunkLoaderPrefab: {fileID: 7907613963683787990, guid: d18b369a8b2106043ba55b0da17f158a, type: 3}
+  playerAnimator: {fileID: 22100000, guid: 731748bca97b7f941825991cf203cdac, type: 2}
+  playerSprite: {fileID: 978012912, guid: 5e4ab4838a9d922438adeab9ad22c3e9, type: 3}
