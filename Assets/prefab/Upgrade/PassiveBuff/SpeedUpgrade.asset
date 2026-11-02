@@ -17,7 +17,7 @@ MonoBehaviour:
   hasKey: 1
   key: 2
   hasValue: 1
-  value: 1
-  explain1: "{0}\uAC00 {1}\uC99D\uAC00\uD569\uB2C8\uB2E4."
+  value: 0.05
+  explain1: "{0}\uAC00 {1:0.#%} \uC99D\uAC00\uD569\uB2C8\uB2E4."
   explain2: 
-  effect: {fileID: 11400000, guid: 631e1694c8514fb2a419bf40da892f52, type: 2}
+  effect: {fileID: 11400000, guid: e4c3656f1c5b4de1a2fa7f0a8722220c, type: 2}

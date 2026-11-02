@@ -55,6 +55,9 @@ public class Spawner
     private readonly Dictionary<MonsterData, MonsterSkin> skinMap = new Dictionary<MonsterData, MonsterSkin>();
     private readonly Dictionary<Spawnable, SkinTarget> skinTargets = new Dictionary<Spawnable, SkinTarget>();
 
+    // 생성한 몬스터 -> 처치 시 EXP 배율 (MonsterData.expValue, 생성할 때 한 번만 찾는다. 없으면 DropManager 기본값)
+    private readonly Dictionary<Spawnable, float> expRates = new Dictionary<Spawnable, float>();
+
     //
     [Header("Spawn Data")]
     public Transform target;
@@ -73,6 +76,9 @@ public class Spawner
 
     // 개체수 비율이 이 값보다 작아지지 않게 한다 (스폰 간격이 무한히 길어지지 않도록)
     private const float MinCountRate = 0.1f;
+
+    // 진행 중인 웨이브 번호 (Wave 코루틴이 갱신, 시작 전이면 -1). 이후 스폰(소환 / 분열 포함)부터 그 웨이브 배율을 쓴다
+    private int currentWaveIndex = -1;
 
     /// <summary>
     /// 보상으로 몬스터 비율을 보정한다
@@ -94,13 +100,57 @@ public class Spawner
     }
 
     /// <summary>
-    /// 보정이 적용된 최종 비율 (Count 의 base 는 1)
+    /// 최종 비율 = 현재 웨이브 배율 × 보상 보정 ((base + ΣAdd) × (1 + ΣMultiply)) (Count 의 base 는 1, 웨이브 배율 없음)
     /// </summary>
     public float GetRate(SpawnModifierType _type)
     {
         int i = (int)_type;
-        float rate = (GetBaseRate(_type) + addRates[i]) * (1f + mulRates[i]);
+        float rate = GetWaveRate(_type) * (GetBaseRate(_type) + addRates[i]) * (1f + mulRates[i]);
         return SpawnModifierType.Count == _type ? Mathf.Max(MinCountRate, rate) : Mathf.Max(0f, rate);
+    }
+
+    /// <summary>
+    /// 현재 웨이브의 배율 (웨이브 시작 전이거나 Count 면 1)
+    /// </summary>
+    public float GetWaveRate(SpawnModifierType _type)
+    {
+        WaveData wave = CurrentWave;
+        if (null == wave)
+        {
+            return 1f;
+        }
+
+        switch (_type)
+        {
+            case SpawnModifierType.HP:
+                return wave.hpRate;
+            case SpawnModifierType.Damage:
+                return wave.damageRate;
+            case SpawnModifierType.Speed:
+                return wave.speedRate;
+            default:
+                return 1f;
+        }
+    }
+
+    /// <summary>
+    /// 진행 중인 웨이브 번호 (0 부터, 시작 전이면 -1)
+    /// </summary>
+    public int CurrentWaveIndex => currentWaveIndex;
+
+    /// <summary>
+    /// 진행 중인 웨이브 (시작 전이면 null)
+    /// </summary>
+    public WaveData CurrentWave
+    {
+        get
+        {
+            if (null == waveArray || currentWaveIndex < 0 || currentWaveIndex >= waveArray.Length)
+            {
+                return null;
+            }
+            return waveArray[currentWaveIndex];
+        }
     }
 
     private float GetBaseRate(SpawnModifierType _type)
@@ -260,6 +310,8 @@ public class Spawner
         data.SetFloat(DATA_TYPE.HPRate, GetRate(SpawnModifierType.HP));
         data.SetFloat(DATA_TYPE.moveSpeedRate, GetRate(SpawnModifierType.Speed));
         data.SetFloat(DATA_TYPE.damageRate, GetRate(SpawnModifierType.Damage));
+        // 0 이면 DropManager 기본값을 쓴다
+        data.SetFloat(DATA_TYPE.expRate, expRates.TryGetValue(sa, out float expRate) ? expRate : 0f);
         data.SetTransform(DATA_TYPE.moveTarget, target);
         sa.blackBoardHandler.Initialize();
 
@@ -301,7 +353,7 @@ public class Spawner
     }
 
     /// <summary>
-    /// 생성한 몬스터의 외형 대상과 기본 외형을 기억한다 (MonsterData 가 없으면 외형을 바꾸지 않는다)
+    /// 생성한 몬스터의 외형 대상과 기본 외형, EXP 배율을 기억한다 (MonsterData 가 없으면 외형을 바꾸지 않고 EXP 는 기본값)
     /// </summary>
     private void RegisterSkinTarget(Spawnable _object)
     {
@@ -310,6 +362,8 @@ public class Spawner
         {
             return;
         }
+
+        expRates[_object] = brain.Data.expValue;
 
         SkinTarget target = new SkinTarget();
         target.data = brain.Data;
@@ -375,6 +429,7 @@ public class Spawner
     private void OnDespawn(Spawnable _object)
     {
         skinTargets.Remove(_object);
+        expRates.Remove(_object);
         Destroy(_object.gameObject);
     }
 
@@ -433,6 +488,9 @@ public class Spawner
                 }
             }
             spawCoroutine.Clear();
+
+            // 이후 스폰부터 이 웨이브의 HP / 데미지 / 속도 배율을 쓴다
+            currentWaveIndex = i;
 
             for (int j = 0; j < waveArray[i].spwanArray.Length; j++)
             {

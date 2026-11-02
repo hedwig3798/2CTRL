@@ -303,8 +303,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::ContactDamage
   owner: {fileID: 5786466256426307854}
-  baseDamage: 1
-  coolTime: 0.1
+  baseDamage: 4
+  coolTime: 0.5
 --- !u!58 &9147467513074917044
 CircleCollider2D:
   m_ObjectHideFlags: 0

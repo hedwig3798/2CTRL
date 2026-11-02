@@ -12,7 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b3795bac8328aef4fb7b53deef8d8087, type: 3}
   m_Name: BoomerangUpgradeTable
   m_EditorClassIdentifier: Game.Runtime::WeaponUpgradeTable
-  rewardWeight: 1
+  rewardWeight: 1.5
   steps:
   - title: "\uB370\uBBF8\uC9C0 +20%"
     description: "\uB370\uBBF8\uC9C0 +20%"
@@ -72,7 +72,7 @@ MonoBehaviour:
       mode: 0
       value: 1.5
   - title: "\u2605 \uADC0\uD658 \uAC15\uD0C0"
-    description: "\uB3CC\uC544\uC62C \uB54C \uB370\uBBF8\uC9C0 2\uBC30"
+    description: "\uB3CC\uC544\uC62C \uB54C \uB370\uBBF8\uC9C0 1.5\uBC30"
     modifiers:
     - param: 200
       mode: 0

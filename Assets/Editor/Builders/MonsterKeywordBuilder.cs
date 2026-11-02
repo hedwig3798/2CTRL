@@ -58,11 +58,11 @@ namespace Builders
 
             var selfDestruct = LoadOrCreate<SelfDestructKeyword>(KEYWORD_DIR + "/SelfDestruct.asset");
             selfDestruct.triggerRange = 1.2f; selfDestruct.telegraphTime = 0.8f; selfDestruct.radius = 1.5f;
-            selfDestruct.damage = 3f; selfDestruct.knockbackForce = 6f; selfDestruct.explodeOnDeath = true; selfDestruct.inflateScale = 1.5f;
+            selfDestruct.damage = 20f; selfDestruct.knockbackForce = 6f; selfDestruct.explodeOnDeath = true; selfDestruct.inflateScale = 1.5f;
 
             var hazardTrail = LoadOrCreate<HazardTrailKeyword>(KEYWORD_DIR + "/HazardTrail.asset");
             hazardTrail.interval = 1.2f; hazardTrail.radius = 0.6f; hazardTrail.duration = 2.5f;
-            hazardTrail.tickInterval = 0.5f; hazardTrail.damagePerTick = 1f;
+            hazardTrail.tickInterval = 0.5f; hazardTrail.damagePerTick = 3f;
 
             var summoner = LoadOrCreate<SummonerKeyword>(KEYWORD_DIR + "/Summoner.asset");
             summoner.count = 2; summoner.maxAlive = 4; summoner.spawnRadius = 1.2f; summoner.telegraphTime = 0.8f;
@@ -86,17 +86,17 @@ namespace Builders
             // 3. 몬스터 스펙
             var specs = new List<MonsterSpec>
             {
-                new MonsterSpec { name = "MiniSlime", hp = 5f, speed = 1.4f, contactDamage = 1f, scale = 0.6f,
+                new MonsterSpec { name = "MiniSlime", hp = 5f, speed = 1.4f, contactDamage = 3f, scale = 0.6f,
                     color = new Color(0.45f, 0.95f, 0.45f, 1f), keywords = new MonsterKeyword[0] },
-                new MonsterSpec { name = "Slime", hp = 20f, speed = 1f, contactDamage = 1f, scale = 1f,
+                new MonsterSpec { name = "Slime", hp = 21f, speed = 1f, contactDamage = 6f, scale = 1f,
                     color = new Color(0.3f, 0.85f, 0.3f, 1f), keywords = new MonsterKeyword[] { predict, split } },
-                new MonsterSpec { name = "Bomber", hp = 12f, speed = 1.3f, contactDamage = 1f, scale = 1f,
+                new MonsterSpec { name = "Bomber", hp = 12f, speed = 1.3f, contactDamage = 4f, scale = 1f,
                     color = new Color(1f, 0.3f, 0.3f, 1f), keywords = new MonsterKeyword[] { dash, selfDestruct, revive } },
-                new MonsterSpec { name = "Wraith", hp = 18f, speed = 1.1f, contactDamage = 1f, scale = 1f,
+                new MonsterSpec { name = "Wraith", hp = 20f, speed = 1.1f, contactDamage = 5f, scale = 1f,
                     color = new Color(0.7f, 0.4f, 1f, 0.55f), keywords = new MonsterKeyword[] { teleport, hazardTrail } },
-                new MonsterSpec { name = "Shaman", hp = 25f, speed = 0.9f, contactDamage = 1f, scale = 1.1f,
+                new MonsterSpec { name = "Shaman", hp = 35f, speed = 0.9f, contactDamage = 4f, scale = 1.1f,
                     color = new Color(0.35f, 0.55f, 1f, 1f), keywords = new MonsterKeyword[] { orbit, summoner } },
-                new MonsterSpec { name = "Golem", hp = 80f, speed = 0.6f, contactDamage = 2f, scale = 1.8f,
+                new MonsterSpec { name = "Golem", hp = 140f, speed = 0.6f, contactDamage = 15f, scale = 1.8f,
                     color = new Color(0.6f, 0.6f, 0.6f, 1f), keywords = new MonsterKeyword[] { kbResist, revive } },
             };
 
@@ -197,6 +197,7 @@ namespace Builders
                 var contact = attackT.GetComponent<ContactDamage>();
                 contact.owner = pipeT.GetComponent<DamagePipeline>();
                 contact.baseDamage = _spec.contactDamage;
+                contact.coolTime = 0.5f;
 
                 // 데미지 텍스트: Dummy 설정을 복사
                 Transform binderT = root.transform.Find("LocalEventBiner");

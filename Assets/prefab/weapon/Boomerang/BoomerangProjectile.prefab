@@ -145,7 +145,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Game.Runtime::BoomerangUpgrade
   scaleTarget: {fileID: 0}
-  returnDamageRate: 2
+  returnDamageRate: 1.5
 --- !u!1 &3052150163120734737
 GameObject:
   m_ObjectHideFlags: 0

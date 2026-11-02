@@ -18,6 +18,10 @@ public class MonsterData
     [Tooltip("행동 키워드. 이동 처리와 행동 검사는 이 순서대로 한다")]
     public MonsterKeyword[] keywords;
 
+    [Tooltip("처치 시 떨어지는 EXP 보석의 배율 (획득 EXP = 보석 baseExp × expValue)")]
+    [Min(0f)]
+    public float expValue = 1f;
+
 #if UNITY_EDITOR
     private void OnValidate()
     {

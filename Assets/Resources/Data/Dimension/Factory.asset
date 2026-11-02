@@ -33,6 +33,8 @@ MonoBehaviour:
   - {fileID: 11400000, guid: 8ac86b62d47dd834ab9d9eeabdd4e9ef, type: 2}
   - {fileID: 11400000, guid: 928dd0de3eae8924b922656c98adb656, type: 2}
   - {fileID: 11400000, guid: 38c968e776c97e944ae529fe0bacc66b, type: 2}
+  - {fileID: 11400000, guid: c3643ad0d350392459ae43d4ceeb1b72, type: 2}
+  - {fileID: 11400000, guid: e80238d6a0fb0134fbb5663532c5be8a, type: 2}
   monsterSkins: []
   chunkLoaderPrefab: {fileID: 7287097152152248050, guid: 2c517fbd785d9544cbf3ca97777a9431, type: 3}
   playerAnimator: {fileID: 22100000, guid: 877b0d512f3e20947b997821f3e7325b, type: 2}

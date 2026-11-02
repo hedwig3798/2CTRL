@@ -128,8 +128,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b4ecebc7b9f48784abd853b201d220a0, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::HealthSystem
-  maxHP: 10
-  currHP: 10
+  maxHP: 100
+  currHP: 100
   isDead: 0
   isInvincibility: 0
 --- !u!114 &1197282222138486179
@@ -830,6 +830,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::PlayerStats
   side: 0
   weaponHolder: {fileID: 1049810268336096917}
+  minMultiplier: 0.5
+  maxWeaponCount: 4
 --- !u!1 &8949733347197857447
 GameObject:
   m_ObjectHideFlags: 0

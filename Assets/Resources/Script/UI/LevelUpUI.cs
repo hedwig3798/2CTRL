@@ -171,7 +171,12 @@ public class LevelUpUI
             }
 
             rewardManager.ApplyReward(selected.Data1, group.Side);
-            rewardManager.ApplyReward(selected.Data2, group.Side.Opposite());
+
+            // 무기 / 무기 업그레이드 패널은 디버프가 없다
+            if (null != selected.Data2)
+            {
+                rewardManager.ApplyReward(selected.Data2, group.Side.Opposite());
+            }
         }
     }
 

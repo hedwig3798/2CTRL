@@ -17,4 +17,4 @@ MonoBehaviour:
   radius: 0.6
   duration: 2.5
   tickInterval: 0.5
-  damagePerTick: 1
+  damagePerTick: 3

@@ -46,8 +46,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::ContactDamage
   owner: {fileID: 6521857905499698694}
-  baseDamage: 2
-  coolTime: 0.1
+  baseDamage: 15
+  coolTime: 0.5
 --- !u!58 &5788772439117072041
 CircleCollider2D:
   m_ObjectHideFlags: 0
@@ -185,7 +185,7 @@ RectTransform:
   m_Father: {fileID: 3039826469366543855}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
-  m_AnchorMax: {x: 1, y: 1}
+  m_AnchorMax: {x: 0, y: 1}
   m_AnchoredPosition: {x: 0, y: 0}
   m_SizeDelta: {x: 0, y: 0}
   m_Pivot: {x: 0.5, y: 0.5}
@@ -681,8 +681,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b4ecebc7b9f48784abd853b201d220a0, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::HealthSystem
-  maxHP: 80
-  currHP: 80
+  maxHP: 140
+  currHP: 140
   isDead: 0
   isInvincibility: 0
 --- !u!58 &6403177312668756748

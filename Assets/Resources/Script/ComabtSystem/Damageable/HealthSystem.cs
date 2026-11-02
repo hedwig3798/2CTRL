@@ -42,6 +42,14 @@ public class HealthSystem
     private bool isInvincibility = false;
 
     private DropManager boundDropManager;
+
+    // 죽을 때 드롭할 EXP 배율 (Initialize 에서 BlackBoard 의 expRate 를 저장, 0 이하면 DropManager 기본값)
+    private float expRate;
+
+    /// <summary>
+    /// 죽을 때 드롭할 EXP 배율 (설정되지 않았으면 0)
+    /// </summary>
+    public float ExpRate => expRate;
     private float baseMaxHP;
 
     // 사망 시 꺼서 추가 피격/접촉/타깃 탐색을 막는다
@@ -248,6 +256,9 @@ public class HealthSystem
 
         MaxHP = baseMaxHP * rate;
         CurrHP = MaxHP;
+
+        // 죽을 때 드롭할 EXP 배율 (Spawner 가 스폰할 때 MonsterData.expValue 로 넣는다, 없으면 0)
+        expRate = null != _data ? _data.GetFloat(DATA_TYPE.expRate) : 0f;
 
         if (null != boundDropManager)
         {

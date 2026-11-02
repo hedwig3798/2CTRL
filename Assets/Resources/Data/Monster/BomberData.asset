@@ -20,3 +20,4 @@ MonoBehaviour:
   - {fileID: 11400000, guid: 2e1b896be97f38b4e99f792cdda5baca, type: 2}
   - {fileID: 11400000, guid: c17fa2f5c8980e94791ebd02709962e9, type: 2}
   - {fileID: 11400000, guid: b70e45f5a8d9f834d837de33b78c6ca1, type: 2}
+  expValue: 3

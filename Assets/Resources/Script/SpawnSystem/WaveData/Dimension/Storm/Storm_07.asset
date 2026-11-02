@@ -16,14 +16,17 @@ MonoBehaviour:
   spwanArray:
   - spawnObject: {fileID: 4410402836052769883, guid: 247c2e464fbb99747a7b166f93aa3225, type: 3}
     count: {x: 1, y: 1}
-    spawnRange: {x: 3, y: 4}
-    spawnInterval: 0.7
+    spawnRange: {x: 11, y: 13}
+    spawnInterval: 0.69
   - spawnObject: {fileID: 4769532583840605374, guid: db64fa7843849d84fa6f328017459dd4, type: 3}
     count: {x: 1, y: 1}
-    spawnRange: {x: 3, y: 4}
-    spawnInterval: 4.5
+    spawnRange: {x: 11, y: 13}
+    spawnInterval: 1.62
   - spawnObject: {fileID: 355824763167936439, guid: ea93310d0ef3ed04d81bc335cfbd7cd2, type: 3}
     count: {x: 1, y: 1}
-    spawnRange: {x: 3, y: 4}
-    spawnInterval: 12
+    spawnRange: {x: 11, y: 13}
+    spawnInterval: 1.91
   time: 150
+  hpRate: 3.34
+  damageRate: 1.6
+  speedRate: 1.1

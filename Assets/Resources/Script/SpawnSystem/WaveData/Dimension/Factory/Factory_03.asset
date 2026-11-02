@@ -14,12 +14,15 @@ MonoBehaviour:
   m_EditorClassIdentifier: Game.Runtime::WaveData
   waveID: Factory_03
   spwanArray:
+  - spawnObject: {fileID: 4629255957395271076, guid: e635f0312efdac5489a07079d8c53b88, type: 3}
+    count: {x: 1, y: 1}
+    spawnRange: {x: 11, y: 13}
+    spawnInterval: 1.09
   - spawnObject: {fileID: 2835197232059612484, guid: 906f69b250e20514dbb6d9609fd1c23c, type: 3}
     count: {x: 1, y: 1}
-    spawnRange: {x: 3, y: 4}
-    spawnInterval: 2
-  - spawnObject: {fileID: 6208623570440085606, guid: fdc4e7adeb2fb984aa20c977340b7d5c, type: 3}
-    count: {x: 1, y: 1}
-    spawnRange: {x: 3, y: 4}
-    spawnInterval: 8
-  time: 150
+    spawnRange: {x: 11, y: 13}
+    spawnInterval: 2.24
+  time: 50
+  hpRate: 2.28
+  damageRate: 1.1
+  speedRate: 1.017

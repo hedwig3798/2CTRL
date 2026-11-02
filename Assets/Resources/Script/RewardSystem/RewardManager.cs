@@ -11,6 +11,7 @@ using UnityEngine;
 ///   - ExcludeFor : 공유 풀의 항목을 그 플레이어에게만 숨긴다 (예: 얻은 무기)
 ///   - AddFor / RemoveFor : 그 플레이어에게만 보이는 항목을 추가 / 삭제한다 (예: 무기 업그레이드)
 ///   - SetPoolFor : 그 플레이어의 type 풀을 전용 항목으로 바꾼다. 공유 풀은 그 플레이어에게 쓰이지 않는다 (예: 차원 무기)
+///   - SetPoolBlockedFor : 그 플레이어에게 type 풀 전체를 막는다 (예: 무기 보유 상한)
 ///   - side 를 받는 GetRandomUnique 가 둘을 반영해 후보를 모은다
 /// - 몬스터 보정 보상은 보상을 받는 진영의 플레이어를 노리는 스포너에 적용한다 (RegisterSpawner)
 ///   등록이 없으면 spawner 필드 -> 씬에서 찾은 스포너를 쓴다
@@ -73,6 +74,11 @@ public class RewardManager
         /// 공유 풀 대신 전용 풀만 쓰는 type
         /// </summary>
         public readonly HashSet<RewardPoolType> overridden = new HashSet<RewardPoolType>();
+
+        /// <summary>
+        /// 이 플레이어에게 아예 뽑히지 않는 type (공유 / 전용 풀 모두. 예: 무기 보유 상한)
+        /// </summary>
+        public readonly HashSet<RewardPoolType> blocked = new HashSet<RewardPoolType>();
     }
 
     private readonly Dictionary<PlayerSide, SideState> sideStates = new Dictionary<PlayerSide, SideState>();
@@ -306,6 +312,55 @@ public class RewardManager
     }
 
     /// <summary>
+    /// _side 플레이어에게 _type 풀 전체를 막거나 다시 연다 (막으면 공유 / 전용 풀 모두 뽑히지 않는다)
+    /// </summary>
+    public void SetPoolBlockedFor(PlayerSide _side, RewardPoolType _type, bool _blocked)
+    {
+        if (true == _blocked)
+        {
+            GetSideState(_side).blocked.Add(_type);
+        }
+        else if (true == sideStates.TryGetValue(_side, out SideState state))
+        {
+            state.blocked.Remove(_type);
+        }
+    }
+
+    /// <summary>
+    /// _side 플레이어에게 _type 풀이 막혔는지
+    /// </summary>
+    public bool IsPoolBlockedFor(PlayerSide _side, RewardPoolType _type)
+    {
+        return sideStates.TryGetValue(_side, out SideState state) && state.blocked.Contains(_type);
+    }
+
+    /// <summary>
+    /// _item 이 _side 플레이어 기준 _type 풀에 있는지 (공유 풀은 SetPoolFor 로 바꾸지 않았을 때만 본다)
+    /// - 숨김(ExcludeFor) / 막힘(SetPoolBlockedFor) 은 따지지 않는다
+    /// </summary>
+    public bool IsInPoolFor(PlayerSide _side, RewardPoolType _type, RewardData _item)
+    {
+        if (null == _item)
+        {
+            return false;
+        }
+
+        sideStates.TryGetValue(_side, out SideState state);
+        if (null == state || false == state.overridden.Contains(_type))
+        {
+            RandomPool<RewardData> shared = GetPool(_type);
+            if (null != shared && true == shared.Contains(_item))
+            {
+                return true;
+            }
+        }
+
+        return null != state
+            && true == state.pools.TryGetValue(_type, out RandomPool<RewardData> sidePool)
+            && true == sidePool.Contains(_item);
+    }
+
+    /// <summary>
     /// _side 플레이어의 숨김 / 전용 항목을 모두 지운다
     /// - SetPoolFor 로 바꾼 풀 설정도 지워지므로, 이후 그 플레이어는 다시 공유 풀을 쓴다
     /// </summary>
@@ -480,6 +535,7 @@ public class RewardManager
     /// _side 플레이어 기준으로 _types 의 풀에서 가중치를 무시하고 균등 랜덤으로 중복 없이 최대 _count 개를 가져온다 (풀에서 빼지 않는다)
     /// - 공유 풀에서 ExcludeFor 로 숨긴 항목은 빼고, AddFor 로 넣은 그 플레이어 전용 항목을 더한다
     /// - SetPoolFor 로 바꾼 type 은 공유 풀을 쓰지 않는다. ExcludeFor 로 숨긴 항목은 전용 풀에서도 뺀다
+    /// - SetPoolBlockedFor 로 막은 type 은 아무것도 뽑지 않는다
     /// - null 항목, weight 가 0 인 항목은 제외하고, 같은 데이터는 한 번만 뽑힌다
     /// </summary>
     /// <param name="_types">후보를 모을 풀 목록</param>
@@ -500,6 +556,12 @@ public class RewardManager
         candidateSet.Clear();
         foreach (RewardPoolType type in _types)
         {
+            // 막힌 type 은 공유 / 전용 풀 모두 후보에서 뺀다
+            if (null != state && true == state.blocked.Contains(type))
+            {
+                continue;
+            }
+
             HashSet<RewardData> excluded = null != state ? state.excluded : null;
             if (null == state || false == state.overridden.Contains(type))
             {

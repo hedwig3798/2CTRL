@@ -25,7 +25,7 @@ UpgradeLevel/UpgradeVersion (UpgradeTable/WeaponPrefab은 Weapon에 없음 -> We
 - IProjectileHitListener.OnProjectileHit(proj,target,hitIndex): 타격 직후 알림.
 
 ## 무기별 (Weapons/*) ★ (5·10단계)
-- Boomerang/BoomerangUpgrade: IHitDamageModifier, FlagReturnDamage면 ReturnMovement.IsReturning 중 2배.
+- Boomerang/BoomerangUpgrade: IHitDamageModifier, FlagReturnDamage면 ReturnMovement.IsReturning 중 returnDamageRate배(빌더 1.5, 이전 2배).
 - Chain/ChainAmplifier(IHitDamageModifier, FlagChainAmplify: 전이마다 +15% 누적), Chain/ChainLightningLine(IProjectileHitListener, 번개 표시). 무기 기본: Repeat, dmg10, 공속0.8, 사거리7, chainCount3, chainRange3; ChainMovement+OneHitProjectile, 프리팹 prefab/weapon/Chain/.
 - Explosive: FlagSecondaryExplosion(0.3s 뒤 반경60%/데미지50%). Mine: FlagChainExplosion(범위 내 활성 지뢰 연쇄). PoisonZone: FlagSlowZone(틱마다 monster.Context.ApplySlow, 기본 -40%). Shockwave: FlagContractWave(소멸 후 수축 파동 50%). SplitShot: FlagResplit(SplitFragmentResplit.Arm/OnProjectileHit, 조각 첫 타격 위치에서 3개). Sweep: FlagSlashWave(formation 0이 조준 방향 관통 검기 60%). Drone/Laser: 파라미터 수정치 사용(드론 탄 Child*, 레이저 FanAngle/LaserWidth).
 
@@ -53,3 +53,6 @@ UpgradeLevel/UpgradeVersion (UpgradeTable/WeaponPrefab은 Weapon에 없음 -> We
 ## 테스트
 - `Assets/Tests/EditMode/WeaponUpgradeTests.cs`
 - `Assets/Tests/PlayMode/ReturnMovementPlayTests.cs`
+
+## 밸런스 반영 (2026-11-02, 상세 balance.md)
+- WeaponUpgradeBuilder: 업그레이드 보상 가중치 1.5, Chain 프리팹 damage 8, 부메랑 귀환 데미지 1.5배(returnDamageRate), PoisonZoneProjectile slowRate 0.3(둔화 -30%), 일부 ★ 수치 하향.

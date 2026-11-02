@@ -8,7 +8,8 @@ using UnityEngine;
 /// - 활성화될 때마다 선택을 초기화하므로 UI 를 열 때마다 선택 없는 상태로 시작한다.
 /// - 레벨업 시 RewardManager 에서 패널마다 보상을 중복 없이 랜덤으로 뽑아 채운다.
 ///   - 첫 번째 데이터 : Weapon / PassiveBuff / WeaponUpgrade 풀 중 하나
-///   - 두 번째 데이터 : PassiveNerf(디버프) 풀 중 하나
+///   - 두 번째 데이터 : 첫 번째 데이터가 PassiveBuff 풀에서 뽑혔을 때만 PassiveNerf(디버프) 풀 중 하나
+///     (Weapon / WeaponUpgrade 패널은 디버프 없음 → SelectPanel 이 디버프 영역을 숨긴다)
 ///   뽑힌 보상이 모자라면 해당 데이터는 비워 두고, 두 데이터가 모두 없는 패널은 숨긴다.
 /// - 고른 보상의 첫 번째 데이터(버프) 는 side 쪽, 두 번째 데이터(디버프) 는 반대쪽 플레이어에게 적용된다 (LevelUpUI 가 재개할 때 적용)
 /// - 비활성 상태에서도 레벨업을 받아야 하므로 OnEnable 이 아닌 Initialize(Awake) / OnDestroy 에서 구독한다.
@@ -67,9 +68,18 @@ public class SelectPanelGroup
         RewardPoolType.PassiveNerf,
     };
 
+    // 첫 번째 데이터가 이 풀에서 뽑혔을 때만 두 번째 데이터(디버프)를 채운다 (무기 / 무기 업그레이드 패널은 디버프 없음)
+    private static readonly RewardPoolType[] DebuffPairedPoolTypes =
+    {
+        RewardPoolType.PassiveBuff,
+    };
+
     // 뽑은 보상을 받는 버퍼
     private readonly List<RewardData> mainBuffer = new List<RewardData>();
     private readonly List<RewardData> debuffBuffer = new List<RewardData>();
+
+    // 무기 보유 상한일 때 Weapon 을 뺀 첫 번째 데이터 풀 목록
+    private readonly List<RewardPoolType> mainTypeBuffer = new List<RewardPoolType>();
 
     private void Awake()
     {
@@ -118,7 +128,30 @@ public class SelectPanelGroup
     /// </summary>
     public void RefreshRewards()
     {
-        RefreshRewards(MainPoolTypes, DebuffPoolTypes);
+        RefreshRewards(GetMainPoolTypes(), DebuffPoolTypes);
+    }
+
+    /// <summary>
+    /// 첫 번째 데이터를 뽑을 풀. side 플레이어가 무기 보유 상한이면 Weapon 풀을 뺀다
+    /// (RewardManager 의 풀 막기와 별개로, 상한 도달 직후 남은 레벨업에서 무기가 다시 나오지 않도록 한 번 더 막는다)
+    /// </summary>
+    private IReadOnlyList<RewardPoolType> GetMainPoolTypes()
+    {
+        PlayerStats player = PlayerStats.Find(side);
+        if (null == player || false == player.IsWeaponFull)
+        {
+            return MainPoolTypes;
+        }
+
+        mainTypeBuffer.Clear();
+        foreach (RewardPoolType type in MainPoolTypes)
+        {
+            if (RewardPoolType.Weapon != type)
+            {
+                mainTypeBuffer.Add(type);
+            }
+        }
+        return mainTypeBuffer;
     }
 
     /// <summary>
@@ -133,7 +166,17 @@ public class SelectPanelGroup
         if (null != rewardManager)
         {
             mainCount = rewardManager.GetRandomUnique(selectPanels.Count, _mainTypes, side, mainBuffer);
-            debuffCount = rewardManager.GetRandomUnique(selectPanels.Count, _debuffTypes, side, debuffBuffer);
+
+            // 디버프는 패시브 패널 수만큼만 뽑는다
+            int pairedCount = 0;
+            for (int i = 0; i < mainCount; ++i)
+            {
+                if (true == IsDebuffPaired(rewardManager, mainBuffer[i]))
+                {
+                    ++pairedCount;
+                }
+            }
+            debuffCount = rewardManager.GetRandomUnique(pairedCount, _debuffTypes, side, debuffBuffer);
         }
         else
         {
@@ -143,6 +186,7 @@ public class SelectPanelGroup
         }
 
         int index = 0;
+        int debuffIndex = 0;
         foreach (SelectPanel selectPanel in selectPanels)
         {
             if (null == selectPanel)
@@ -151,7 +195,12 @@ public class SelectPanelGroup
             }
 
             RewardData main = index < mainCount ? mainBuffer[index] : null;
-            RewardData debuff = index < debuffCount ? debuffBuffer[index] : null;
+            RewardData debuff = null;
+            if (null != main && debuffIndex < debuffCount && true == IsDebuffPaired(rewardManager, main))
+            {
+                debuff = debuffBuffer[debuffIndex];
+                debuffIndex++;
+            }
             selectPanel.SetData(main, debuff);
             selectPanel.gameObject.SetActive(null != main || null != debuff);
             index++;
@@ -160,6 +209,26 @@ public class SelectPanelGroup
         mainBuffer.Clear();
         debuffBuffer.Clear();
         ClearSelection();
+    }
+
+    /// <summary>
+    /// _main 이 디버프와 짝지어지는 풀(PassiveBuff) 에서 뽑혔는지
+    /// </summary>
+    private bool IsDebuffPaired(RewardManager _rewardManager, RewardData _main)
+    {
+        if (null == _rewardManager || null == _main)
+        {
+            return false;
+        }
+
+        foreach (RewardPoolType type in DebuffPairedPoolTypes)
+        {
+            if (true == _rewardManager.IsInPoolFor(side, type, _main))
+            {
+                return true;
+            }
+        }
+        return false;
     }
 
     private void CollectPanels()

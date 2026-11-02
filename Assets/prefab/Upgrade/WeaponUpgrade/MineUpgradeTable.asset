@@ -12,7 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b3795bac8328aef4fb7b53deef8d8087, type: 3}
   m_Name: MineUpgradeTable
   m_EditorClassIdentifier: Game.Runtime::WeaponUpgradeTable
-  rewardWeight: 1
+  rewardWeight: 1.5
   steps:
   - title: "\uB370\uBBF8\uC9C0 +20%"
     description: "\uB370\uBBF8\uC9C0 +20%"
@@ -38,12 +38,12 @@ MonoBehaviour:
     - param: 109
       mode: 1
       value: -0.5
-  - title: "\u2605 \uD3ED\uBC1C \uBC18\uACBD +40%, \uB109\uBC31 +50%"
-    description: "\uD3ED\uBC1C \uBC18\uACBD +40%, \uB109\uBC31 +50%"
+  - title: "\u2605 \uD3ED\uBC1C \uBC18\uACBD +25%, \uB109\uBC31 +50%"
+    description: "\uD3ED\uBC1C \uBC18\uACBD +25%, \uB109\uBC31 +50%"
     modifiers:
     - param: 5
       mode: 1
-      value: 0.4
+      value: 0.25
     - param: 7
       mode: 1
       value: 0.5
@@ -65,12 +65,12 @@ MonoBehaviour:
     - param: 6
       mode: 0
       value: 5
-  - title: "\uC9C0\uB8B0 +1"
-    description: "\uC9C0\uB8B0 +1"
+  - title: "\uB370\uBBF8\uC9C0 +20%"
+    description: "\uB370\uBBF8\uC9C0 +20%"
     modifiers:
-    - param: 3
-      mode: 0
-      value: 1
+    - param: 0
+      mode: 1
+      value: 0.2
   - title: "\u2605 \uC5F0\uC1C4 \uD3ED\uBC1C"
     description: "\uD3ED\uBC1C \uBC94\uC704 \uC548\uC758 \uD65C\uC131 \uC9C0\uB8B0\uB3C4 \uD130\uC9C4\uB2E4"
     modifiers:

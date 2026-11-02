@@ -30,10 +30,10 @@ public class PoisonZoneProjectile
     public PoisonZoneLandMovement landMovement;
 
     [Header("slow (★)")]
-    [Tooltip("FlagSlowZone 이 켜졌을 때 장판 위 적의 이동 속도 감소 비율 (0.4 = -40%)")]
+    [Tooltip("FlagSlowZone 이 켜졌을 때 장판 위 적의 이동 속도 감소 비율 (0.3 = -30%)")]
     [Range(0f, 1f)]
     [SerializeField]
-    private float slowRate = 0.4f;
+    private float slowRate = 0.3f;
     [Tooltip("둔화가 다음 틱 이후로 더 유지되는 시간 (초). 장판을 벗어나면 이 시간 뒤에 풀린다")]
     [Min(0f)]
     [SerializeField]

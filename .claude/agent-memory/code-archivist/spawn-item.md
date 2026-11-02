@@ -21,8 +21,8 @@
 - 사용처: SummonerKeyword, SplitKeyword ([monster.md](monster.md)).
 
 ### 30분 웨이브 (2026-10-29)
-- 빌더 `Assets/Editor/Builders/Wave30Builder.cs` (메뉴 `Tools/Builders/Wave30`, 멱등): 차원별 웨이브 `SpawnSystem/WaveData/Dimension/<차원>/` 생성(각 150초, 합 30분). 씬 스포너 waveArray 덮어쓰기는 제거됨(웨이브는 DimensionApplier가 SetWaves로 주입).
-- 구성 표는 빌더 안 `table`. spawnInterval은 Spawner 1개 기준. 마지막 웨이브는 30분 이후에도 계속 돈다.
+- 빌더 `Assets/Editor/Builders/Wave30Builder.cs` (메뉴 `Tools/Builders/Wave30`, 멱등): 차원별 웨이브 `SpawnSystem/WaveData/Dimension/<차원>/` 생성(14웨이브: 50초x3 + 150초x11, 웨이브별 hp/damage/speedRate는 balance.md). 씬 스포너 waveArray 덮어쓰기는 제거됨(웨이브는 DimensionApplier가 SetWaves로 주입).
+- 구성 표는 빌더 안 `Table()`(DimensionTable: monsters/hpRate/intervals, NO=0은 미출현), 스폰거리 11~13. spawnInterval은 Spawner 1개 기준. 마지막 웨이브는 30분 이후에도 계속 돈다.
 - MonsterKeywordBuilder도 씬 Spawner 덮어쓰기 제거됨(재실행 시 웨이브 되돌림 문제 해소).
 
 ## 차원 연동 (Spawner, 미커밋)

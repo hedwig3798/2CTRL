@@ -145,9 +145,8 @@ public class PlayerStatDebugUI
         foreach (ValueType type in StatTypes)
         {
             float add = stats.GetAdd(type);
-            float mul = stats.GetMultiply(type);
             builder.Append($"{type.ToDisplayName()}  <b>{stats.Get(type):0.##}</b>");
-            builder.Append($"  <color=#999999>({stats.GetBase(type):0.##} {add:+0.##;-0.##;+0} × {1f + mul:0.##})</color>\n");
+            builder.Append($"  <color=#999999>({stats.GetBase(type):0.##} {add:+0.##;-0.##;+0} × {stats.GetMultiplier(type):0.##})</color>\n");
         }
 
         if (weaponCache.TryGetValue(_side, out List<Weapon> weapons))
@@ -160,9 +159,9 @@ public class PlayerStatDebugUI
                 }
 
                 builder.Append($"\n<b>무기 : {weapon.name}</b>{(weapon.isActiveAndEnabled ? string.Empty : " <color=#ff6666>(꺼짐)</color>")}\n");
-                builder.Append($"데미지  <b>{weapon.FinalDamage:0.##}</b>  <color=#999999>({weapon.damage:0.##} + {stats.Get(ValueType.Damage):0.##})</color>\n");
-                builder.Append($"공격 속도  <b>{weapon.FinalAttackSpeed:0.##}</b>/s  <color=#999999>({weapon.attackSpeed:0.##} + {stats.Get(ValueType.AttackSpeed):0.##}, 간격 {weapon.FinalCoolTime:0.##}s)</color>\n");
-                builder.Append($"범위  <b>{weapon.FinalRange:0.##}</b>  <color=#999999>({weapon.range:0.##} + {stats.Get(ValueType.Range):0.##})</color>\n");
+                builder.Append($"데미지  <b>{weapon.FinalDamage:0.##}</b>  <color=#999999>(({weapon.damage:0.##} {stats.GetAdd(ValueType.Damage):+0.##;-0.##;+0}) × {stats.GetMultiplier(ValueType.Damage):0.##})</color>\n");
+                builder.Append($"공격 속도  <b>{weapon.FinalAttackSpeed:0.##}</b>/s  <color=#999999>(({weapon.attackSpeed:0.##} {stats.GetAdd(ValueType.AttackSpeed):+0.##;-0.##;+0}) × {stats.GetMultiplier(ValueType.AttackSpeed):0.##}, 간격 {weapon.FinalCoolTime:0.##}s)</color>\n");
+                builder.Append($"범위  <b>{weapon.FinalRange:0.##}</b>  <color=#999999>(({weapon.range:0.##} {stats.GetAdd(ValueType.Range):+0.##;-0.##;+0}) × {stats.GetMultiplier(ValueType.Range):0.##})</color>\n");
                 if (weapon.fireDelay > 0f)
                 {
                     builder.Append($"발사 딜레이  <b>{weapon.FinalFireDelay:0.###}</b>s  <color=#999999>(기본 {weapon.fireDelay:0.###}s)</color>\n");

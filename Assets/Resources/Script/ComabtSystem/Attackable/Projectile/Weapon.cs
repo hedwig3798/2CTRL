@@ -22,7 +22,8 @@ public enum WEAPON_TYPE
 /// 무기 스펙을 가지고 발사체를 풀에서 꺼내 발사한다
 /// Repeat 은 쿨타임마다 발사하고, Persistent 는 발사체를 fireCount 개 유지한다
 /// 타겟 탐색 / 공격 로직은 Projectile 이 담당한다
-/// - 무기 스텟(damage / attackSpeed / range) 은 플레이어 스텟과 따로 있으며, 실제 공격에는 둘을 더한 Final* 값을 쓴다
+/// - 무기 스텟(damage / attackSpeed / range) 은 플레이어 스텟과 따로 있으며, 실제 공격에는 Final* 값을 쓴다
+///   Final = (무기 스텟 + 플레이어 ΣAdd) × 플레이어 배율 (PlayerStats.GetMultiplier, 모든 무기에 곱해짐)
 ///   (주인 PlayerStats 가 없으면 무기 스텟 그대로)
 /// </summary>
 public class Weapon
@@ -42,11 +43,11 @@ public class Weapon
     public LayerMask targetLayer;
 
     [Header("weapon stat (플레이어 스텟이 더해진다)")]
-    [Tooltip("발사체 하나의 기본 데미지. 실제 데미지 = damage + 플레이어 Damage")]
+    [Tooltip("발사체 하나의 기본 데미지. 실제 데미지 = (damage + 플레이어 Damage Add) × 플레이어 Damage 배율")]
     public float damage = 10f;
-    [Tooltip("Repeat: 초당 공격 횟수 / Persistent: 같은 대상 초당 재타격 횟수. 실제 값 = attackSpeed + 플레이어 AttackSpeed")]
+    [Tooltip("Repeat: 초당 공격 횟수 / Persistent: 같은 대상 초당 재타격 횟수. 실제 값 = (attackSpeed + 플레이어 AttackSpeed Add) × 플레이어 AttackSpeed 배율")]
     public float attackSpeed = 1f;
-    [Tooltip("타겟 탐색 범위. 실제 값 = range + 플레이어 Range")]
+    [Tooltip("타겟 탐색 범위. 실제 값 = (range + 플레이어 Range Add) × 플레이어 Range 배율")]
     public float range;
 
     [Header("weapon spec")]
@@ -98,12 +99,12 @@ public class Weapon
 
     #region Final Stat
     /// <summary>
-    /// 무기 damage + 플레이어 Damage (0 미만은 0)
+    /// (무기 damage + 플레이어 Damage Add) × 플레이어 Damage 배율 (0 미만은 0)
     /// </summary>
-    public float FinalDamage => Mathf.Max(0f, damage + GetOwnerStat(ValueType.Damage));
+    public float FinalDamage => Mathf.Max(0f, ApplyOwnerStat(damage, ValueType.Damage));
 
     /// <summary>
-    /// 무기 attackSpeed + 플레이어 AttackSpeed
+    /// (무기 attackSpeed + 플레이어 AttackSpeed Add) × 플레이어 AttackSpeed 배율
     /// 무기 attackSpeed 가 0 이하면 공격하지 않는 무기로 보고 0, 아니면 최소 MinAttackSpeed
     /// </summary>
     public float FinalAttackSpeed
@@ -114,7 +115,7 @@ public class Weapon
             {
                 return 0f;
             }
-            return Mathf.Max(MinAttackSpeed, attackSpeed + GetOwnerStat(ValueType.AttackSpeed));
+            return Mathf.Max(MinAttackSpeed, ApplyOwnerStat(attackSpeed, ValueType.AttackSpeed));
         }
     }
 
@@ -131,9 +132,9 @@ public class Weapon
     }
 
     /// <summary>
-    /// 무기 range + 플레이어 Range (0 미만은 0)
+    /// (무기 range + 플레이어 Range Add) × 플레이어 Range 배율 (0 미만은 0)
     /// </summary>
-    public float FinalRange => Mathf.Max(0f, range + GetOwnerStat(ValueType.Range));
+    public float FinalRange => Mathf.Max(0f, ApplyOwnerStat(range, ValueType.Range));
 
     /// <summary>
     /// 발사당 딜레이 (초). 무기 기본 공격 속도 대비 최종 공격 속도 배율만큼 줄어든다
@@ -154,9 +155,16 @@ public class Weapon
         }
     }
 
-    private float GetOwnerStat(ValueType _type)
+    /// <summary>
+    /// (_weaponValue + 주인 ΣAdd) × 주인 배율 (주인이 없으면 _weaponValue 그대로)
+    /// </summary>
+    private float ApplyOwnerStat(float _weaponValue, ValueType _type)
     {
-        return null != ownerStats ? ownerStats.Get(_type) : 0f;
+        if (null == ownerStats)
+        {
+            return _weaponValue;
+        }
+        return (_weaponValue + ownerStats.GetAdd(_type)) * ownerStats.GetMultiplier(_type);
     }
     #endregion
 

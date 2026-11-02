@@ -51,7 +51,7 @@ MonoBehaviour:
   targetLayer:
     serializedVersion: 2
     m_Bits: 0
-  damage: 10
+  damage: 8
   attackSpeed: 0.8
   range: 7
   fireCount: 1

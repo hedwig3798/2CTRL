@@ -13,6 +13,7 @@ using UnityEngine.UI;
 ///   - explainText1 = 첫 번째 RewardData 의 explain1, explainText2 = 두 번째 RewardData 의 explain1
 ///   - image / name 은 첫 번째 RewardData 를 우선하고, 없으면 두 번째 것을 사용한다
 ///   - RewardData 가 하나만 들어오면 들어온 하나의 정보만 표시한다
+///   - 두 번째 데이터가 없으면 debuffArea(있으면) 를 숨긴다
 /// - key / value 는 따로 표시하지 않고 explain 에 포멧팅되어 표시되며, explain1 / explain2 별로 따로 저장한다.
 /// </summary>
 public class SelectPanel
@@ -46,6 +47,10 @@ public class SelectPanel
     [Tooltip("두 번째 RewardData 의 explain1 을 key / value 로 포멧팅해서 표시할 텍스트")]
     [SerializeField]
     private TMP_Text explainText2;
+
+    [Tooltip("두 번째 데이터(디버프) 영역 전체 (배경 / 라벨 등). 두 번째 데이터가 없으면 숨긴다. 비워두면 explainText2 만 숨긴다")]
+    [SerializeField]
+    private GameObject debuffArea;
 
     // explainText1 / explainText2 에 들어간 데이터 (없으면 null)
     public RewardData Data1 { get; private set; }
@@ -139,6 +144,12 @@ public class SelectPanel
 
         bool hasExplain2 = null != _data2 && _data2.HasExplain1;
         ApplyText(explainText2, hasExplain2, hasExplain2 ? _data2.GetFormattedExplain1() : string.Empty);
+
+        // 디버프가 없는 패널(무기 / 무기 업그레이드) 은 디버프 영역 전체를 숨긴다
+        if (null != debuffArea)
+        {
+            debuffArea.SetActive(null != _data2);
+        }
     }
 
     /// <summary>

@@ -47,8 +47,7 @@ MonoBehaviour:
   owner: {fileID: 0}
   weaponType: 0
   preLoadCount: 5
-  projectile: {fileID: 3738543396606932142, guid: b49dcf0f633645cb9176a2592e803ee7,
-    type: 3}
+  projectile: {fileID: 3738543396606932142, guid: b49dcf0f633645cb9176a2592e803ee7, type: 3}
   targetLayer:
     serializedVersion: 2
     m_Bits: 0
@@ -60,7 +59,8 @@ MonoBehaviour:
   hitCount: 10
   fireDelay: 0.15
   spreadRange: 0
-  chainCount: 0
-  chainRange: 0
   lifetime: 0
   knockbackForce: 3
+  chainCount: 0
+  chainRange: 0
+  areaRadius: 0

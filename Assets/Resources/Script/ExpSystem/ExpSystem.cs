@@ -37,7 +37,7 @@ public class ExpSystem
 
     public void GetExp(float _exp)
     {
-        if (null == levelTable || null == levelTable.expTable || 0 == levelTable.expTable.Length)
+        if (null == levelTable || false == levelTable.HasData)
         {
             return;
         }
@@ -111,18 +111,11 @@ public class ExpSystem
         instance = null;
     }
 
+    /// <summary>
+    /// level 에서 다음 레벨로 오르는 데 필요한 EXP (LevelTable 의 공식 또는 표)
+    /// </summary>
     private float GetNeedExp(int level)
     {
-        if (level < 0)
-        {
-            level = 0;
-        }
-
-        if (level >= levelTable.expTable.Length)
-        {
-            return levelTable.expTable[levelTable.expTable.Length - 1];
-        }
-
-        return levelTable.expTable[level];
+        return levelTable.GetNeedExp(level);
     }
 }

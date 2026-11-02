@@ -12,7 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b3795bac8328aef4fb7b53deef8d8087, type: 3}
   m_Name: ExplosiveUpgradeTable
   m_EditorClassIdentifier: Game.Runtime::WeaponUpgradeTable
-  rewardWeight: 1
+  rewardWeight: 1.5
   steps:
   - title: "\uB370\uBBF8\uC9C0 +20%"
     description: "\uB370\uBBF8\uC9C0 +20%"

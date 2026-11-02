@@ -241,7 +241,7 @@ MonoBehaviour:
   unitRadius: 0.5
   minHitRadius: 0.2
   landMovement: {fileID: 1472305581456664320}
-  slowRate: 0.4
+  slowRate: 0.3
   slowLinger: 0.15
 --- !u!114 &6720738795137415168
 MonoBehaviour:

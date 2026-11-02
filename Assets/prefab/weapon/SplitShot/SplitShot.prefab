@@ -47,12 +47,11 @@ MonoBehaviour:
   owner: {fileID: 0}
   weaponType: 0
   preLoadCount: 5
-  projectile: {fileID: 551840077929287642, guid: 6e7e9551b65444b6a238c59ca7ecf1f8,
-    type: 3}
+  projectile: {fileID: 551840077929287642, guid: 6e7e9551b65444b6a238c59ca7ecf1f8, type: 3}
   targetLayer:
     serializedVersion: 2
     m_Bits: 0
-  damage: 12
+  damage: 15
   attackSpeed: 0.9
   range: 8
   fireCount: 1

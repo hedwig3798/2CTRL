@@ -4,9 +4,11 @@ using UnityEngine;
 
 /// <summary>
 /// 플레이어 스텟 (Player 루트에 하나 배치)
-/// - ValueType 마다 base / ΣAdd / ΣMultiply 를 가지며, 최종값 = (base + ΣAdd) × (1 + ΣMultiply) (0 미만은 0)
+/// - ValueType 마다 base / ΣAdd / ΣMultiply 를 가지며, 최종값 = (base + ΣAdd) × 배율 (0 미만은 0)
+///   배율 = max(minMultiplier, 1 + ΣMultiply) (상대에게 너프를 몰아 받아도 일정 이하로 떨어지지 않게)
 /// - base 는 MoveSpeed = ArrowMovemnt.speed, HP = HealthSystem.maxHP 에서 가져오고, 나머지(Damage / AttackSpeed / Range) 는 0
-/// - 무기 스텟과는 별개이며, Weapon 이 자신의 스텟에 플레이어 스텟을 더해서 사용한다
+/// - 무기 스텟과는 별개이며, Weapon 이 (무기 스텟 + ΣAdd) × 배율 로 사용한다 (Damage / AttackSpeed / Range 의 배율은 모든 무기에 곱해진다)
+/// - 무기 보유 상한(maxWeaponCount, 시작 무기 포함)에 도달하면 AddWeapon 이 더 이상 무기를 주지 않는다
 /// - 스텟이 바뀌면 OnStatChanged 로 알리고, ArrowMovemnt / HealthSystem 이 구독해서 반영한다
 /// - side 로 등록되어 Find 로 찾을 수 있다 (왼쪽 보상 → 왼쪽 플레이어)
 /// </summary>
@@ -23,6 +25,15 @@ public class PlayerStats
     [Tooltip("보상으로 얻은 무기를 생성할 부모 (비어 있으면 이 오브젝트)")]
     [SerializeField]
     private Transform weaponHolder;
+
+    [Tooltip("배율(1 + ΣMultiply) 의 하한. 너프를 몰아 받아도 이 배율 아래로 내려가지 않는다")]
+    [Min(0f)]
+    [SerializeField]
+    private float minMultiplier = 0.5f;
+
+    [Tooltip("보유할 수 있는 무기 수 (시작 무기 포함). 0 이하면 상한 없음")]
+    [SerializeField]
+    private int maxWeaponCount = 4;
 
     private static readonly int StatCount = Enum.GetValues(typeof(ValueType)).Length;
 
@@ -51,13 +62,22 @@ public class PlayerStats
 
     #region Stat
     /// <summary>
-    /// 최종 수치 = (base + ΣAdd) × (1 + ΣMultiply), 0 미만은 0
+    /// 최종 수치 = (base + ΣAdd) × GetMultiplier, 0 미만은 0
+    /// - Damage / AttackSpeed / Range 는 base 가 0 이므로 무기에서는 GetAdd / GetMultiplier 를 따로 쓴다
     /// </summary>
     public float Get(ValueType _type)
     {
         EnsureBaseValues();
         int i = (int)_type;
-        return Mathf.Max(0f, (baseValues[i] + addValues[i]) * (1f + mulValues[i]));
+        return Mathf.Max(0f, (baseValues[i] + addValues[i]) * GetMultiplier(_type));
+    }
+
+    /// <summary>
+    /// 최종 배율 = max(minMultiplier, 1 + ΣMultiply)
+    /// </summary>
+    public float GetMultiplier(ValueType _type)
+    {
+        return Mathf.Max(minMultiplier, 1f + mulValues[(int)_type]);
     }
 
     public float GetBase(ValueType _type)
@@ -102,8 +122,23 @@ public class PlayerStats
 
     #region Weapon
     /// <summary>
+    /// AddWeapon 으로 얻은 무기 수 (시작 무기 포함)
+    /// </summary>
+    public int WeaponCount => acquiredWeapons.Count;
+
+    /// <summary>
+    /// 보유할 수 있는 무기 수 (0 이하면 상한 없음)
+    /// </summary>
+    public int MaxWeaponCount => maxWeaponCount;
+
+    /// <summary>
+    /// 무기 보유 상한에 도달했는지
+    /// </summary>
+    public bool IsWeaponFull => maxWeaponCount > 0 && acquiredWeapons.Count >= maxWeaponCount;
+
+    /// <summary>
     /// 무기 프리팹을 weaponHolder 아래에 생성한다
-    /// - 이미 같은 프리팹으로 얻은 무기가 있으면 생성하지 않는다
+    /// - 이미 같은 프리팹으로 얻은 무기가 있거나 보유 상한에 도달했으면 생성하지 않는다
     /// - 레이어와 targetLayer 는 이미 가진 무기를 따라간다 (플레이어마다 다른 레이어를 쓰므로)
     /// </summary>
     /// <returns>새로 생성했으면 true</returns>
@@ -111,6 +146,12 @@ public class PlayerStats
     {
         if (null == _prefab || true == acquiredWeapons.ContainsKey(_prefab))
         {
+            return false;
+        }
+
+        if (true == IsWeaponFull)
+        {
+            Debug.LogWarning($"[PlayerStats] 무기 보유 상한({maxWeaponCount}) 에 도달해 {_prefab.name} 을(를) 얻지 못했습니다. ({name})", this);
             return false;
         }
 

@@ -7,7 +7,7 @@ namespace Builders
 {
     /// <summary>
     /// 무기 업그레이드 테이블 10개, 기존 무기 연결, Sweep 검기 / Chain 무기 프리팹과 보상 에셋을 생성·갱신한다 (멱등)
-    /// 수치는 docs/weapon-upgrade-design.md 표를 따른다
+    /// 수치는 docs/weapon-upgrade-design.md 표를 따른다 (docs/balance-design.md 3.3 수정 반영, 업그레이드 보상 가중치 1.5)
     /// </summary>
     public static class WeaponUpgradeBuilder
     {
@@ -28,6 +28,12 @@ namespace Builders
         private const StatModifierMode ADD = StatModifierMode.Add;
         private const StatModifierMode MUL = StatModifierMode.Multiply;
 
+        // 업그레이드 보상 가중치 (docs/balance-design.md 4.3)
+        private const float UPGRADE_REWARD_WEIGHT = 1.5f;
+        // ★ 귀환 강타 데미지 배율 / ★ 둔화 장판 감소율 (docs/balance-design.md 3.3)
+        private const float BOOMERANG_RETURN_DAMAGE_RATE = 1.5f;
+        private const float POISON_SLOW_RATE = 0.3f;
+
         [MenuItem("Tools/Builders/WeaponUpgrade")]
         public static void BuildMenu()
         {
@@ -45,7 +51,7 @@ namespace Builders
             foreach (var kv in Tables())
             {
                 var table = LoadOrCreate<WeaponUpgradeTable>($"{TABLE_DIR}/{kv.Key}UpgradeTable.asset");
-                table.SetSteps(kv.Value, 1f);
+                table.SetSteps(kv.Value, UPGRADE_REWARD_WEIGHT);
                 EditorUtility.SetDirty(table);
                 tables[kv.Key] = table;
             }
@@ -78,10 +84,22 @@ namespace Builders
                 {
                     s.useAreaRadius = true;
                 }
+                var zone = root.GetComponent<PoisonZoneProjectile>();
+                if (null != zone)
+                {
+                    var zso = new SerializedObject(zone);
+                    SetFloat(zso, "slowRate", POISON_SLOW_RATE);
+                    zso.ApplyModifiedPropertiesWithoutUndo();
+                }
             });
 
             // 부메랑 / 조각 훅
-            EditPrefab(WEAPON_DIR + "/Boomerang/BoomerangProjectile.prefab", root => GetOrAdd<BoomerangUpgrade>(root));
+            EditPrefab(WEAPON_DIR + "/Boomerang/BoomerangProjectile.prefab", root =>
+            {
+                var bso = new SerializedObject(GetOrAdd<BoomerangUpgrade>(root));
+                SetFloat(bso, "returnDamageRate", BOOMERANG_RETURN_DAMAGE_RATE);
+                bso.ApplyModifiedPropertiesWithoutUndo();
+            });
             EditPrefab(WEAPON_DIR + "/SplitShot/SplitShotFragment.prefab", root => GetOrAdd<SplitFragmentResplit>(root));
 
             // Sweep 검기
@@ -303,7 +321,7 @@ namespace Builders
                 w.preLoadCount = 5;
                 w.projectile = _projectile.GetComponent<Projectile>();
                 w.targetLayer = null != refWeapon ? refWeapon.targetLayer : (LayerMask)0;
-                w.damage = 10f;
+                w.damage = 8f; // docs/balance-design.md 3.2
                 w.attackSpeed = 0.8f;
                 w.range = 7f;
                 w.fireCount = 1;
@@ -347,21 +365,21 @@ namespace Builders
                 S("★ 크기 +40%, 타격 수 +10", "부메랑 크기 +40%, 타격 수 +10", M(WeaponParam.ProjectileScale, MUL, 0.4f), M(WeaponParam.HitCount, ADD, 10f)),
                 As(), Count(1), Dmg(),
                 S("사거리 +1.5", "사거리 +1.5", M(WeaponParam.Range, ADD, 1.5f)),
-                Flag(WeaponParam.FlagReturnDamage, "귀환 강타", "돌아올 때 데미지 2배"),
+                Flag(WeaponParam.FlagReturnDamage, "귀환 강타", "돌아올 때 데미지 1.5배"),
             };
 
             t["Drone"] = new[]
             {
                 S("드론 탄 데미지 +20%", "드론 탄 데미지 +20%", M(WeaponParam.ChildDamage, MUL, 0.2f)),
                 S("드론 탄 공속 +15%", "드론 탄 공격 속도 +15%", M(WeaponParam.ChildAttackSpeed, MUL, 0.15f)),
-                Count(1, "드론"),
+                S("드론 탄 데미지 +20%", "드론 탄 데미지 +20%", M(WeaponParam.ChildDamage, MUL, 0.2f)),
                 S("드론 탄 데미지 +20%", "드론 탄 데미지 +20%", M(WeaponParam.ChildDamage, MUL, 0.2f)),
                 S("★ 드론 탄 2연발", "드론이 탄을 2연발로 쏜다", M(WeaponParam.ChildFireCount, ADD, 1f)),
                 S("공전 반경 +0.4, 드론 탄 사거리 +1.5", "드론 공전 반경 +0.4, 드론 탄 사거리 +1.5", M(WeaponParam.OrbitRadius, ADD, 0.4f), M(WeaponParam.ChildRange, ADD, 1.5f)),
                 Count(1, "드론"),
                 S("드론 탄 데미지 +20%", "드론 탄 데미지 +20%", M(WeaponParam.ChildDamage, MUL, 0.2f)),
                 S("드론 탄 공속 +15%", "드론 탄 공격 속도 +15%", M(WeaponParam.ChildAttackSpeed, MUL, 0.15f)),
-                S("★ 드론 탄 관통 +2", "드론 탄 관통 +2", M(WeaponParam.ChildHitCount, ADD, 2f)),
+                S("★ 드론 탄 관통 +1", "드론 탄 관통 +1", M(WeaponParam.ChildHitCount, ADD, 1f)),
             };
 
             t["Explosive"] = new[]
@@ -387,7 +405,7 @@ namespace Builders
                 S("관통 +3", "관통 +3", M(WeaponParam.HitCount, ADD, 3f)),
                 S("사거리 +1.5", "사거리 +1.5", M(WeaponParam.Range, ADD, 1.5f)),
                 Dmg(),
-                S("★ 개수 +2, 부채꼴 각도 +5", "광선 +2, 부채꼴 각도 +5", M(WeaponParam.FireCount, ADD, 2f), M(WeaponParam.FanAngle, ADD, 5f)),
+                S("★ 개수 +1, 부채꼴 각도 +5", "광선 +1, 부채꼴 각도 +5", M(WeaponParam.FireCount, ADD, 1f), M(WeaponParam.FanAngle, ADD, 5f)),
             };
 
             t["Mine"] = new[]
@@ -396,10 +414,10 @@ namespace Builders
                 S("폭발 반경 +20%", "폭발 반경 +20%", M(WeaponParam.AreaRadius, MUL, 0.2f)),
                 Count(1, "지뢰"),
                 S("활성화 지연 -50%", "활성화 지연 -50%", M(WeaponParam.ArmDelay, MUL, -0.5f)),
-                S("★ 폭발 반경 +40%, 넉백 +50%", "폭발 반경 +40%, 넉백 +50%", M(WeaponParam.AreaRadius, MUL, 0.4f), M(WeaponParam.Knockback, MUL, 0.5f)),
+                S("★ 폭발 반경 +25%, 넉백 +50%", "폭발 반경 +25%, 넉백 +50%", M(WeaponParam.AreaRadius, MUL, 0.25f), M(WeaponParam.Knockback, MUL, 0.5f)),
                 As(), Dmg(),
                 S("지뢰 수명 +5초", "지뢰 수명 +5초", M(WeaponParam.Lifetime, ADD, 5f)),
-                Count(1, "지뢰"),
+                Dmg(),
                 Flag(WeaponParam.FlagChainExplosion, "연쇄 폭발", "폭발 범위 안의 활성 지뢰도 터진다"),
             };
 
@@ -407,14 +425,14 @@ namespace Builders
             {
                 Dmg(),
                 S("장판 크기 +20%", "장판 크기 +20%", M(WeaponParam.AreaRadius, MUL, 0.2f)),
-                S("지속 +1초", "지속 시간 +1초", M(WeaponParam.Lifetime, ADD, 1f)),
-                S("틱 간격 -20%", "피해 간격 -20%", M(WeaponParam.TickInterval, MUL, -0.2f)),
+                S("지속 +0.5초", "지속 시간 +0.5초", M(WeaponParam.Lifetime, ADD, 0.5f)),
+                S("틱 간격 -10%", "피해 간격 -10%", M(WeaponParam.TickInterval, MUL, -0.1f)),
                 S("★ 개수 +1", "장판 개수 +1", M(WeaponParam.FireCount, ADD, 1f)),
                 Dmg(),
                 S("장판 크기 +20%", "장판 크기 +20%", M(WeaponParam.AreaRadius, MUL, 0.2f)),
-                S("지속 +1초", "지속 시간 +1초", M(WeaponParam.Lifetime, ADD, 1f)),
                 Dmg(),
-                Flag(WeaponParam.FlagSlowZone, "둔화 장판", "장판 위 적 이동속도 -40%"),
+                Dmg(),
+                Flag(WeaponParam.FlagSlowZone, "둔화 장판", "장판 위 적 이동속도 -30%"),
             };
 
             t["Shockwave"] = new[]

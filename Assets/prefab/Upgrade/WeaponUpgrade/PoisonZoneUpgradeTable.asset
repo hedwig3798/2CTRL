@@ -12,7 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b3795bac8328aef4fb7b53deef8d8087, type: 3}
   m_Name: PoisonZoneUpgradeTable
   m_EditorClassIdentifier: Game.Runtime::WeaponUpgradeTable
-  rewardWeight: 1
+  rewardWeight: 1.5
   steps:
   - title: "\uB370\uBBF8\uC9C0 +20%"
     description: "\uB370\uBBF8\uC9C0 +20%"
@@ -26,18 +26,18 @@ MonoBehaviour:
     - param: 5
       mode: 1
       value: 0.2
-  - title: "\uC9C0\uC18D +1\uCD08"
-    description: "\uC9C0\uC18D \uC2DC\uAC04 +1\uCD08"
+  - title: "\uC9C0\uC18D +0.5\uCD08"
+    description: "\uC9C0\uC18D \uC2DC\uAC04 +0.5\uCD08"
     modifiers:
     - param: 6
       mode: 0
-      value: 1
-  - title: "\uD2F1 \uAC04\uACA9 -20%"
-    description: "\uD53C\uD574 \uAC04\uACA9 -20%"
+      value: 0.5
+  - title: "\uD2F1 \uAC04\uACA9 -10%"
+    description: "\uD53C\uD574 \uAC04\uACA9 -10%"
     modifiers:
     - param: 110
       mode: 1
-      value: -0.2
+      value: -0.1
   - title: "\u2605 \uAC1C\uC218 +1"
     description: "\uC7A5\uD310 \uAC1C\uC218 +1"
     modifiers:
@@ -56,12 +56,12 @@ MonoBehaviour:
     - param: 5
       mode: 1
       value: 0.2
-  - title: "\uC9C0\uC18D +1\uCD08"
-    description: "\uC9C0\uC18D \uC2DC\uAC04 +1\uCD08"
+  - title: "\uB370\uBBF8\uC9C0 +20%"
+    description: "\uB370\uBBF8\uC9C0 +20%"
     modifiers:
-    - param: 6
-      mode: 0
-      value: 1
+    - param: 0
+      mode: 1
+      value: 0.2
   - title: "\uB370\uBBF8\uC9C0 +20%"
     description: "\uB370\uBBF8\uC9C0 +20%"
     modifiers:
@@ -69,7 +69,7 @@ MonoBehaviour:
       mode: 1
       value: 0.2
   - title: "\u2605 \uB454\uD654 \uC7A5\uD310"
-    description: "\uC7A5\uD310 \uC704 \uC801 \uC774\uB3D9\uC18D\uB3C4 -40%"
+    description: "\uC7A5\uD310 \uC704 \uC801 \uC774\uB3D9\uC18D\uB3C4 -30%"
     modifiers:
     - param: 203
       mode: 0

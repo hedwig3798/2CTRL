@@ -157,7 +157,7 @@ MonoBehaviour:
   mapLayerName: LBG
   opponentSpawner: {fileID: 2046546053}
   rewardManager: {fileID: 3651695441737288913}
-  weaponRewardWeight: 1
+  weaponRewardWeight: 1.5
 --- !u!4 &23784762
 Transform:
   m_ObjectHideFlags: 0
@@ -857,7 +857,7 @@ MonoBehaviour:
   mapLayerName: RBG
   opponentSpawner: {fileID: 1056349828}
   rewardManager: {fileID: 3651695441737288913}
-  weaponRewardWeight: 1
+  weaponRewardWeight: 1.5
 --- !u!4 &932711838
 Transform:
   m_ObjectHideFlags: 0

@@ -20,7 +20,7 @@ public class BoomerangUpgrade
     [Tooltip("FlagReturnDamage 가 켜졌을 때 되돌아오는 중 타격의 데미지 배율")]
     [Min(0f)]
     [SerializeField]
-    private float returnDamageRate = 2f;
+    private float returnDamageRate = 1.5f;
 
     private OneHitProjectile oneHitProjectile;
     private ReturnMovement returnMovement;

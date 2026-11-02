@@ -15,7 +15,7 @@ MonoBehaviour:
   triggerRange: 1.2
   telegraphTime: 0.8
   radius: 1.5
-  damage: 3
+  damage: 20
   knockbackForce: 6
   explodeOnDeath: 1
   inflateScale: 1.5
