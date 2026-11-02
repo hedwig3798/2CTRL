@@ -331,6 +331,13 @@ public class MonsterBrain
             return;
         }
 
+        // 부활 인터셉트를 지난 진짜 사망만 알린다 (킬 귀속은 구독자가 레이어로 판정)
+        // Dead 상태 진입(풀 반환 등)으로 레이어가 바뀌기 전에 발행한다
+        if (true == EventManager.HasInstance)
+        {
+            EventManager.Instance.OnEnemyDeath?.Invoke(gameObject);
+        }
+
         machine.ChangeState(deadState);
     }
     #endregion

@@ -44,6 +44,26 @@ public class EventManager
     /// </summary>
     public Action<GameObject, int> OnLevelUp;
 
+    /// <summary>
+    /// 플레이어가 데미지를 받았을 때 (받은 플레이어, 실제로 깎인 양)
+    /// </summary>
+    public Action<PlayerSide, float> OnPlayerDamaged;
+
+    /// <summary>
+    /// 플레이어 무기가 적에게 데미지를 줬을 때 (무기 주인, 무기, 실제로 깎인 양)
+    /// </summary>
+    public Action<PlayerSide, Weapon, float> OnWeaponDamage;
+
+    /// <summary>
+    /// 플레이어가 EXP 아이템을 수집했을 때 (수집한 플레이어, 획득 EXP)
+    /// </summary>
+    public Action<PlayerSide, float> OnExpGained;
+
+    /// <summary>
+    /// 플레이어 사망 시 (사망한 플레이어)
+    /// </summary>
+    public Action<PlayerSide> OnPlayerDeath;
+
     #endregion
 
     public static EventManager Instance

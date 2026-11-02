@@ -122,6 +122,12 @@ public class HealthSystem
             OnDamaged?.Invoke(displayDamage);
         }
 
+        // 통계는 무적 여부와 상관없이 실제로 깎인 양 기준
+        if (0f < appliedDamage)
+        {
+            PublishDamage(ref _msg, appliedDamage);
+        }
+
         if (true == isInvincibility)
         {
             CurrHP = MaxHP;
@@ -184,7 +190,44 @@ public class HealthSystem
         {
             return;
         }
+
+        if (null != playerStats && true == EventManager.HasInstance)
+        {
+            EventManager.Instance.OnPlayerDeath?.Invoke(playerStats.Side);
+        }
         OnDeath?.Invoke(gameObject);
+    }
+
+    /// <summary>
+    /// 통계용 데미지 이벤트 발행
+    /// - 플레이어가 맞았으면 OnPlayerDamaged, 아니면 무기 주인 기준 OnWeaponDamage
+    /// </summary>
+    private void PublishDamage(ref DamageMassage _msg, float _applied)
+    {
+        // 매니져가 없으면 구독자도 없다 (종료 중 새로 만들지 않도록 Instance 를 건드리지 않는다)
+        if (false == EventManager.HasInstance)
+        {
+            return;
+        }
+
+        if (null != playerStats)
+        {
+            EventManager.Instance.OnPlayerDamaged?.Invoke(playerStats.Side, _applied);
+            return;
+        }
+
+        if (null == _msg.weapon)
+        {
+            return;
+        }
+
+        PlayerStats owner = _msg.weapon.OwnerStats;
+        if (null == owner)
+        {
+            return;
+        }
+
+        EventManager.Instance.OnWeaponDamage?.Invoke(owner.Side, _msg.weapon, _applied);
     }
 
     public void Initialize(BlackBoard _data)

@@ -14,4 +14,9 @@ public struct DamageMassage
     /// 타격이 일어난 지점. 넉백은 이 지점에서 대상 쪽으로 밀어낸다
     /// </summary>
     public Vector2 hitPoint;
+
+    /// <summary>
+    /// 이 데미지를 만든 무기 (통계 귀속용). 무기가 아닌 데미지(접촉, 몬스터 장판 등)는 null
+    /// </summary>
+    public Weapon weapon;
 }

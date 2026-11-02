@@ -4,6 +4,7 @@
 - `Spawnable`, `SpawnableInitData`, `SpawnData`(struct), `IPoolable`(빈 마커 인터페이스), `DespawnOutOfCamera`, `Lifetime`(신규, Initializable, lifetime 키).
 ## ItemDropManager
 - `DropManager`, `Item`, `ExpItem`(+Initializable), `ItemCollector`, `ItemTrigger`.
+- `ItemCollector`: Awake 에서 ownerStats(owner 또는 부모의 PlayerStats) 캐시, EXP 수집 시 EventManager.OnExpGained(Side, exp) 발행 ([statistics.md](statistics.md)).
 ## ExpSystem
 - `ExpSystem`(싱글턴 Instance/HasInstance): currLevel/currExp/maxExp, LevelTable(SO), GetExp(float). 이벤트 `levelUpAction`, `OnExpChanged(float,float)`; 레벨업 시 EventManager.OnLevelUp 발행(ExpSystem.cs:83).
 ## Tile

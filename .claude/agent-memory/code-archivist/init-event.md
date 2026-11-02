@@ -5,6 +5,7 @@
 - `BlackBoardHandler`(MonoBehaviour): Projectile이 보유, Initializable들에 배포.
 ## EventSystem
 - `EventManager`(MonoBehaviour, 자동생성 싱글턴 Instance, 씬 유지): `Action<GameObject> OnEnemyDeath`, `Action<GameObject,int> OnLevelUp`. 발행=직접 Invoke, 구독=+=/-=. 현재 OnLevelUp 발행: ExpSystem, 구독: LevelUpUI, SelectPanelGroup.
+  - 통계 이벤트(2026-11-02, [statistics.md](statistics.md)): `Action<PlayerSide,float> OnPlayerDamaged`(HealthSystem), `Action<PlayerSide,Weapon,float> OnWeaponDamage`(HealthSystem), `Action<PlayerSide,float> OnExpGained`(ItemCollector), `Action<PlayerSide> OnPlayerDeath`(HealthSystem.Die; 구독 GameOverManager). OnEnemyDeath 발행처=MonsterBrain.HandleDeath. 발행 전 `EventManager.HasInstance` 확인.
 ## Utils
 - GamePause(static), LayerUtils, MathUtils, DIRECTION enum, PriorityQueue<,>, RandomPool<T>(ISerializationCallbackReceiver), SerializableInterface<T>(+PropertyDrawer).
 

@@ -140,6 +140,8 @@ public abstract class Projectile
         damageMassage.isReflected = false;
         damageMassage.attacker = null;
         damageMassage.knockbackForce = weapon.knockbackForce;
+        // 보조 발사체(LaunchAt/FireSub)도 부모 무기로 귀속된다
+        damageMassage.weapon = _weapon;
     }
 
     /// <summary>

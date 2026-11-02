@@ -10,6 +10,21 @@ public class ItemCollector
     [SerializeField]
     private GameObject owner;
 
+    // 통계용 EXP 획득 귀속 (owner 우선, 없으면 부모에서 찾는다)
+    private PlayerStats ownerStats;
+
+    private void Awake()
+    {
+        if (null != owner)
+        {
+            ownerStats = owner.GetComponentInParent<PlayerStats>();
+        }
+        if (null == ownerStats)
+        {
+            ownerStats = GetComponentInParent<PlayerStats>();
+        }
+    }
+
     private void OnTriggerEnter2D(Collider2D _other)
     {
         if (false == _other.CompareTag("item"))
@@ -36,5 +51,10 @@ public class ItemCollector
         }
 
         expSystem.GetExp(exp);
+
+        if (null != ownerStats && true == EventManager.HasInstance)
+        {
+            EventManager.Instance.OnExpGained?.Invoke(ownerStats.Side, exp);
+        }
     }
 }

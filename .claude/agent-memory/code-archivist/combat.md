@@ -25,3 +25,7 @@
   - private `Die()`: isDead, 콜라이더 끄기, 인터셉터 -> 다운 또는 OnDeath.
   - Initialize에서 isDowned 리셋.
 - 사용처: [monster.md](monster.md)
+
+## 통계 연동 (2026-11-02, [statistics.md](statistics.md))
+- `DamageMassage.weapon`(Weapon, 통계 귀속용; 접촉/장판 데미지는 null). `Projectile.SetupDamage` 에서 `damageMassage.weapon = _weapon`(보조 발사체 포함).
+- `HealthSystem.PublishDamage(ref msg, applied)`(private): applied>0 일 때 호출. playerStats 있으면 OnPlayerDamaged, 아니면 msg.weapon.OwnerStats 기준 OnWeaponDamage. `Die()` 에서 playerStats 있으면 OnPlayerDeath(Side).
