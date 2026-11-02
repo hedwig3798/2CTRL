@@ -88,6 +88,8 @@ namespace Builders.Visual
                     lr.colorGradient = g;
                     lr.numCapVertices = 4;
                     lr.numCornerVertices = 2;
+                    // Default 정렬 레이어는 BG 보다 먼저 그려져 게임 씬 바닥에 가려진다
+                    lr.sortingLayerName = "attack";
                     lr.sortingOrder = 6;
                     sb.Append("line ok ");
                 }
@@ -97,6 +99,7 @@ namespace Builders.Visual
                 {
                     sr.color = new Color(0.7f, 0.92f, 1f, 1f);
                     vis.localScale = new Vector3(0.3f, 0.3f, 1f);
+                    sr.sortingLayerName = "attack";
                     sr.sortingOrder = 7;
                     sb.Append("visual ok(sprite=" + (sr.sprite != null ? sr.sprite.name : "null") + ")");
                 }
