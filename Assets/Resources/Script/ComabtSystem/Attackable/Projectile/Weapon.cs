@@ -16,6 +16,14 @@ public enum WEAPON_TYPE
     /// fireCount 개를 사라지지 않게 유지한다. 공격 속도는 발사체의 같은 대상 재타격 간격이 된다
     /// </summary>
     Persistent,
+    /// <summary>
+    /// 공격 간격마다 1 개를 발사한다. 살아 있는 발사체가 fireCount 개 이상이면 발사하지 않고 타이머도 멈춘다
+    /// </summary>
+    Capped,
+    /// <summary>
+    /// 살아 있는 발사체가 모두 사라진 뒤 공격 간격이 지나면 fireCount 개를 한 번에 발사한다
+    /// </summary>
+    Wave,
 }
 
 /// <summary>
@@ -93,6 +101,9 @@ public class Weapon
     private Coroutine fireRoutine;
 
     private List<Projectile> persistentProjectiles = new List<Projectile>();
+
+    // Capped / Wave 가 세는 살아 있는 발사체
+    private List<Projectile> aliveProjectiles = new List<Projectile>();
 
     // 무기 스텟에 더할 주인 스텟 (없으면 무기 스텟만 사용)
     private PlayerStats ownerStats;
@@ -242,6 +253,11 @@ public class Weapon
         {
             projectilePool.Release(p);
             return false;
+        }
+
+        if (WEAPON_TYPE.Capped == weaponType || WEAPON_TYPE.Wave == weaponType)
+        {
+            aliveProjectiles.Add(p);
         }
         return true;
     }
@@ -626,6 +642,12 @@ public class Weapon
             case WEAPON_TYPE.Persistent:
                 UpdatePersistent();
                 break;
+            case WEAPON_TYPE.Capped:
+                UpdateCapped();
+                break;
+            case WEAPON_TYPE.Wave:
+                UpdateWave();
+                break;
         }
     }
 
@@ -643,6 +665,15 @@ public class Weapon
             }
         }
         persistentProjectiles.Clear();
+
+        foreach (Projectile p in aliveProjectiles)
+        {
+            if (null != p && true == p.gameObject.activeSelf)
+            {
+                p.gameObject.SetActive(false);
+            }
+        }
+        aliveProjectiles.Clear();
     }
 
     private void UpdateRepeat()
@@ -659,6 +690,66 @@ public class Weapon
         {
             timer -= coolTime;
             Fire();
+        }
+    }
+
+    /// <summary>
+    /// 살아 있는 발사체가 fireCount 미만일 때만 타이머가 흐르고, 공격 간격마다 1 개를 발사한다
+    /// </summary>
+    private void UpdateCapped()
+    {
+        aliveProjectiles.RemoveAll(p => null == p || false == p.gameObject.activeSelf);
+        if (aliveProjectiles.Count >= fireCount)
+        {
+            return;
+        }
+
+        float coolTime = FinalCoolTime;
+        if (coolTime <= 0f)
+        {
+            return;
+        }
+
+        timer += Time.deltaTime;
+        if (timer >= coolTime)
+        {
+            // 발사하지 못하면(타겟 없음) 다음 프레임에 다시 시도한다
+            if (true == FireOne(aliveProjectiles.Count, fireCount))
+            {
+                timer = 0f;
+            }
+        }
+    }
+
+    /// <summary>
+    /// 살아 있는 발사체가 없을 때만 타이머가 흐르고, 공격 간격이 지나면 fireCount 개를 한 번에 발사한다
+    /// </summary>
+    private void UpdateWave()
+    {
+        aliveProjectiles.RemoveAll(p => null == p || false == p.gameObject.activeSelf);
+        if (0 < aliveProjectiles.Count)
+        {
+            timer = 0f;
+            return;
+        }
+
+        float coolTime = FinalCoolTime;
+        if (coolTime <= 0f)
+        {
+            return;
+        }
+
+        timer += Time.deltaTime;
+        if (timer >= coolTime)
+        {
+            timer = 0f;
+            for (int i = 0; i < fireCount; ++i)
+            {
+                if (false == FireOne(i, fireCount))
+                {
+                    break;
+                }
+            }
         }
     }
 

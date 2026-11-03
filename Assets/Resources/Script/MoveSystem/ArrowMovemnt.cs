@@ -26,6 +26,13 @@ public class ArrowMovemnt
 
     private bool isLeft = true;
 
+    private Vector2 lastMoveDirection = Vector2.right;
+
+    /// <summary>
+    /// 마지막으로 이동한 방향 (정규화). 멈춰 있으면 마지막 값을 유지한다. 처음에는 오른쪽
+    /// </summary>
+    public Vector2 LastMoveDirection => lastMoveDirection;
+
     // 있으면 speed 를 플레이어 MoveSpeed 스텟으로 맞춘다
     private PlayerStats stats;
 
@@ -107,17 +114,22 @@ public class ArrowMovemnt
             transform.Translate(Vector2.down * speed * Time.deltaTime);
         }
 
+        Vector2 move = Vector2.zero;
+        if (isRightPressed) move.x += 1f;
+        if (isLeftPressed) move.x -= 1f;
+        if (isUpPressed) move.y += 1f;
+        if (isDownPressed) move.y -= 1f;
+        if (move.sqrMagnitude > 0.0001f)
+        {
+            lastMoveDirection = move.normalized;
+        }
+
         if (SPRITE_ROTATE_MODE.FLIP == rotateMode)
         {
             FlipSprite();
         }
         else if (SPRITE_ROTATE_MODE.ROTATE == rotateMode)
         {
-            Vector2 move = Vector2.zero;
-            if (isRightPressed) move.x += 1f;
-            if (isLeftPressed) move.x -= 1f;
-            if (isUpPressed) move.y += 1f;
-            if (isDownPressed) move.y -= 1f;
             if (move.sqrMagnitude > 0.0001f)
             {
                 float angle = Mathf.Atan2(move.y, move.x) * Mathf.Rad2Deg + rotateOffset;

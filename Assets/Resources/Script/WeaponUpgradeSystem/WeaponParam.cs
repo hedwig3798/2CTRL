@@ -52,6 +52,14 @@ public enum WeaponParam
     FragmentDistance = 113,
     /// <summary>칼날 길이. Sweep</summary>
     Reach = 114,
+    /// <summary>추적 이동 속도. Spirit</summary>
+    ChaseSpeed = 115,
+    /// <summary>분사 시간. Flame</summary>
+    BurstDuration = 116,
+    /// <summary>끌어당기는 힘. Tornado</summary>
+    PullForce = 117,
+    /// <summary>한 번에 낙뢰를 맞히는 대상 수. Lightning</summary>
+    StrikeCount = 118,
 
     // ★ 플래그
     /// <summary>돌아올 때 데미지 배율 적용. Boomerang</summary>
@@ -70,6 +78,18 @@ public enum WeaponParam
     FlagSlashWave = 206,
     /// <summary>전이 증폭. Chain</summary>
     FlagChainAmplify = 207,
+    /// <summary>덩굴이 틱 데미지를 줄 때 가시 발사. Vine</summary>
+    FlagVineThorn = 208,
+    /// <summary>뿌리 지역이 가장 가까운 적을 추적. Root</summary>
+    FlagRootChase = 209,
+    /// <summary>화면 경계에서 튕기고 소멸하지 않음. Saw</summary>
+    FlagSawBounce = 210,
+    /// <summary>맞은 적에 화상. Flame</summary>
+    FlagBurn = 211,
+    /// <summary>소멸하지 않고 플레이어 근처를 영구히 떠돎. Tornado</summary>
+    FlagTornadoPermanent = 212,
+    /// <summary>낙뢰 대상 연결 데미지. Lightning</summary>
+    FlagStormLink = 213,
 }
 
 public static class WeaponParamUtils
