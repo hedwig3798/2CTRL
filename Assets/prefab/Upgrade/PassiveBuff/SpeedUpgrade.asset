@@ -12,7 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 9bc5b6c958c092042aacceca90abbb8b, type: 3}
   m_Name: SpeedUpgrade
   m_EditorClassIdentifier: Assembly-CSharp::RewardData
-  image: {fileID: 1345797050, guid: 19e0a7bfbeb6cad47bf4899311bd56f8, type: 3}
+  image: {fileID: 21300000, guid: b3a5edb3a7f2fd548b8868c1960b7906, type: 3}
   rewardName: "\uC774\uB3D9\uC18D\uB3C4"
   hasKey: 1
   key: 2

@@ -117,13 +117,11 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::SplitShotProjectile
   blackBoardHandler: {fileID: 1459922121479912234}
-  fragmentPrefab: {fileID: 3152730403643045509, guid: 7b265669b69c4b72b183bb7eccdbb2e1,
-    type: 3}
+  fragmentPrefab: {fileID: 3152730403643045509, guid: 7b265669b69c4b72b183bb7eccdbb2e1, type: 3}
   fragmentCount: 6
   fragmentDamageRate: 0.4
   fragmentDistance: 3
-  burstEffect: {fileID: 8165593268452849281, guid: 951303592f3d4448868b3bddba6ba4b7,
-    type: 3}
+  burstEffect: {fileID: 8165593268452849281, guid: 951303592f3d4448868b3bddba6ba4b7, type: 3}
   burstRadius: 0.6
 --- !u!114 &1459922121479912234
 MonoBehaviour:
@@ -171,6 +169,7 @@ Transform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!212 &7966429979631984887
 SpriteRenderer:
+  serializedVersion: 3
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
@@ -216,9 +215,9 @@ SpriteRenderer:
   m_SortingLayerID: -105541197
   m_SortingLayer: 4
   m_SortingOrder: 0
-  m_Sprite: {fileID: -2413806693520163455, guid: 0b0c64724ca45ea4ba5a2ffc1cb6ffea,
-    type: 3}
-  m_Color: {r: 1, g: 0.6, b: 0.15, a: 1}
+  m_MaskInteraction: 0
+  m_Sprite: {fileID: 21300000, guid: 955a8502cf65e1c43883314082018840, type: 3}
+  m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
   m_FlipY: 0
   m_DrawMode: 0
@@ -226,5 +225,5 @@ SpriteRenderer:
   m_AdaptiveModeThreshold: 0.5
   m_SpriteTileMode: 0
   m_WasSpriteAssigned: 1
-  m_MaskInteraction: 0
   m_SpriteSortPoint: 0
+  m_BlendShapeWeights: []

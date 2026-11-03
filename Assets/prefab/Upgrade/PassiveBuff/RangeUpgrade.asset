@@ -12,7 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 9bc5b6c958c092042aacceca90abbb8b, type: 3}
   m_Name: RangeUpgrade
   m_EditorClassIdentifier: Assembly-CSharp::RewardData
-  image: {fileID: 1345797050, guid: 19e0a7bfbeb6cad47bf4899311bd56f8, type: 3}
+  image: {fileID: 21300000, guid: 34de992cbc237fc41939eef4dd4bcbda, type: 3}
   rewardName: "\uBC94\uC704"
   hasKey: 1
   key: 4

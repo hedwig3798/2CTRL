@@ -12,6 +12,8 @@ using UnityEngine;
 /// - 소멸은 Lifetime 이 담당한다
 /// - 업그레이드 : 틱 간격 기본값 = weapon.GetParam(TickInterval, tickInterval)
 /// - ★ FlagSlowZone : 틱마다 장판 안의 적을 slowRate 만큼 둔화시킨다 (다음 틱 + slowLinger 초까지 유지)
+/// - 상속 훅 : LaunchZone(발사 처리) / IsSlowActive(둔화 조건) / OnLandedUpdate(착지 후 매 프레임) / OnTick(틱 직후). 덩굴(Vine), 뿌리 속박(Root) 이 사용
+///   (파생 클래스는 Awake / Update 를 선언하지 말 것. 이 클래스의 private Awake / Update 가 가려진다)
 /// </summary>
 public class PoisonZoneProjectile
     : Projectile
@@ -83,7 +85,40 @@ public class PoisonZoneProjectile
     protected override bool OnLaunch()
     {
         landed = false;
+        return LaunchZone();
+    }
+
+    /// <summary>
+    /// 발사 처리 (상속 훅). false 면 발사하지 않는다
+    /// 기본은 무기 범위 안의 가장 가까운 적을 착지 목표로 삼는다 (적이 없으면 발사하지 않는다)
+    /// </summary>
+    protected virtual bool LaunchZone()
+    {
         return AimAtNearest();
+    }
+
+    /// <summary>
+    /// 틱마다 장판 위 적을 둔화시킬지 (상속 훅). 기본은 FlagSlowZone 이 켜졌을 때
+    /// </summary>
+    protected virtual bool IsSlowActive => true == weapon.HasFlag(WeaponParam.FlagSlowZone);
+
+    /// <summary>
+    /// 둔화 비율 (상속 훅). 기본은 slowRate
+    /// </summary>
+    protected virtual float SlowRate => slowRate;
+
+    /// <summary>
+    /// 착지한 뒤 매 프레임 틱 판정 전에 호출된다 (상속 훅. 장판 이동 등)
+    /// </summary>
+    protected virtual void OnLandedUpdate()
+    {
+    }
+
+    /// <summary>
+    /// 틱 데미지를 준 직후 호출된다 (상속 훅). _hitCount 는 이번 틱에 맞은 적 수
+    /// </summary>
+    protected virtual void OnTick(float _radius, int _hitCount)
+    {
     }
 
     protected override bool OnLaunchAt()
@@ -111,6 +146,8 @@ public class PoisonZoneProjectile
             nextTickTime = Time.time;
         }
 
+        OnLandedUpdate();
+
         if (Time.time < nextTickTime)
         {
             return;
@@ -122,15 +159,17 @@ public class PoisonZoneProjectile
             return;
         }
 
-        ApplyAreaDamage(transform.position, radius);
+        int hitCount = ApplyAreaDamage(transform.position, radius);
 
         float interval = FinalTickInterval;
-        if (true == weapon.HasFlag(WeaponParam.FlagSlowZone))
+        if (true == IsSlowActive)
         {
             ApplySlow(radius, interval + slowLinger);
         }
 
         nextTickTime = Time.time + interval;
+
+        OnTick(radius, hitCount);
     }
 
     /// <summary>
@@ -144,7 +183,7 @@ public class PoisonZoneProjectile
             MonsterBrain brain = slowBuffer[i].GetComponentInParent<MonsterBrain>();
             if (null != brain && null != brain.Context)
             {
-                brain.Context.ApplySlow(slowRate, _duration);
+                brain.Context.ApplySlow(SlowRate, _duration);
             }
         }
         slowBuffer.Clear();

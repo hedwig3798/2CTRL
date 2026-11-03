@@ -13,13 +13,15 @@ MonoBehaviour:
   m_Name: Storm
   m_EditorClassIdentifier: Game.Runtime::DimensionData
   displayName: "\uD3ED\uD48D"
-  previewSprite: {fileID: 132210538, guid: f387b2b9ac8b14f4c9f65f6c2df761a4, type: 3}
+  previewSprite: {fileID: 21300000, guid: aee4f21e22dbdfb44b3569ff7c8300f0, type: 3}
   themeColor: {r: 0.45, g: 0.55, b: 1, a: 1}
   startWeapon: {fileID: 7092167963846720789, guid: 66053baba310708419383e1369626dd8, type: 3}
   weaponRewards:
   - {fileID: 11400000, guid: 37c043b0366fd8e46a6db77a839962c0, type: 2}
   - {fileID: 11400000, guid: 543d8378eaf843dc8a586b7de8f34c82, type: 2}
   - {fileID: 11400000, guid: b5fa0b879bc746b4ab8abaf6260f5dd2, type: 2}
+  - {fileID: 11400000, guid: 7f7327b1ee1a26244bd85daf85ee915c, type: 2}
+  - {fileID: 11400000, guid: ceaadcee5547a0f46ab568eb65c65e5b, type: 2}
   waves:
   - {fileID: 11400000, guid: 65257a1f9875c524e83c97264bd8d172, type: 2}
   - {fileID: 11400000, guid: e5d7d79e27ac1f1429495cecb471f3d6, type: 2}
@@ -35,7 +37,13 @@ MonoBehaviour:
   - {fileID: 11400000, guid: e9d975144ea2eae4a8819e76193c7e3b, type: 2}
   - {fileID: 11400000, guid: b68066978dac4ce4cb5d83bcb59b520f, type: 2}
   - {fileID: 11400000, guid: 33467cfc5a2fb48498a441150b8fbf18, type: 2}
-  monsterSkins: []
-  chunkLoaderPrefab: {fileID: 7287097152152248050, guid: 2c517fbd785d9544cbf3ca97777a9431, type: 3}
+  monsterSkins:
+  - monster: {fileID: 11400000, guid: 4345d4521e4a5a04d8db629e1ba833bc, type: 2}
+    animator: {fileID: 22100000, guid: 1c8ed2d2122a0f54b9bb685666fda95a, type: 2}
+    sprite: {fileID: 1624172287888288921, guid: 79a29f7ad0f318d4fa65af3646da11c4, type: 3}
+  - monster: {fileID: 11400000, guid: 6562a27e200617b44ad14487a80a9ca3, type: 2}
+    animator: {fileID: 22100000, guid: 8bbb7ea68d4ee184798f90e011bc9462, type: 2}
+    sprite: {fileID: 5767486347711545402, guid: b155d19416235b64ca0873032a1d50c6, type: 3}
+  chunkLoaderPrefab: {fileID: 7907613963683787990, guid: 187c01795aac6a84ca23ca4f72954c73, type: 3}
   playerAnimator: {fileID: 22100000, guid: cb43a72c613e4da4cbe03941a97d1ca3, type: 2}
-  playerSprite: {fileID: 978012912, guid: 5e4ab4838a9d922438adeab9ad22c3e9, type: 3}
+  playerSprite: {fileID: 5513857620866038434, guid: 6dff1a978b5e1c94ea63af9861768dec, type: 3}

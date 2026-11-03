@@ -56,3 +56,18 @@ UpgradeLevel/UpgradeVersion (UpgradeTable/WeaponPrefab은 Weapon에 없음 -> We
 
 ## 밸런스 반영 (2026-11-02, 상세 balance.md)
 - WeaponUpgradeBuilder: 업그레이드 보상 가중치 1.5, Chain 프리팹 damage 8, 부메랑 귀환 데미지 1.5배(returnDamageRate), PoisonZoneProjectile slowRate 0.3(둔화 -30%), 일부 ★ 수치 하향.
+
+## 차원별 추가 무기 (커밋 6c6fa1a 베이스 + 미커밋 구현, 2026-11-03, 설계: docs/weapon-dimension-extra-design.md)
+- WeaponParam 추가: ChaseSpeed=115, BurstDuration=116, PullForce=117, StrikeCount=118 / 플래그 FlagVineThorn=208, FlagRootChase=209, FlagSawBounce=210, FlagBurn=211, FlagTornadoPermanent=212, FlagStormLink=213. (FanAngle=108, ProjectileScale=100 재사용)
+- 경로 `Script/Weapons/<이름>/`. 모두 Projectile 파생, 이동/수명 컴포넌트 없이 직접 처리하는 것이 많음(Spirit/Saw/Tornado/Lightning).
+- Vine/VineProjectile(:PoisonZoneProjectile) 주인 위치에 조각 깔기, segmentSpacing 미만이면 생략, VineTrail(무기에 붙어 마지막 조각 기억). ★가시 FireSub. 프리팹에 PoisonZoneLandMovement 금지.
+- Root/RootProjectile(:PoisonZone) 사거리 내 랜덤 위치에 지역, 둔화 항상. ★FlagRootChase 가장 가까운 적 추적(ChaseSpeed).
+- Spirit/SpiritProjectile(Capped) 대기→추적(SPIRIT_STATE Idle/Chase), hitCount 타격 후 소멸, TickInterval/ChaseSpeed 업글.
+- Saw/SawProjectile(Wave) 카메라 시야 좌/우 끝에서 가로 관통 이동, ProjectileScale, ★FlagSawBounce 화면 경계 튕김.
+- Flame/FlameProjectile(Repeat, fireCount1) LastMoveDirection 방향 부채꼴 분사(BurstDuration, FanAngle), ★FlagBurn → Flame/FlameBurn(화상 DoT, static Apply).
+- Tornado/TornadoProjectile(Capped) 떠돌며 MonsterContext.root 위치를 직접 끌어당김(PullForce, Knockback.resistance 반영), ★FlagTornadoPermanent 수명 무한+leash 복귀. 무기 knockbackForce 0.
+- Lightning/LightningProjectile(Repeat, fireCount1) StrikeCount명 표식(markDelay) 후 낙뢰 범위 데미지, ★FlagStormLink 지점 간 전기선(볼록껍질/선) 데미지. Lightning/LightningLineUtil(static: AddLink/Apply/Clear, LineRenderer 보조).
+
+- 통합(2026-11-03): `Assets/Editor/Builders/ExtraWeaponBuilder.cs`(7종 프리팹 `prefab/weapon/<Name>/`, 업그레이드 테이블, 보상). `DimensionDataBuilder` 무기 목록 숲 7 / 공장 5 / 폭풍 5.
+- 아트: `tools/art/extra_weapons.py`(Ninja Adventure + `tools/art/gen` 생성 원본) → `Textuer/Art/Weapon/D?_Weapon_<Name>_*.png`, `Icon/Common_Icon_<Name>.png`.
+- 테스트: `Tests/EditMode/ExtraWeaponEditTests.cs`, `Tests/PlayMode/{WeaponTestKit,WeaponFireModePlayTests,ExtraWeaponPlayTests}.cs`.

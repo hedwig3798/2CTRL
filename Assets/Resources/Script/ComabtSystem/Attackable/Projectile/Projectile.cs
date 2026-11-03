@@ -16,6 +16,24 @@ public abstract class Projectile
     protected Weapon weapon;
     protected DamageMassage damageMassage;
 
+    // LaunchAt 으로 받은 데미지 배율 (RefreshDamage 가 다시 곱한다)
+    private float damageRate = 1f;
+
+    /// <summary>
+    /// 데미지 / 넉백을 무기의 현재 값으로 다시 기록한다 (발사 시 배율 유지)
+    /// 오래 사는 발사체(영구 회오리, 튕기는 톱날, 정령 등)가 업그레이드·플레이어 스텟 변화를 반영할 때 쓴다
+    /// </summary>
+    protected void RefreshDamage()
+    {
+        if (null == weapon)
+        {
+            return;
+        }
+
+        damageMassage.damage = weapon.FinalDamage * damageRate;
+        damageMassage.knockbackForce = weapon.knockbackForce;
+    }
+
     /// <summary>
     /// 함께 발사된 발사체 중 몇 번째인지 (0 부터)
     /// </summary>
@@ -108,7 +126,8 @@ public abstract class Projectile
     public bool LaunchAt(Weapon _weapon, Vector3 _start, Vector3 _point, float _damageRate = 1f)
     {
         SetupDamage(_weapon);
-        damageMassage.damage *= Mathf.Max(0f, _damageRate);
+        damageRate = Mathf.Max(0f, _damageRate);
+        damageMassage.damage *= damageRate;
 
         if (false == OnLaunchAt())
         {
@@ -135,6 +154,7 @@ public abstract class Projectile
     private void SetupDamage(Weapon _weapon)
     {
         weapon = _weapon;
+        damageRate = 1f;
 
         damageMassage.damage = weapon.FinalDamage;
         damageMassage.isReflected = false;

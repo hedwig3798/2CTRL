@@ -1,0 +1,76 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b3795bac8328aef4fb7b53deef8d8087, type: 3}
+  m_Name: FlameUpgradeTable
+  m_EditorClassIdentifier: Game.Runtime::WeaponUpgradeTable
+  rewardWeight: 1.5
+  steps:
+  - title: "\uB370\uBBF8\uC9C0 +20%"
+    description: "\uB370\uBBF8\uC9C0 +20%"
+    modifiers:
+    - param: 0
+      mode: 1
+      value: 0.2
+  - title: "\uC0AC\uAC70\uB9AC +20%"
+    description: "\uC0AC\uAC70\uB9AC +20%"
+    modifiers:
+    - param: 2
+      mode: 1
+      value: 0.2
+  - title: "\uACF5\uC18D +15%"
+    description: "\uACF5\uC18D +15%"
+    modifiers:
+    - param: 1
+      mode: 1
+      value: 0.15
+  - title: "\uB370\uBBF8\uC9C0 +20%"
+    description: "\uB370\uBBF8\uC9C0 +20%"
+    modifiers:
+    - param: 0
+      mode: 1
+      value: 0.2
+  - title: "\u2605 \uBD80\uCC44\uAF34 \uAC01\uB3C4 +30\xB0"
+    description: "\uBD80\uCC44\uAF34 \uAC01\uB3C4 +30\xB0"
+    modifiers:
+    - param: 108
+      mode: 0
+      value: 30
+  - title: "\uB370\uBBF8\uC9C0 +20%"
+    description: "\uB370\uBBF8\uC9C0 +20%"
+    modifiers:
+    - param: 0
+      mode: 1
+      value: 0.2
+  - title: "\uBD84\uC0AC \uC2DC\uAC04 +0.3\uCD08"
+    description: "\uBD84\uC0AC \uC2DC\uAC04 +0.3\uCD08"
+    modifiers:
+    - param: 116
+      mode: 0
+      value: 0.3
+  - title: "\uB370\uBBF8\uC9C0 +20%"
+    description: "\uB370\uBBF8\uC9C0 +20%"
+    modifiers:
+    - param: 0
+      mode: 1
+      value: 0.2
+  - title: "\uB370\uBBF8\uC9C0 +20%"
+    description: "\uB370\uBBF8\uC9C0 +20%"
+    modifiers:
+    - param: 0
+      mode: 1
+      value: 0.2
+  - title: "\u2605 \uD654\uC0C1"
+    description: "\uD654\uC0C1"
+    modifiers:
+    - param: 211
+      mode: 0
+      value: 1

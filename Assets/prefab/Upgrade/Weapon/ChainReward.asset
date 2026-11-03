@@ -12,7 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 9bc5b6c958c092042aacceca90abbb8b, type: 3}
   m_Name: ChainReward
   m_EditorClassIdentifier: Game.Runtime::RewardData
-  image: {fileID: 7482667652216324306, guid: fa9fb6f87712df14bbf9dcc4ee179076, type: 3}
+  image: {fileID: 21300000, guid: 33e3787d76fc9e04494dd31a6af09a86, type: 3}
   rewardName: "\uCCB4\uC778 \uB77C\uC774\uD2B8\uB2DD"
   hasKey: 0
   key: 0

@@ -51,10 +51,10 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::SliderUI
   background: {fileID: 5567921872355123194}
   fill: {fileID: 3081507812724508016}
-  backgroundSprite: {fileID: 0}
-  backgroundColor: {r: 0.2, g: 0.2, b: 0.2, a: 1}
-  fillSprite: {fileID: 0}
-  fillColor: {r: 0.85, g: 0.2, b: 0.2, a: 1}
+  backgroundSprite: {fileID: 21300000, guid: e84cf4f67df57394d82b677c98b0e091, type: 3}
+  backgroundColor: {r: 1, g: 1, b: 1, a: 1}
+  fillSprite: {fileID: 21300000, guid: bb52342d2a417be42bb7ac6d517c43cd, type: 3}
+  fillColor: {r: 1, g: 1, b: 1, a: 1}
   maxValue: 100
   currValue: 100
   direction: 0
@@ -408,8 +408,8 @@ SpriteRenderer:
   m_SortingLayer: 2
   m_SortingOrder: 0
   m_MaskInteraction: 0
-  m_Sprite: {fileID: -8072220183094876539, guid: 5803d80c395da5e4996ae40dea188eff, type: 3}
-  m_Color: {r: 0.35, g: 0.55, b: 1, a: 1}
+  m_Sprite: {fileID: 5767486347711545402, guid: b155d19416235b64ca0873032a1d50c6, type: 3}
+  m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
   m_FlipY: 0
   m_DrawMode: 0
@@ -429,7 +429,7 @@ Animator:
   m_GameObject: {fileID: 7628816898910095507}
   m_Enabled: 1
   m_Avatar: {fileID: 0}
-  m_Controller: {fileID: 9100000, guid: 6e138010e4a87cd41b4d5e29da894428, type: 2}
+  m_Controller: {fileID: 22100000, guid: 8bbb7ea68d4ee184798f90e011bc9462, type: 2}
   m_CullingMode: 0
   m_UpdateMode: 0
   m_ApplyRootMotion: 0
@@ -551,7 +551,7 @@ RectTransform:
   m_Father: {fileID: 6080276549635294678}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
-  m_AnchorMax: {x: 0, y: 1}
+  m_AnchorMax: {x: 1, y: 1}
   m_AnchoredPosition: {x: 0, y: 0}
   m_SizeDelta: {x: 0, y: 0}
   m_Pivot: {x: 0.5, y: 0.5}
@@ -576,18 +576,18 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: UnityEngine.UI::UnityEngine.UI.Image
   m_Material: {fileID: 0}
-  m_Color: {r: 0.85, g: 0.2, b: 0.2, a: 1}
+  m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_RaycastTarget: 0
   m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
   m_Maskable: 1
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_Sprite: {fileID: 0}
-  m_Type: 0
+  m_Sprite: {fileID: 21300000, guid: bb52342d2a417be42bb7ac6d517c43cd, type: 3}
+  m_Type: 3
   m_PreserveAspect: 0
   m_FillCenter: 1
-  m_FillMethod: 4
+  m_FillMethod: 0
   m_FillAmount: 1
   m_FillClockwise: 1
   m_FillOrigin: 0
@@ -778,14 +778,14 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: UnityEngine.UI::UnityEngine.UI.Image
   m_Material: {fileID: 0}
-  m_Color: {r: 0.2, g: 0.2, b: 0.2, a: 1}
+  m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_RaycastTarget: 0
   m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
   m_Maskable: 1
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_Sprite: {fileID: 0}
+  m_Sprite: {fileID: 21300000, guid: e84cf4f67df57394d82b677c98b0e091, type: 3}
   m_Type: 0
   m_PreserveAspect: 0
   m_FillCenter: 1

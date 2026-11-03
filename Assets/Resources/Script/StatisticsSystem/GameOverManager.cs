@@ -61,7 +61,7 @@ public class GameOverManager
 
         if (null != gameOverUI)
         {
-            gameOverUI.Show(stats);
+            gameOverUI.Show(stats, deadSide);
         }
         else
         {

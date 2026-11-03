@@ -29,3 +29,10 @@
 ## 통계 연동 (2026-11-02, [statistics.md](statistics.md))
 - `DamageMassage.weapon`(Weapon, 통계 귀속용; 접촉/장판 데미지는 null). `Projectile.SetupDamage` 에서 `damageMassage.weapon = _weapon`(보조 발사체 포함).
 - `HealthSystem.PublishDamage(ref msg, applied)`(private): applied>0 일 때 호출. playerStats 있으면 OnPlayerDamaged, 아니면 msg.weapon.OwnerStats 기준 OnWeaponDamage. `Die()` 에서 playerStats 있으면 OnPlayerDeath(Side).
+- (2026-11-03) WEAPON_TYPE 추가: Capped(공격 간격마다 1개 발사, 살아 있는 발사체 >= fireCount 면 발사/타이머 정지), Wave(발사체가 모두 사라진 뒤 간격 후 fireCount개 일괄). Weapon.cs UpdateCapped/UpdateWave, 살아있는 발사체 목록으로 셈.
+- PoisonZoneProjectile 상속 훅(protected virtual): LaunchZone(발사, 기본 AimAtNearest), IsSlowActive(기본 FlagSlowZone), OnLandedUpdate(착지 후 매 프레임), OnTick(radius, hitCount; ApplyAreaDamage가 hitCount 반환). 파생은 Awake/Update 선언 금지(가려짐). Vine/Root가 사용. 신규 무기 상세 weapon-upgrade.md.
+
+## 추가 무기 후속 (2026-11-03)
+- `Projectile.RefreshDamage()`(protected): weapon.FinalDamage × 발사 배율(LaunchAt damageRate)과 knockback 재기록. 오래 사는 발사체(Saw 튕김, Tornado 영구, Spirit)가 타격 직전 호출.
+- `PoisonZoneProjectile.SlowRate`(protected virtual) 훅. Root 는 `rootSlowRate` 0.4 로 override.
+- Saw: 카메라 탐색 실패 캐시(cameraRetryInterval 1초). Tornado: brainCacheLimit 256. Spirit: UpgradeVersion 변경 시 hitCount 증가분을 remainingHits 에 더함.

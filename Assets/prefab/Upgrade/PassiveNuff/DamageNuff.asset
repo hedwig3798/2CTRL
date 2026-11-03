@@ -12,7 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 9bc5b6c958c092042aacceca90abbb8b, type: 3}
   m_Name: DamageNuff
   m_EditorClassIdentifier: Assembly-CSharp::RewardData
-  image: {fileID: 0}
+  image: {fileID: 21300000, guid: d669bd9d4c1b04a4782a1db4ed5bd06e, type: 3}
   rewardName: 
   hasKey: 1
   key: 0

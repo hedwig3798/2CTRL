@@ -1,0 +1,76 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!1 &2969764201426380929
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 3720727702967245612}
+  - component: {fileID: 7907613963683787990}
+  m_Layer: 7
+  m_Name: ChunkLoader_D1
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &3720727702967245612
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2969764201426380929}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &7907613963683787990
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2969764201426380929}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9fb18ead38f0d614682947521e48445e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::WFCChunkLoader
+  tileDatas:
+  - {fileID: 6516552732686047453, guid: 54164dfc27c017f4190a5606330d5871, type: 3}
+  - {fileID: 8658732152256928859, guid: 9bbb67ddcdd4cac4e9054a6f63e6c00b, type: 3}
+  - {fileID: 4805734740255721621, guid: b32b2cc7b429932439642fcb03f5ce39, type: 3}
+  - {fileID: 7863728781333104557, guid: 59e12c49848458d49834b22c65d982f0, type: 3}
+  - {fileID: 4046658373625148452, guid: 8fa93f5501b326e4eb7d4e3bf6fc76fb, type: 3}
+  - {fileID: 1988718494170785211, guid: 7003bac32605f33429cea0076b43a14d, type: 3}
+  - {fileID: 1110790553224178923, guid: ea2432dcce47eb943a66ea03d7642fc3, type: 3}
+  - {fileID: 343466282499496640, guid: de4f85a1fd9ccf440a27f27748f64323, type: 3}
+  - {fileID: 1936971025672124355, guid: 51472f76ea0f56e40baffc529b8ef00f, type: 3}
+  - {fileID: 5366948631025703244, guid: 92a38c209b37c96428ed2f9515a44aab, type: 3}
+  - {fileID: 1116228726104921788, guid: fc18e3bedc82f4d40bf00cbd9d3f0065, type: 3}
+  - {fileID: 7493913767872164384, guid: ea3d86b9acd2fd6419366f0ff8c870ea, type: 3}
+  - {fileID: 4603368119838912543, guid: cfc437997823c5a43884d7a6eff2caf1, type: 3}
+  - {fileID: 2884573496376115501, guid: a6546cd0425db104aa6449f81782884b, type: 3}
+  - {fileID: 4276709984664858725, guid: f4414dba11ece944d8c7a17779a73691, type: 3}
+  - {fileID: 1590146059737081921, guid: 909ab35156323de43a99e096dda71f01, type: 3}
+  - {fileID: 6573286662431860906, guid: 26c78fb8204e8d1428107a644254ca58, type: 3}
+  - {fileID: 8295927868319394219, guid: eb7a6d916eb47d4499ff099cd2cbd27c, type: 3}
+  - {fileID: 2815255815192546128, guid: 7bef7e21e9f7bec44a7200d4fd5cbf87, type: 3}
+  tileScale: 1
+  chunkWidth: 16
+  chunkHeight: 16
+  targetCamera: {fileID: 0}
+  preloadChunks: 1
+  unloadMargin: 1
+  tilePlaneZ: 0
+  frameBudgetMs: 4
+  backtrackBudgetPerCell: 2
+  maxRestarts: 30

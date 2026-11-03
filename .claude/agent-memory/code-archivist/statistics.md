@@ -22,3 +22,5 @@
 - 루트: StatisticsManager, GameOverManager(statisticsManager, gameOverUI 연결), GameOverCanvas(Overlay, sortingOrder 100, Scaler 1920x1080) > GameOverUI > Panel(불투명 검정, 기본 꺼짐) > Title, LeftCard>LeftLabel, RightCard>RightLabel.
 - Linear 색공간이라 반투명 오버레이가 많이 비침 → Panel alpha 1, 카드 alpha 0.035.
 - IMGUI 디버그(PlayerStatDebugUI 등)는 패널 위에 그려짐.
+## 갱신 (2026-11-02)
+- `GameOverUI.Show(StatisticsManager, PlayerSide deadSide)` 오버로드 추가(승자 제목 + [승리]/[패배] 태그). 기존 Show(stats) 유지. `GameOverManager.TriggerGameOver` 가 새 오버로드 호출.

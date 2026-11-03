@@ -12,12 +12,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 9bc5b6c958c092042aacceca90abbb8b, type: 3}
   m_Name: DroneReward
   m_EditorClassIdentifier: Assembly-CSharp::RewardData
-  image: {fileID: 7482667652216324306, guid: fa9fb6f87712df14bbf9dcc4ee179076, type: 3}
-  rewardName: "드론"
+  image: {fileID: 21300000, guid: 96085dd95118a3e4b84154fdc217367a, type: 3}
+  rewardName: "\uB4DC\uB860"
   hasKey: 0
   key: 0
   hasValue: 0
   value: 0
-  explain1: "주변을 천천히 맴돌며 가장 가까운 적에게 탄을 쏘는 드론 2기를 얻습니다."
-  explain2:
+  explain1: "\uC8FC\uBCC0\uC744 \uCC9C\uCC9C\uD788 \uB9F4\uB3CC\uBA70 \uAC00\uC7A5 \uAC00\uAE4C\uC6B4 \uC801\uC5D0\uAC8C \uD0C4\uC744 \uC3D8\uB294 \uB4DC\uB860 2\uAE30\uB97C \uC5BB\uC2B5\uB2C8\uB2E4."
+  explain2: 
   effect: {fileID: 11400000, guid: 7cd086365d3f48b2a9dc8bbb8a4f449b, type: 2}

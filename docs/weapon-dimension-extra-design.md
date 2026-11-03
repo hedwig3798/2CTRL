@@ -1,6 +1,6 @@
 # 차원별 추가 무기 설계 (확정 2026-11-03)
 
-무기 8종을 추가한다. 무기 보상은 각 차원 무기 풀(`DimensionData.weaponRewards`)에 넣는다.
+무기 7종을 추가한다. 무기 보상은 각 차원 무기 풀(`DimensionData.weaponRewards`)에 넣는다.
 수치는 `docs/balance-design.md` 3.2장 기준으로 정한 기본 유효 DPS 목표에 맞춘 초기값이다. 플레이테스트 후 조정한다.
 
 | 차원 | 추가 무기 | 차원 무기 수 |
@@ -95,3 +95,25 @@
 | 1 | 2 | 3 | 4 | 5 ★ | 6 | 7 | 8 | 9 | 10 ★ |
 |---|---|---|---|---|---|---|---|---|---|
 | 데미지 +20% | 범위 +20% | 공속 +15% | 데미지 +20% | 대상 +2 (최대 3) | 데미지 +20% | 사거리 +1.5 | 데미지 +20% | 데미지 +20% | 연결 |
+
+## 통합 정보 (프리팹 / 무기 값)
+공통: 프리팹 폴더 `Assets/prefab/weapon/<Name>/`, 렌더러 정렬 레이어 `attack`. 업그레이드 테이블·보상은 기존 무기와 같은 방식(`WeaponUpgradeBuilder`, 가중치 1.5).
+
+| 무기 | Weapon 값 | 발사체 프리팹 구성 |
+|---|---|---|
+| Vine | Repeat, dmg 6, as 4, range 0, fire 1, hit 1, areaRadius 0.6, lifetime 3 | VineProjectile + BlackBoardHandler + Lifetime + ScaleOverLifetime(useAreaRadius) + SpriteRenderer. LandMovement 없음. thornPrefab = Straight + OneHitProjectile + Lifetime + BlackBoardHandler + 트리거 콜라이더 |
+| Spirit | Capped, dmg 8, as 0.5, range 4, fire 3, hit 6 | SpiritProjectile + SpriteRenderer. Lifetime 없음 |
+| Root | Repeat, dmg 5, as 0.4, range 6, fire 1, hit 1, areaRadius 1.2, lifetime 4 | RootProjectile(rootSlowRate 0.4) + BlackBoardHandler + Lifetime + ScaleOverLifetime(useAreaRadius) + SpriteRenderer |
+| Saw | Wave, dmg 15, as 1, fire 2, speedRate 1, preLoad 4 | 루트 SawProjectile + 자식 스프라이트. 콜라이더·Rigidbody·Lifetime·이동 컴포넌트 없음 |
+| Flame | Repeat, dmg 4, as 0.8, range 3, fire 1, knockback ~1, preLoad 2 | 루트 FlameProjectile + 자식 visualRoot(+x 가 분사 방향, 파티클/스프라이트). 콜라이더·Lifetime 없음. FlameBurn 은 런타임 추가 |
+| Tornado | Capped, dmg 6, as 0.33, fire 1, lifetime 5, knockback 0 | 루트 TornadoProjectile + 자식 SpriteRenderer(scaleTarget). 콜라이더·Lifetime·이동·ScaleOverLifetime 없음 |
+| Lightning | Repeat, dmg 25, as 0.7, range 8, fire 1, areaRadius 0.8 | 루트 LightningProjectile + 자식 Marker(원 SpriteRenderer → markerTemplate), Bolt(LineRenderer → boltTemplate), Link(LineRenderer → linkLine) |
+
+업그레이드 매핑 (Multiply 0.2 = +20%):
+- Vine: 데미지 Damage×0.2, 범위 AreaRadius×0.2, 틱 TickInterval×-0.1, 수명 Lifetime×0.5, ★ FlagVineThorn +1
+- Spirit: 공속 AttackSpeed×0.15, 추적 ChaseSpeed×0.2, 정령 FireCount +2, 사거리 Range +1.5, 공격 횟수 HitCount +4
+- Root: 범위 AreaRadius×0.2, 공속 AttackSpeed×0.15, 지역 FireCount +1, 수명 Lifetime +1, ★ FlagRootChase +1
+- Saw: 크기 ProjectileScale×0.2, 속도 SpeedRate×0.2, 톱날 FireCount +2, 공속 AttackSpeed×0.15, ★ FlagSawBounce +1
+- Flame: 사거리 Range×0.2, 공속 AttackSpeed×0.15, 각도 FanAngle +30, 분사 BurstDuration +0.3, ★ FlagBurn +1
+- Tornado: 크기 ProjectileScale×0.2, 수명 Lifetime +1, 회오리 FireCount +1, 끌어당김 PullForce×0.3, ★ FlagTornadoPermanent +1
+- Lightning: 범위 AreaRadius×0.2, 공속 AttackSpeed×0.15, 대상 StrikeCount +2, 사거리 Range +1.5, ★ FlagStormLink +1

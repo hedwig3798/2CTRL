@@ -46,6 +46,13 @@ public class GameOverUI
     private string noWeaponText = "  없음";
     [SerializeField]
     private string expFormat = "획득 EXP : {0:0}";
+    [Tooltip("승자가 있을 때 제목. {0} = 승리한 쪽 헤더")]
+    [SerializeField]
+    private string winTitleFormat = "{0} 승리!";
+    [SerializeField]
+    private string winTag = "  [승리]";
+    [SerializeField]
+    private string loseTag = "  [패배]";
 
     private readonly StringBuilder builder = new StringBuilder(256);
     private readonly List<KeyValuePair<string, float>> sortedWeapons = new List<KeyValuePair<string, float>>();
@@ -68,13 +75,37 @@ public class GameOverUI
     /// </summary>
     public void Show(StatisticsManager _stats)
     {
-        if (null != titleLabel)
+        ShowInternal(_stats, null);
+    }
+
+    /// <summary>
+    /// 먼저 죽은 쪽(_deadSide)을 패배, 반대쪽을 승리로 표시한다
+    /// </summary>
+    public void Show(StatisticsManager _stats, PlayerSide _deadSide)
+    {
+        ShowInternal(_stats, _deadSide);
+    }
+
+    private void ShowInternal(StatisticsManager _stats, PlayerSide? _deadSide)
+    {
+        string title = titleText;
+        string leftTitle = leftHeader;
+        string rightTitle = rightHeader;
+        if (_deadSide.HasValue)
         {
-            titleLabel.text = titleText;
+            bool leftWin = PlayerSide.Right == _deadSide.Value;
+            title = string.Format(winTitleFormat, leftWin ? leftHeader : rightHeader);
+            leftTitle += leftWin ? winTag : loseTag;
+            rightTitle += leftWin ? loseTag : winTag;
         }
 
-        SetSideText(leftLabel, leftHeader, null != _stats ? _stats.Get(PlayerSide.Left) : null);
-        SetSideText(rightLabel, rightHeader, null != _stats ? _stats.Get(PlayerSide.Right) : null);
+        if (null != titleLabel)
+        {
+            titleLabel.text = title;
+        }
+
+        SetSideText(leftLabel, leftTitle, title, null != _stats ? _stats.Get(PlayerSide.Left) : null);
+        SetSideText(rightLabel, rightTitle, title, null != _stats ? _stats.Get(PlayerSide.Right) : null);
 
         if (null != panel)
         {
@@ -90,26 +121,26 @@ public class GameOverUI
         }
     }
 
-    private void SetSideText(TMP_Text _label, string _header, PlayerCombatStats _stats)
+    private void SetSideText(TMP_Text _label, string _header, string _title, PlayerCombatStats _stats)
     {
         if (null == _label)
         {
             return;
         }
 
-        _label.text = BuildText(_header, _stats);
+        _label.text = BuildText(_header, _title, _stats);
     }
 
     /// <summary>
     /// 한 플레이어의 통계 문자열 (무기별 데미지는 큰 순서)
     /// </summary>
-    private string BuildText(string _header, PlayerCombatStats _stats)
+    private string BuildText(string _header, string _title, PlayerCombatStats _stats)
     {
         builder.Clear();
 
         if (null == titleLabel)
         {
-            builder.AppendLine(titleText);
+            builder.AppendLine(_title);
         }
         builder.AppendLine(_header);
 

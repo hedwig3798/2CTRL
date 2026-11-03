@@ -12,12 +12,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 9bc5b6c958c092042aacceca90abbb8b, type: 3}
   m_Name: PoisonZoneReward
   m_EditorClassIdentifier: Assembly-CSharp::RewardData
-  image: {fileID: -2413806693520163455, guid: 0b0c64724ca45ea4ba5a2ffc1cb6ffea, type: 3}
-  rewardName: "독 장판"
+  image: {fileID: 21300000, guid: 347e99b9fdf0e464abb39398fb8e2dcf, type: 3}
+  rewardName: "\uB3C5 \uC7A5\uD310"
   hasKey: 0
   key: 0
   hasValue: 0
   value: 0
-  explain1: "가장 가까운 적에게 독 장판을 던져, 장판 위의 적들에게 지속적으로 피해를 줍니다."
-  explain2:
+  explain1: "\uAC00\uC7A5 \uAC00\uAE4C\uC6B4 \uC801\uC5D0\uAC8C \uB3C5 \uC7A5\uD310\uC744 \uB358\uC838, \uC7A5\uD310 \uC704\uC758 \uC801\uB4E4\uC5D0\uAC8C \uC9C0\uC18D\uC801\uC73C\uB85C \uD53C\uD574\uB97C \uC90D\uB2C8\uB2E4."
+  explain2: 
   effect: {fileID: 11400000, guid: fbc748ce3d61448ba46d2c07a116c99b, type: 2}

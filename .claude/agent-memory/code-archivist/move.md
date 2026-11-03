@@ -4,3 +4,5 @@
 - 목록: Straight, Chasing(sealed), Chain(chainCount/chainRange), Return(신규), Slingshot, Orbit, Follow, ArrowMovemnt.
 - `SPRITE_ROTATE_MODE` enum (SpriteRotateMode.cs).
 - 추가 무기 이동은 Initializable 구현 후 프리팹에 부착.
+- MoveAnimator (2026-11-02, 신규): target(기본 root) 위치 변화로 Animator bool `IsMoving` 설정. 컨트롤러에 파라미터 없으면 무시. 플레이어 visual 에 부착.
+- ArrowMovemnt.LastMoveDirection (2026-11-03): 마지막 이동 방향(정규화, 정지 시 유지, 초기 right). FlameProjectile 이 부채꼴 방향으로 사용.

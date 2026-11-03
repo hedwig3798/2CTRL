@@ -12,7 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 9bc5b6c958c092042aacceca90abbb8b, type: 3}
   m_Name: SplitShotReward
   m_EditorClassIdentifier: Assembly-CSharp::RewardData
-  image: {fileID: -2413806693520163455, guid: 0b0c64724ca45ea4ba5a2ffc1cb6ffea, type: 3}
+  image: {fileID: 21300000, guid: 260b5935f2af4f144a8471993361be4c, type: 3}
   rewardName: "\uBD84\uC5F4\uD0C4"
   hasKey: 0
   key: 0

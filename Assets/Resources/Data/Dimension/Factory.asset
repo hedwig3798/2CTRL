@@ -13,13 +13,15 @@ MonoBehaviour:
   m_Name: Factory
   m_EditorClassIdentifier: Game.Runtime::DimensionData
   displayName: "\uACF5\uC7A5"
-  previewSprite: {fileID: 132210538, guid: f387b2b9ac8b14f4c9f65f6c2df761a4, type: 3}
+  previewSprite: {fileID: 21300000, guid: 6eb6f7066acf9b446a0a971deaeeb561, type: 3}
   themeColor: {r: 0.85, g: 0.55, b: 0.2, a: 1}
   startWeapon: {fileID: 5536439645276528640, guid: 384bb9388fa9441a852324600bf99205, type: 3}
   weaponRewards:
   - {fileID: 11400000, guid: 9f931794e3b34900a4fc20d49d487184, type: 2}
   - {fileID: 11400000, guid: 47511eda51fc404cb884cb5222a3d585, type: 2}
   - {fileID: 11400000, guid: 849f46d9d1d244e6a959674018e0215a, type: 2}
+  - {fileID: 11400000, guid: 38b20e867d7109a4db90bbb88bcbe030, type: 2}
+  - {fileID: 11400000, guid: 53543db3e5287574591d5ef0e5d21887, type: 2}
   waves:
   - {fileID: 11400000, guid: f1ac7c48d62ff054384edc8fa3d65b79, type: 2}
   - {fileID: 11400000, guid: 157c8af25b125d54f872618273f71b8d, type: 2}
@@ -35,7 +37,19 @@ MonoBehaviour:
   - {fileID: 11400000, guid: 38c968e776c97e944ae529fe0bacc66b, type: 2}
   - {fileID: 11400000, guid: c3643ad0d350392459ae43d4ceeb1b72, type: 2}
   - {fileID: 11400000, guid: e80238d6a0fb0134fbb5663532c5be8a, type: 2}
-  monsterSkins: []
-  chunkLoaderPrefab: {fileID: 7287097152152248050, guid: 2c517fbd785d9544cbf3ca97777a9431, type: 3}
+  monsterSkins:
+  - monster: {fileID: 11400000, guid: a5b03e809cd679541bec165c0df59d97, type: 2}
+    animator: {fileID: 22100000, guid: 7f87eb60d4312284493b45f864aba04f, type: 2}
+    sprite: {fileID: 4720302014468866920, guid: 3f89b7dff5654ca42b5ffa0f9c574775, type: 3}
+  - monster: {fileID: 11400000, guid: f37e7a716d20b074fad33787132250a4, type: 2}
+    animator: {fileID: 22100000, guid: eeae7a27c81469447bf0ba0cd7c084bf, type: 2}
+    sprite: {fileID: 5090289110187903302, guid: b0d2f99995167244c80e77d4d1df759b, type: 3}
+  - monster: {fileID: 11400000, guid: 729fe8d75bf38e14b97be163a4cba9b9, type: 2}
+    animator: {fileID: 22100000, guid: f1b38c77d0e3c23479134e833e5b0aef, type: 2}
+    sprite: {fileID: -4764869508980763211, guid: f72eae821ab496f41a82fda181c0340e, type: 3}
+  - monster: {fileID: 11400000, guid: d2e3925e614074e489ab3a5ddb7be6b3, type: 2}
+    animator: {fileID: 22100000, guid: f1b38c77d0e3c23479134e833e5b0aef, type: 2}
+    sprite: {fileID: -4764869508980763211, guid: f72eae821ab496f41a82fda181c0340e, type: 3}
+  chunkLoaderPrefab: {fileID: 7907613963683787990, guid: a250d4bee245e8a4491eecc4c0beb9b1, type: 3}
   playerAnimator: {fileID: 22100000, guid: 877b0d512f3e20947b997821f3e7325b, type: 2}
-  playerSprite: {fileID: 978012912, guid: 5e4ab4838a9d922438adeab9ad22c3e9, type: 3}
+  playerSprite: {fileID: 366906121453711152, guid: 3cc52c2310ae1114d83ae913bc686219, type: 3}

@@ -1,0 +1,16 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d44659d547e349079d987e65f6e61f4a, type: 3}
+  m_Name: FlameRewardEffect
+  m_EditorClassIdentifier: Game.Runtime::WeaponRewardEffect
+  weaponPrefab: {fileID: 1531015672605070998, guid: 8baf1a8b19f6ba24197bd8f46c004f92, type: 3}
+  upgradeTable: {fileID: 11400000, guid: 4825ec2f02d0a5f4b9f4cd700309a56b, type: 2}

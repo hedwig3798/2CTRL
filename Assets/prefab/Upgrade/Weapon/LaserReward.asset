@@ -12,12 +12,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 9bc5b6c958c092042aacceca90abbb8b, type: 3}
   m_Name: LaserReward
   m_EditorClassIdentifier: Assembly-CSharp::RewardData
-  image: {fileID: 7482667652216324306, guid: fa9fb6f87712df14bbf9dcc4ee179076, type: 3}
-  rewardName: "레이저"
+  image: {fileID: 21300000, guid: ffe4f9ad0ba4cef4ba2360b6d5588817, type: 3}
+  rewardName: "\uB808\uC774\uC800"
   hasKey: 0
   key: 0
   hasValue: 0
   value: 0
-  explain1: "가장 가까운 적을 향해 즉시 광선을 쏘아 일직선 위의 적들을 관통하는 레이저를 얻습니다."
-  explain2:
+  explain1: "\uAC00\uC7A5 \uAC00\uAE4C\uC6B4 \uC801\uC744 \uD5A5\uD574 \uC989\uC2DC \uAD11\uC120\uC744 \uC3D8\uC544 \uC77C\uC9C1\uC120 \uC704\uC758 \uC801\uB4E4\uC744 \uAD00\uD1B5\uD558\uB294 \uB808\uC774\uC800\uB97C \uC5BB\uC2B5\uB2C8\uB2E4."
+  explain2: 
   effect: {fileID: 11400000, guid: 6465db87d4374f5ea1fef4b8c69a3689, type: 2}

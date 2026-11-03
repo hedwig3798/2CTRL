@@ -41,12 +41,12 @@ namespace Builders
         private static readonly Def[] DEFS =
         {
             new Def { id = "Forest", displayName = "숲", theme = new Color(0.35f, 0.75f, 0.35f, 1f),
-                weapons = new[] { "Boomerang", "PoisonZone", "Sweep", "SplitShot" }, loader = FOREST_LOADER, preview = FOREST_PREVIEW },
+                weapons = new[] { "Boomerang", "PoisonZone", "Sweep", "SplitShot", "Vine", "Spirit", "Root" }, loader = FOREST_LOADER, preview = FOREST_PREVIEW },
             new Def { id = "Factory", displayName = "공장", theme = new Color(0.85f, 0.55f, 0.2f, 1f),
-                weapons = new[] { "Laser", "Drone", "Mine" }, loader = FACTORY_LOADER, preview = FACTORY_PREVIEW },
+                weapons = new[] { "Laser", "Drone", "Mine", "Saw", "Flame" }, loader = FACTORY_LOADER, preview = FACTORY_PREVIEW },
             // 폭풍 맵은 임시로 공장 맵 (전용 타일 셋은 아트 단계)
             new Def { id = "Storm", displayName = "폭풍", theme = new Color(0.45f, 0.55f, 1f, 1f),
-                weapons = new[] { "Chain", "Shockwave", "Explosive" }, loader = FACTORY_LOADER, preview = FACTORY_PREVIEW },
+                weapons = new[] { "Chain", "Shockwave", "Explosive", "Tornado", "Lightning" }, loader = FACTORY_LOADER, preview = FACTORY_PREVIEW },
         };
 
         [MenuItem("Tools/Builders/DimensionData")]
