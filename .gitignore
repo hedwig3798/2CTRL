@@ -105,3 +105,9 @@ InitTestScene*.unity*
 .claude/*.local.json
 CLAUDE.local.md
 **/CLAUDE.local.md
+
+# Unity CLI (Pipeline) 로컬 설정
+/ProjectSettings/Packages/com.unity.pipeline/
+
+# Python 캐시
+__pycache__/
