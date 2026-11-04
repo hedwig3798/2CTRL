@@ -124,7 +124,7 @@ public class GameOverManager
     {
         if (null == spawners || 0 == spawners.Length)
         {
-            spawners = FindObjectsByType<Spawner>(FindObjectsSortMode.None);
+            spawners = FindObjectsByType<Spawner>();
         }
     }
 
