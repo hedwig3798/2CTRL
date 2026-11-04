@@ -2,8 +2,10 @@ using System;
 using UnityEngine;
 
 /// <summary>
-/// 플레이어가 한 명이라도 죽으면 즉시 게임 오버 처리 (씬에 하나 배치)
-/// - EventManager.OnPlayerDeath 를 구독하고 한 번만 처리한다
+/// 게임 종료 처리 (씬에 하나 배치)
+/// - 한 명이 양쪽을 플레이하는 싱글 게임: 어느 쪽이든 죽으면 즉시 게임 오버, TriggerVictory 로 승리
+/// - EventManager.OnPlayerDeath 를 구독하고, 게임 오버·승리 중 처음 한 번만 처리한다
+/// - 모든 Spawner 의 웨이브가 끝나면(Spawner.OnAllWavesFinished) 승리
 /// - 순서: 일시정지(GamePause) → 통계 큐 동기 처리(StatisticsManager.Flush) → 결과 패널 표시(GameOverUI) → OnGameOver
 /// </summary>
 [DisallowMultipleComponent]
@@ -18,22 +20,32 @@ public class GameOverManager
     [SerializeField]
     private GameOverUI gameOverUI;
 
+    [Tooltip("모두 웨이브를 끝내면 승리할 Spawner 목록 (비우면 씬의 모든 Spawner)")]
+    [SerializeField]
+    private Spawner[] spawners;
+
     /// <summary>
-    /// 게임 오버 처리가 끝난 뒤 호출
+    /// 게임 종료(게임 오버·승리) 처리가 끝난 뒤 호출
     /// </summary>
     public Action OnGameOver;
 
     private bool isGameOver = false;
+    private bool isVictory = false;
 
-    // 먼저 죽은 플레이어
+    // 먼저 죽은 쪽 (승리로 끝났으면 의미 없음)
     private PlayerSide deadSide;
 
+    /// <summary>
+    /// 게임이 끝났는지 (게임 오버·승리 모두 포함)
+    /// </summary>
     public bool IsGameOver => isGameOver;
+
+    public bool IsVictory => isVictory;
 
     public PlayerSide DeadSide => deadSide;
 
     /// <summary>
-    /// 게임 오버를 처리한다 (이미 처리했으면 무시)
+    /// 게임 오버를 처리한다 (이미 끝났으면 무시)
     /// </summary>
     public void TriggerGameOver(PlayerSide _deadSide)
     {
@@ -42,8 +54,27 @@ public class GameOverManager
             return;
         }
 
-        isGameOver = true;
         deadSide = _deadSide;
+        EndGame(false);
+    }
+
+    /// <summary>
+    /// 승리를 처리한다 (이미 끝났으면 무시)
+    /// </summary>
+    public void TriggerVictory()
+    {
+        if (true == isGameOver)
+        {
+            return;
+        }
+
+        EndGame(true);
+    }
+
+    private void EndGame(bool _victory)
+    {
+        isGameOver = true;
+        isVictory = _victory;
 
         GamePause.Pause(this);
 
@@ -61,7 +92,7 @@ public class GameOverManager
 
         if (null != gameOverUI)
         {
-            gameOverUI.Show(stats, deadSide);
+            gameOverUI.Show(stats, isVictory);
         }
         else
         {
@@ -76,8 +107,38 @@ public class GameOverManager
         TriggerGameOver(_side);
     }
 
+    private void HandleWavesFinished(Spawner _spawner)
+    {
+        foreach (Spawner spawner in spawners)
+        {
+            if (null != spawner && false == spawner.IsFinished)
+            {
+                return;
+            }
+        }
+
+        TriggerVictory();
+    }
+
+    private void Awake()
+    {
+        if (null == spawners || 0 == spawners.Length)
+        {
+            spawners = FindObjectsByType<Spawner>(FindObjectsSortMode.None);
+        }
+    }
+
     private void OnEnable()
     {
+        foreach (Spawner spawner in spawners)
+        {
+            if (null != spawner)
+            {
+                spawner.OnAllWavesFinished -= HandleWavesFinished;
+                spawner.OnAllWavesFinished += HandleWavesFinished;
+            }
+        }
+
         EventManager events = EventManager.Instance;
         if (null == events)
         {
@@ -90,6 +151,14 @@ public class GameOverManager
 
     private void OnDisable()
     {
+        foreach (Spawner spawner in spawners)
+        {
+            if (null != spawner)
+            {
+                spawner.OnAllWavesFinished -= HandleWavesFinished;
+            }
+        }
+
         if (true == EventManager.HasInstance)
         {
             EventManager.Instance.OnPlayerDeath -= HandlePlayerDeath;

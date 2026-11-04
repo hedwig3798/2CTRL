@@ -81,6 +81,12 @@ public class LevelUpUI
 
     private void OnDisable()
     {
+        // 열린 채로 씬이 바뀌면(재시작·타이틀) 다음 씬이 멈춘 채 시작하지 않도록 일시정지 요청을 푼다
+        if (true == isOpen)
+        {
+            GamePause.Resume(this);
+        }
+
         // 종료 중 매니져가 새로 생성되지 않도록 HasInstance 로 확인
         if (true == EventManager.HasInstance)
         {

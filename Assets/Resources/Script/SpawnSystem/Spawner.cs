@@ -80,6 +80,18 @@ public class Spawner
     // 진행 중인 웨이브 번호 (Wave 코루틴이 갱신, 시작 전이면 -1). 이후 스폰(소환 / 분열 포함)부터 그 웨이브 배율을 쓴다
     private int currentWaveIndex = -1;
 
+    private bool isFinished = false;
+
+    /// <summary>
+    /// 마지막 웨이브의 time 이 끝났을 때 한 번 호출 (이후에도 마지막 웨이브 스폰은 계속된다)
+    /// </summary>
+    public System.Action<Spawner> OnAllWavesFinished;
+
+    /// <summary>
+    /// 모든 웨이브의 time 이 끝났는지
+    /// </summary>
+    public bool IsFinished => isFinished;
+
     /// <summary>
     /// 보상으로 몬스터 비율을 보정한다
     /// </summary>
@@ -499,5 +511,8 @@ public class Spawner
 
             yield return new WaitForSeconds(waveArray[i].time);
         }
+
+        isFinished = true;
+        OnAllWavesFinished?.Invoke(this);
     }
 }

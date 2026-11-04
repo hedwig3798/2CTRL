@@ -80,8 +80,11 @@ namespace Builders
 
             Transform leftCard = MakeCard(panelGo.transform, "LeftCard", 0.07f, 0.48f);
             Transform rightCard = MakeCard(panelGo.transform, "RightCard", 0.52f, 0.93f);
-            TMP_Text left = MakeCardLabel(panelGo.transform, leftCard, "LeftLabel", font, "왼쪽 플레이어");
-            TMP_Text right = MakeCardLabel(panelGo.transform, rightCard, "RightLabel", font, "오른쪽 플레이어");
+            TMP_Text left = MakeCardLabel(panelGo.transform, leftCard, "LeftLabel", font, "왼쪽 화면");
+            TMP_Text right = MakeCardLabel(panelGo.transform, rightCard, "RightLabel", font, "오른쪽 화면");
+
+            Button restart = MakeButton(panelGo.transform, "RestartButton", font, "재시작", 0.30f, 0.48f);
+            Button toTitle = MakeButton(panelGo.transform, "TitleButton", font, "타이틀", 0.52f, 0.70f);
 
             // 에디터에서 패널은 꺼 둔다 (런타임 Awake 에서도 끈다)
             panelGo.SetActive(false);
@@ -91,6 +94,11 @@ namespace Builders
             uiSo.FindProperty("titleLabel").objectReferenceValue = title;
             uiSo.FindProperty("leftLabel").objectReferenceValue = left;
             uiSo.FindProperty("rightLabel").objectReferenceValue = right;
+            uiSo.FindProperty("restartButton").objectReferenceValue = restart;
+            uiSo.FindProperty("titleButton").objectReferenceValue = toTitle;
+            // 싱글 게임: 좌우는 플레이어가 아니라 화면 구분
+            uiSo.FindProperty("leftHeader").stringValue = "왼쪽 화면";
+            uiSo.FindProperty("rightHeader").stringValue = "오른쪽 화면";
             uiSo.ApplyModifiedPropertiesWithoutUndo();
 
             // 4. GameOverManager
@@ -105,7 +113,7 @@ namespace Builders
             EditorSceneManager.SaveScene(scene);
 
             sb.AppendLine("씬: " + SCENE_PATH);
-            sb.AppendLine("StatisticsManager / GameOverManager / GameOverCanvas(order " + SORTING_ORDER + ")/GameOverUI/Panel/{Title,LeftLabel,RightLabel}");
+            sb.AppendLine("StatisticsManager / GameOverManager / GameOverCanvas(order " + SORTING_ORDER + ")/GameOverUI/Panel/{Title,LeftLabel,RightLabel,RestartButton,TitleButton}");
             return sb.ToString();
         }
 
@@ -128,7 +136,7 @@ namespace Builders
         {
             GameObject go = FindOrCreateChild(_panel, _name);
             RectTransform rt = go.GetComponent<RectTransform>();
-            rt.anchorMin = new Vector2(_xMin, 0.08f);
+            rt.anchorMin = new Vector2(_xMin, 0.19f);
             rt.anchorMax = new Vector2(_xMax, 0.56f);
             rt.offsetMin = Vector2.zero;
             rt.offsetMax = Vector2.zero;
@@ -137,6 +145,30 @@ namespace Builders
             img.color = new Color(1f, 1f, 1f, 0.035f);
             img.raycastTarget = false;
             return go.transform;
+        }
+
+        /// <summary>
+        /// 카드 아래 버튼 한 줄 (스프라이트는 ArtResourceBuilder 가 입힌다)
+        /// </summary>
+        private static Button MakeButton(Transform _panel, string _name, TMP_FontAsset _font, string _text, float _xMin, float _xMax)
+        {
+            GameObject go = FindOrCreateChild(_panel, _name);
+            RectTransform rt = go.GetComponent<RectTransform>();
+            rt.anchorMin = new Vector2(_xMin, 0.05f);
+            rt.anchorMax = new Vector2(_xMax, 0.14f);
+            rt.offsetMin = Vector2.zero;
+            rt.offsetMax = Vector2.zero;
+            rt.localScale = Vector3.one;
+            Image img = GetOrAdd<Image>(go);
+            img.color = new Color(0.15f, 0.15f, 0.2f, 0.9f);
+            img.raycastTarget = true;
+            Button button = GetOrAdd<Button>(go);
+            button.targetGraphic = img;
+
+            TMP_Text label = MakeLabel(go.transform, go.transform, "Label", _font, 40f, TextAlignmentOptions.Center,
+                Vector2.zero, Vector2.one, _text);
+            label.raycastTarget = false;
+            return button;
         }
 
         private static TMP_Text MakeCardLabel(Transform _panel, Transform _card, string _name, TMP_FontAsset _font, string _text)
