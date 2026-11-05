@@ -7,8 +7,13 @@ using UnityEngine;
 /// Canvas 없이 3D TextMeshPro 로 그리며, 대상과 같은 레이어로 설정해 해당 카메라에만 보이게 한다.
 /// 끝나면 비활성화되고 onFinished 로 풀에 반환된다.
 ///
+/// 정렬 레이어
+/// - MeshRenderer 의 정렬 레이어가 Default 면 BG 레이어(바닥 타일)보다 먼저 그려져 가려진다.
+///   그래서 기본값으로 가장 위 레이어("Front UI", 없으면 "attack")를 쓰고, Setup 으로 바꿀 수 있다.
+///
 /// 타 스크립트 사용 예)
 ///   FloatingTextUI ui = FloatingTextUI.Create(container);
+///   ui.Setup(font, FontStyles.Normal, SortingLayer.NameToID("Front UI"), 1000);
 ///   ui.Play("12", Color.white, worldPos, layer, 4f, 0.8f, 1f, Release);
 /// </summary>
 public class FloatingTextUI
@@ -18,6 +23,8 @@ public class FloatingTextUI
     private static readonly Vector2 TEXT_SIZE = new Vector2(3f, 1f);
     // 스프라이트 위에 그려지도록
     private const int SORTING_ORDER = 1000;
+    // 정렬 레이어 기본값 (앞쪽이 우선, 프로젝트에 있는 첫 레이어 사용)
+    private static readonly string[] DEFAULT_SORTING_LAYERS = { "Front UI", "attack" };
 
     [Tooltip("시간(0~1)에 따른 떠오르는 비율(0~1)")]
     public AnimationCurve riseCurve = AnimationCurve.EaseInOut(0f, 0f, 1f, 1f);
@@ -49,9 +56,44 @@ public class FloatingTextUI
         ui.text.textWrappingMode = TextWrappingModes.NoWrap;
         ui.text.overflowMode = TextOverflowModes.Overflow;
         ui.text.fontStyle = FontStyles.Bold;
+        ui.text.sortingLayerID = DefaultSortingLayerID();
         ui.text.sortingOrder = SORTING_ORDER;
 
         return ui;
+    }
+
+    /// <summary>
+    /// DEFAULT_SORTING_LAYERS 중 프로젝트에 있는 첫 정렬 레이어 (없으면 Default)
+    /// </summary>
+    public static int DefaultSortingLayerID()
+    {
+        foreach (string layerName in DEFAULT_SORTING_LAYERS)
+        {
+            int id = SortingLayer.NameToID(layerName);
+            if (true == SortingLayer.IsValid(id))
+            {
+                return id;
+            }
+        }
+        return 0;
+    }
+
+    /// <summary>
+    /// 폰트 / 정렬 설정 (Create 직후 한 번 호출)
+    /// </summary>
+    /// <param name="_font">null 이면 TMP 기본 폰트 유지</param>
+    /// <param name="_sortingLayerID">Default(0) 이거나 유효하지 않으면 DefaultSortingLayerID (Default 는 BG 에 가려짐)</param>
+    public void Setup(TMP_FontAsset _font, FontStyles _style, int _sortingLayerID, int _sortingOrder)
+    {
+        if (null != _font)
+        {
+            text.font = _font;
+            text.fontSharedMaterial = _font.material;
+        }
+        text.fontStyle = _style;
+        bool usable = 0 != _sortingLayerID && true == SortingLayer.IsValid(_sortingLayerID);
+        text.sortingLayerID = usable ? _sortingLayerID : DefaultSortingLayerID();
+        text.sortingOrder = _sortingOrder;
     }
 
     /// <summary>

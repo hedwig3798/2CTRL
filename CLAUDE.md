@@ -36,4 +36,5 @@ Unity 제어: Unity CLI(`unity`, Pipeline 패키지). 열린 에디터는 `unity
 4. 같은 실수를 반복하지 말 것. 실수는 여기에 한줄씩 적는다.
    - 발사체·이펙트 렌더러를 Default 정렬 레이어로 두지 말 것 (BG 보다 먼저 그려져 GameScene 바닥에 가려짐). 무기는 `attack` 레이어.
    - 아트는 `Builders.Visual.ArtResourceBuilder.Build()` 로 적용한다. 다른 씬·프리팹 빌더를 다시 돌린 뒤에는 이것도 다시 실행 (안 하면 아트가 덮어써짐).
+   - internal 헬퍼(예: `SettingsUIKit`)를 쓰는 빌더는 `script run` 이 CS0122 로 실패한다. `unity command script eval "return Builders.X.Build();"` 로 실행.
    - `capture game_view --save_path` 상대 경로는 `Assets/` 아래에 저장된다. 캡처 후 `.claude/tmp/` 로 옮기고 지울 것. Game 뷰가 Free Aspect 면 캡처가 찌그러진다.

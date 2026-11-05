@@ -254,6 +254,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::HPSliderBinder
   target: {fileID: 7824922074171291554}
   slider: {fileID: 2767757589719135546}
+  owner: 0
+  hpBarCanvas: {fileID: 0}
 --- !u!1 &3367822726254655728
 GameObject:
   m_ObjectHideFlags: 0

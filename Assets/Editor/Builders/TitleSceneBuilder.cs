@@ -27,6 +27,8 @@ namespace Builders
         private const string BACKGROUND_PATH = "Assets/Resources/Textuer/fbg.png";
         private const string FONT_PATH = "Assets/Fonts/NotoSansKR-Regular SDF.asset";
         private const string CAPTURE_PATH = ".claude/tmp/titlescene.png";
+        // TitleCanvas(0) 위
+        private const int SETTINGS_SORTING_ORDER = 50;
 
         private static TMP_FontAsset font;
 
@@ -46,6 +48,9 @@ namespace Builders
             {
                 sb.AppendLine("경고: 폰트 없음 " + FONT_PATH);
             }
+
+            // 설정 창 프리팹은 새 씬을 열기 전에 준비 (빌드 중 임시 오브젝트가 새 씬에 남지 않게)
+            SettingsPanelBuilder.GetOrBuildPrefab();
 
             Scene scene = EditorSceneManager.NewScene(NewSceneSetup.EmptyScene, NewSceneMode.Single);
 
@@ -114,12 +119,28 @@ namespace Builders
             vlg.childForceExpandHeight = false;
 
             Button startButton = CreateButton("StartButton", menuRt, "게임 시작", 360f, 80f);
+            Button settingsButton = CreateButton("SettingsButton", menuRt, "설정", 360f, 80f);
+
+            // 설정 창 : ArtResourceBuilder 가 TitleCanvas 에 이미지를 뒤에 추가해도 가리지 않도록 별도 캔버스(위 순서)
+            var settingsCanvasGo = new GameObject("SettingsCanvas", typeof(RectTransform), typeof(Canvas), typeof(CanvasScaler), typeof(GraphicRaycaster));
+            settingsCanvasGo.layer = canvasGo.layer;
+            var settingsCanvas = settingsCanvasGo.GetComponent<Canvas>();
+            settingsCanvas.renderMode = RenderMode.ScreenSpaceOverlay;
+            settingsCanvas.sortingOrder = SETTINGS_SORTING_ORDER;
+            var settingsScaler = settingsCanvasGo.GetComponent<CanvasScaler>();
+            settingsScaler.uiScaleMode = CanvasScaler.ScaleMode.ScaleWithScreenSize;
+            settingsScaler.referenceResolution = new Vector2(1920f, 1080f);
+            settingsScaler.matchWidthOrHeight = 0.5f;
+            SettingsPanel settingsPanel = SettingsPanelBuilder.InstantiateInto(settingsCanvasGo.transform);
+            sb.AppendLine("설정 창: " + (null != settingsPanel ? SettingsPanelBuilder.PREFAB_PATH : "생성 실패"));
 
             // 4. TitleMenu
             var menu = canvasGo.AddComponent<TitleMenu>();
             var so = new SerializedObject(menu);
             so.FindProperty("startButton").objectReferenceValue = startButton;
             so.FindProperty("gameSceneName").stringValue = "DimensionSelectScene";
+            so.FindProperty("settingsButton").objectReferenceValue = settingsButton;
+            so.FindProperty("settingsPanel").objectReferenceValue = settingsPanel;
             so.ApplyModifiedPropertiesWithoutUndo();
 
             EditorSceneManager.SaveScene(scene, SCENE_PATH);

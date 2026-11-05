@@ -131,6 +131,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::HPSliderBinder
   target: {fileID: 6347094533486906632}
   slider: {fileID: 5553545110276880037}
+  owner: 0
+  hpBarCanvas: {fileID: 0}
 --- !u!114 &2184202245129890923
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -148,6 +150,10 @@ MonoBehaviour:
   textColor: {r: 1, g: 1, b: 1, a: 1}
   fontSize: 4
   numberFormat: 0
+  font: {fileID: 11400000, guid: e630ae8bae655864ab0071ff5a93c44f, type: 2}
+  fontStyle: 0
+  sortingLayerName: Front UI
+  sortingOrder: 1000
   duration: 0.8
   worldOffset: {x: 0, y: 1, z: 0}
   worldRise: 1
