@@ -22,6 +22,14 @@ public class DescriptionHolder
         return null != description ? description.GetName() : string.Empty;
     }
 
+    /// <summary>
+    /// 번역 전 이름 키 (언어와 무관한 식별용)
+    /// </summary>
+    public string GetNameKey()
+    {
+        return null != description ? description.GetNameKey() : string.Empty;
+    }
+
     public Sprite GetSprite()
     {
         return null != description ? description.GetSprite() : null;

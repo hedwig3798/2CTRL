@@ -87,6 +87,7 @@ GameObject:
   - component: {fileID: 3257495165581128705}
   - component: {fileID: 3900046208465953334}
   - component: {fileID: 8435927627980881444}
+  - component: {fileID: 1874547804937565440}
   m_Layer: 0
   m_Name: Text (TMP)
   m_TagString: Untagged
@@ -141,7 +142,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: Reaume
+  m_text: "\uACC4\uC18D\uD558\uAE30"
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 2d563fa32bc55de479e271133d7ae902, type: 2}
   m_sharedMaterial: {fileID: 2764176041051116933, guid: 2d563fa32bc55de479e271133d7ae902, type: 2}
@@ -213,6 +214,19 @@ MonoBehaviour:
   m_hasFontAssetChanged: 0
   m_baseMaterial: {fileID: 0}
   m_maskOffset: {x: 0, y: 0, z: 0, w: 0}
+--- !u!114 &1874547804937565440
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1312747499898946956}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: db375a1c688f5ea428a7f18b698cb819, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Game.Runtime::LocalizedText
+  key: ui.levelup.resume
 --- !u!1 &1649527183971336569
 GameObject:
   m_ObjectHideFlags: 0
@@ -309,6 +323,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::LevelUpUI
   resumeButton: {fileID: 4892805582166811452}
+  resumeLabelKey: ui.levelup.resume
+  resumeLabel: {fileID: 8435927627980881444}
 --- !u!114 &6587578463437931376
 MonoBehaviour:
   m_ObjectHideFlags: 0

@@ -67,7 +67,8 @@ public class WeaponRewardEffect
             return;
         }
 
-        string weaponName = true == _data.HasName ? _data.GetName() : weaponPrefab.name;
+        // 번역 전 키를 넘긴다 (업그레이드 보상이 표시할 때 현재 언어로 바꾼다)
+        string weaponName = true == _data.HasName ? _data.GetNameKey() : weaponPrefab.name;
         RewardData upgrade = WeaponUpgradeRewardEffect.CreateRewardData(upgradeTable, weaponPrefab, weaponName, _data.GetImage(), 1);
         if (null != upgrade)
         {

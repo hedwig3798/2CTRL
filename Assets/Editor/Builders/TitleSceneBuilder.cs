@@ -118,8 +118,11 @@ namespace Builders
             vlg.childForceExpandWidth = false;
             vlg.childForceExpandHeight = false;
 
-            Button startButton = CreateButton("StartButton", menuRt, "게임 시작", 360f, 80f);
-            Button settingsButton = CreateButton("SettingsButton", menuRt, "설정", 360f, 80f);
+            LocalizationBuilderUtil.Reload();
+            Button startButton = CreateButton("StartButton", menuRt, string.Empty, 360f, 80f);
+            Button settingsButton = CreateButton("SettingsButton", menuRt, string.Empty, 360f, 80f);
+            LocalizationBuilderUtil.BindChildLabel(startButton, "ui.title.start");
+            LocalizationBuilderUtil.BindChildLabel(settingsButton, "ui.title.settings");
 
             // 설정 창 : ArtResourceBuilder 가 TitleCanvas 에 이미지를 뒤에 추가해도 가리지 않도록 별도 캔버스(위 순서)
             var settingsCanvasGo = new GameObject("SettingsCanvas", typeof(RectTransform), typeof(Canvas), typeof(CanvasScaler), typeof(GraphicRaycaster));

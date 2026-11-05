@@ -6,6 +6,7 @@ using UnityEngine.UI;
 /// 설정 창의 볼륨 한 줄 (슬라이더 + 음소거 토글 버튼)
 /// - 슬라이더 값(0~1)은 GameSettings.SetVolume, 버튼은 GameSettings.SetMuted 를 뒤집는다.
 /// - 켜질 때마다 GameSettings 값을 다시 읽고, 켜져 있는 동안은 변경 이벤트로 표시를 맞춘다.
+/// - 음소거 버튼 글자는 StringTable 키. 언어가 바뀌면 다시 표시한다.
 /// </summary>
 public class VolumeSettingRow
     : MonoBehaviour
@@ -20,8 +21,10 @@ public class VolumeSettingRow
     [SerializeField] private TMP_Text valueLabel;
 
     [Header("text")]
-    [SerializeField] private string unmutedText = "켜짐";
-    [SerializeField] private string mutedText = "음소거";
+    [Tooltip("켜짐 상태 버튼 글자 StringTable 키")]
+    [SerializeField] private string unmutedKey = "ui.settings.volume.on";
+    [Tooltip("음소거 상태 버튼 글자 StringTable 키")]
+    [SerializeField] private string mutedKey = "ui.settings.volume.muted";
     [Tooltip("볼륨 % 숫자 포맷 (0~100 정수)")]
     [SerializeField] private string valueNumberFormat = "0";
     [SerializeField] private string valueSuffix = "%";
@@ -46,6 +49,7 @@ public class VolumeSettingRow
             muteButton.onClick.AddListener(HandleMuteClicked);
         }
         GameSettings.OnVolumeChanged += HandleVolumeChanged;
+        StringTable.OnLanguageChanged += HandleLanguageChanged;
 
         Refresh();
     }
@@ -61,6 +65,7 @@ public class VolumeSettingRow
             muteButton.onClick.RemoveListener(HandleMuteClicked);
         }
         GameSettings.OnVolumeChanged -= HandleVolumeChanged;
+        StringTable.OnLanguageChanged -= HandleLanguageChanged;
     }
 
     /// <summary>
@@ -82,7 +87,7 @@ public class VolumeSettingRow
         }
         if (null != muteLabel)
         {
-            muteLabel.text = true == muted ? mutedText : unmutedText;
+            muteLabel.text = StringTable.Get(true == muted ? mutedKey : unmutedKey);
             muteLabel.color = true == muted ? mutedColor : unmutedColor;
         }
     }
@@ -97,6 +102,11 @@ public class VolumeSettingRow
     private void HandleMuteClicked()
     {
         GameSettings.SetMuted(channel, false == GameSettings.IsMuted(channel));
+        Refresh();
+    }
+
+    private void HandleLanguageChanged(Language _language)
+    {
         Refresh();
     }
 

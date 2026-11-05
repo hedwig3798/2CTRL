@@ -15,6 +15,7 @@ using UnityEngine.UI;
 ///   - RewardData 가 하나만 들어오면 들어온 하나의 정보만 표시한다
 ///   - 두 번째 데이터가 없으면 debuffArea(있으면) 를 숨긴다
 /// - key / value 는 따로 표시하지 않고 explain 에 포멧팅되어 표시되며, explain1 / explain2 별로 따로 저장한다.
+/// - 이름 / 설명은 RewardData 가 현재 언어로 돌려준다. 언어가 바뀌면 같은 데이터로 다시 표시한다.
 /// </summary>
 public class SelectPanel
     : MonoBehaviour
@@ -91,6 +92,26 @@ public class SelectPanel
         }
 
         ApplySelected();
+    }
+
+    private void OnEnable()
+    {
+        StringTable.OnLanguageChanged += HandleLanguageChanged;
+        // 꺼져 있는 동안 언어가 바뀌었을 수 있으므로 다시 표시
+        HandleLanguageChanged(StringTable.CurrentLanguage);
+    }
+
+    private void OnDisable()
+    {
+        StringTable.OnLanguageChanged -= HandleLanguageChanged;
+    }
+
+    private void HandleLanguageChanged(Language _language)
+    {
+        if (null != Data1 || null != Data2)
+        {
+            SetData(Data1, Data2);
+        }
     }
 
     // 인스펙터에서 isSelected 를 바꿨을 때도 바로 반영

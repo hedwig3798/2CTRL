@@ -12,6 +12,8 @@ using UnityEngine.UI;
 /// - 재시작 : 현재 씬을 다시 로드 (DimensionSelection 이 static 이라 같은 차원 설정 유지)
 /// - 타이틀 : titleSceneName 씬으로 이동
 /// - 시작 시 panel 을 끈다. panel 은 이 컴포넌트가 붙은 오브젝트의 자식으로 두는 것을 권장
+/// - 표시 문자열은 모두 StringTable 키. 표시 중에 언어가 바뀌면 마지막 통계로 다시 채운다
+/// - 무기 이름은 통계 키(무기 이름 StringTable 키 또는 오브젝트 이름)를 번역해서 표시 (키가 없으면 그대로)
 /// </summary>
 public class GameOverUI
     : MonoBehaviour
@@ -44,29 +46,37 @@ public class GameOverUI
     [SerializeField]
     private string titleSceneName = "TitleScene";
 
-    [Header("text")]
+    [Header("text (StringTable 키)")]
     [SerializeField]
-    private string titleText = "게임 오버";
+    private string titleKey = "gameover.title";
     [SerializeField]
-    private string victoryText = "승리";
+    private string victoryKey = "gameover.victory";
     [SerializeField]
-    private string leftHeader = "왼쪽 화면";
+    private string leftHeaderKey = "gameover.left_header";
     [SerializeField]
-    private string rightHeader = "오른쪽 화면";
+    private string rightHeaderKey = "gameover.right_header";
+    [Tooltip("{0} = 킬 수")]
     [SerializeField]
-    private string killFormat = "킬 : {0}";
+    private string killFormatKey = "gameover.kill";
+    [Tooltip("{0} = 받은 데미지")]
     [SerializeField]
-    private string damageTakenFormat = "받은 데미지 : {0:0}";
+    private string damageTakenFormatKey = "gameover.damage_taken";
     [SerializeField]
-    private string weaponHeader = "무기별 데미지";
+    private string weaponHeaderKey = "gameover.weapon_header";
+    [Tooltip("{0} = 무기 이름, {1} = 데미지")]
     [SerializeField]
-    private string weaponFormat = "  {0} : {1:0}";
+    private string weaponFormatKey = "gameover.weapon_line";
     [SerializeField]
-    private string noWeaponText = "  없음";
+    private string noWeaponKey = "gameover.no_weapon";
+    [Tooltip("{0} = 획득 EXP")]
     [SerializeField]
-    private string expFormat = "획득 EXP : {0:0}";
+    private string expFormatKey = "gameover.exp";
 
     private readonly StringBuilder builder = new StringBuilder(256);
+
+    // 언어가 바뀌었을 때 다시 채우기 위한 마지막 표시 내용
+    private StatisticsManager lastStats;
+    private bool lastVictory;
     private readonly List<KeyValuePair<string, float>> sortedWeapons = new List<KeyValuePair<string, float>>();
 
     public bool IsShown => null != panel && true == panel.activeSelf;
@@ -92,6 +102,9 @@ public class GameOverUI
         {
             titleButton.onClick.AddListener(GoToTitle);
         }
+        StringTable.OnLanguageChanged += HandleLanguageChanged;
+        // 꺼져 있는 동안 언어가 바뀌었을 수 있으므로 다시 표시 (표시 중일 때만 채움)
+        HandleLanguageChanged(StringTable.CurrentLanguage);
     }
 
     private void OnDisable()
@@ -104,6 +117,15 @@ public class GameOverUI
         {
             titleButton.onClick.RemoveListener(GoToTitle);
         }
+        StringTable.OnLanguageChanged -= HandleLanguageChanged;
+    }
+
+    private void HandleLanguageChanged(Language _language)
+    {
+        if (true == IsShown)
+        {
+            Fill(lastStats, lastVictory);
+        }
     }
 
     /// <summary>
@@ -112,20 +134,27 @@ public class GameOverUI
     /// </summary>
     public void Show(StatisticsManager _stats, bool _victory = false)
     {
-        string title = true == _victory ? victoryText : titleText;
+        lastStats = _stats;
+        lastVictory = _victory;
+        Fill(_stats, _victory);
+
+        if (null != panel)
+        {
+            panel.SetActive(true);
+        }
+    }
+
+    private void Fill(StatisticsManager _stats, bool _victory)
+    {
+        string title = StringTable.Get(true == _victory ? victoryKey : titleKey);
 
         if (null != titleLabel)
         {
             titleLabel.text = title;
         }
 
-        SetSideText(leftLabel, leftHeader, title, null != _stats ? _stats.Get(PlayerSide.Left) : null);
-        SetSideText(rightLabel, rightHeader, title, null != _stats ? _stats.Get(PlayerSide.Right) : null);
-
-        if (null != panel)
-        {
-            panel.SetActive(true);
-        }
+        SetSideText(leftLabel, StringTable.Get(leftHeaderKey), title, null != _stats ? _stats.Get(PlayerSide.Left) : null);
+        SetSideText(rightLabel, StringTable.Get(rightHeaderKey), title, null != _stats ? _stats.Get(PlayerSide.Right) : null);
     }
 
     public void Hide()
@@ -179,10 +208,10 @@ public class GameOverUI
         float damageTaken = null != _stats ? _stats.DamageTaken : 0f;
         float exp = null != _stats ? _stats.Exp : 0f;
 
-        builder.AppendFormat(killFormat, kills).AppendLine();
-        builder.AppendFormat(damageTakenFormat, damageTaken).AppendLine();
+        builder.AppendLine(StringTable.Format(killFormatKey, kills));
+        builder.AppendLine(StringTable.Format(damageTakenFormatKey, damageTaken));
 
-        builder.AppendLine(weaponHeader);
+        builder.AppendLine(StringTable.Get(weaponHeaderKey));
         sortedWeapons.Clear();
         if (null != _stats)
         {
@@ -191,17 +220,18 @@ public class GameOverUI
 
         if (0 == sortedWeapons.Count)
         {
-            builder.AppendLine(noWeaponText);
+            builder.AppendLine(StringTable.Get(noWeaponKey));
         }
         else
         {
+            string weaponFormat = StringTable.Get(weaponFormatKey);
             foreach (KeyValuePair<string, float> pair in sortedWeapons)
             {
-                builder.AppendFormat(weaponFormat, pair.Key, pair.Value).AppendLine();
+                builder.AppendLine(StringTable.FormatText(weaponFormat, StringTable.Resolve(pair.Key), pair.Value));
             }
         }
 
-        builder.AppendFormat(expFormat, exp);
+        builder.Append(StringTable.Format(expFormatKey, exp));
         return builder.ToString();
     }
 }

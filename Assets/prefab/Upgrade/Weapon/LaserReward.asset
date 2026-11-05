@@ -13,11 +13,11 @@ MonoBehaviour:
   m_Name: LaserReward
   m_EditorClassIdentifier: Assembly-CSharp::RewardData
   image: {fileID: 21300000, guid: ffe4f9ad0ba4cef4ba2360b6d5588817, type: 3}
-  rewardName: "\uB808\uC774\uC800"
+  rewardName: reward.weapon.laser.name
   hasKey: 0
   key: 0
   hasValue: 0
   value: 0
-  explain1: "\uAC00\uC7A5 \uAC00\uAE4C\uC6B4 \uC801\uC744 \uD5A5\uD574 \uC989\uC2DC \uAD11\uC120\uC744 \uC3D8\uC544 \uC77C\uC9C1\uC120 \uC704\uC758 \uC801\uB4E4\uC744 \uAD00\uD1B5\uD558\uB294 \uB808\uC774\uC800\uB97C \uC5BB\uC2B5\uB2C8\uB2E4."
+  explain1: reward.weapon.laser.explain
   explain2: 
   effect: {fileID: 11400000, guid: 6465db87d4374f5ea1fef4b8c69a3689, type: 2}

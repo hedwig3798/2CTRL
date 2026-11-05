@@ -13,11 +13,11 @@ MonoBehaviour:
   m_Name: TornadoReward
   m_EditorClassIdentifier: Game.Runtime::RewardData
   image: {fileID: 21300000, guid: 56f6ba944a1100a43a928115fed06013, type: 3}
-  rewardName: "\uD68C\uC624\uB9AC"
+  rewardName: reward.weapon.tornado.name
   hasKey: 0
   key: 0
   hasValue: 0
   value: 0
-  explain1: "\uC8FC\uBCC0\uC744 \uB5A0\uB3C4\uB294 \uD68C\uC624\uB9AC\uB97C \uB9CC\uB4E4\uC5B4 \uC801\uC744 \uB04C\uC5B4\uB2F9\uAE30\uACE0 \uC9C0\uC18D\uC801\uC73C\uB85C \uD0C0\uACA9\uD569\uB2C8\uB2E4."
+  explain1: reward.weapon.tornado.explain
   explain2: 
   effect: {fileID: 11400000, guid: 82b13b1821ccba047b879cd698b2d522, type: 2}

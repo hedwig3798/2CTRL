@@ -13,11 +13,11 @@ MonoBehaviour:
   m_Name: SpeedUpgrade
   m_EditorClassIdentifier: Assembly-CSharp::RewardData
   image: {fileID: 21300000, guid: b3a5edb3a7f2fd548b8868c1960b7906, type: 3}
-  rewardName: "\uC774\uB3D9\uC18D\uB3C4"
+  rewardName: reward.passive.move_speed.name
   hasKey: 1
   key: 2
   hasValue: 1
   value: 0.05
-  explain1: "{0}\uAC00 {1:0.#%} \uC99D\uAC00\uD569\uB2C8\uB2E4."
+  explain1: reward.passive.buff_ga
   explain2: 
   effect: {fileID: 11400000, guid: e4c3656f1c5b4de1a2fa7f0a8722220c, type: 2}

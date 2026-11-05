@@ -7,6 +7,7 @@ using UnityEngine.UI;
 /// - 무기 아이콘 + 아이콘 좌하단 레벨 숫자 (Weapon.UpgradeLevel, 최초 습득 0)
 /// - 아이콘이 없으면 아이콘을 숨기고 nameText 에 무기 이름을 표시한다
 /// - 레벨은 RefreshLevel 에서 이전 값과 비교해서 바뀔 때만 글자를 바꾼다
+/// - 무기 이름 · 레벨 포멧은 StringTable 키. 언어가 바뀌면 다시 표시한다
 /// </summary>
 [DisallowMultipleComponent]
 public class WeaponSlotUI
@@ -28,11 +29,15 @@ public class WeaponSlotUI
     [SerializeField]
     private GameObject contentRoot;
 
-    [Tooltip("레벨 표시 포멧 ({0} = 레벨)")]
+    [Tooltip("레벨 표시 포멧 StringTable 키 ({0} = 레벨)")]
     [SerializeField]
-    private string levelFormat = "{0}";
+    private string levelFormatKey = "hud.weapon_slot.level";
 
     private Weapon weapon;
+
+    // 아이콘이 없을 때 표시할 이름 키 (또는 그대로 표시할 이름)
+    private string fallbackNameKey;
+    private bool hasIcon;
 
     // 마지막으로 표시한 레벨 (-1 이면 아직 표시 전)
     private int displayedLevel = -1;
@@ -55,27 +60,58 @@ public class WeaponSlotUI
     /// <summary>
     /// 무기를 표시한다
     /// - _icon 이 null 이면 아이콘을 숨기고 _fallbackName 을 nameText 에 표시한다
+    /// - _fallbackName 은 StringTable 키 (키가 없으면 그대로 표시)
     /// </summary>
     public void SetWeapon(Weapon _weapon, Sprite _icon, string _fallbackName)
     {
         weapon = _weapon;
         SetContentActive(true);
 
-        bool hasIcon = null != _icon;
+        hasIcon = null != _icon;
+        fallbackNameKey = _fallbackName;
         if (null != iconImage)
         {
             iconImage.sprite = _icon;
             iconImage.enabled = hasIcon;
         }
 
-        if (null != nameText)
-        {
-            nameText.text = hasIcon ? string.Empty : (null != _fallbackName ? _fallbackName : string.Empty);
-            nameText.gameObject.SetActive(false == hasIcon);
-        }
+        ApplyName();
 
         displayedLevel = -1;
         RefreshLevel();
+    }
+
+    private void OnEnable()
+    {
+        StringTable.OnLanguageChanged += HandleLanguageChanged;
+        // 꺼져 있는 동안 언어가 바뀌었을 수 있으므로 다시 표시
+        HandleLanguageChanged(StringTable.CurrentLanguage);
+    }
+
+    private void OnDisable()
+    {
+        StringTable.OnLanguageChanged -= HandleLanguageChanged;
+    }
+
+    private void HandleLanguageChanged(Language _language)
+    {
+        if (null == weapon)
+        {
+            return;
+        }
+        ApplyName();
+        displayedLevel = -1;
+        RefreshLevel();
+    }
+
+    private void ApplyName()
+    {
+        if (null == nameText)
+        {
+            return;
+        }
+        nameText.text = hasIcon ? string.Empty : StringTable.Resolve(fallbackNameKey);
+        nameText.gameObject.SetActive(false == hasIcon);
     }
 
     /// <summary>
@@ -85,6 +121,7 @@ public class WeaponSlotUI
     {
         weapon = null;
         displayedLevel = -1;
+        fallbackNameKey = null;
 
         if (null != iconImage)
         {
@@ -110,7 +147,7 @@ public class WeaponSlotUI
             return;
         }
         displayedLevel = level;
-        levelText.text = string.Format(levelFormat, level);
+        levelText.text = StringTable.FormatText(StringTable.Resolve(levelFormatKey), level);
     }
 
     private void SetContentActive(bool _active)

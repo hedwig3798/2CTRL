@@ -1,3 +1,4 @@
+using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -6,6 +7,7 @@ using UnityEngine.UI;
 /// - EventManager.OnLevelUp 을 구독하므로, 항상 활성 상태인 Canvas 루트에 붙이고 자식 전체를 On/Off 한다.
 /// - 한 번에 여러 레벨이 오르면 오른 레벨 수만큼 버튼을 눌러야 재개된다.
 /// - 자식 SelectPanelGroup 에서 선택지를 고르기 전에는 재개 버튼이 비활성화된다.
+/// - 재개 버튼 글자는 resumeLabelKey 로 채운다 (프리팹에 박힌 글자 대신. 언어가 바뀌면 다시 채움)
 /// </summary>
 public class LevelUpUI
     : MonoBehaviour
@@ -13,6 +15,14 @@ public class LevelUpUI
     [Tooltip("누르면 게임을 재개하는 버튼")]
     [SerializeField]
     private Button resumeButton;
+
+    [Tooltip("재개 버튼 글자 StringTable 키 (비우면 프리팹 글자 그대로)")]
+    [SerializeField]
+    private string resumeLabelKey = "ui.levelup.resume";
+
+    [Tooltip("재개 버튼 글자 (비우면 버튼 자식에서 찾는다. LocalizedText 가 붙은 라벨은 건드리지 않음)")]
+    [SerializeField]
+    private TMP_Text resumeLabel;
 
     // 아직 처리하지 않은 레벨업 횟수
     private int pendingCount = 0;
@@ -87,10 +97,42 @@ public class LevelUpUI
             group.OnSelectionChanged += HandleSelectionChanged;
         }
         UpdateResumeButton();
+
+        StringTable.OnLanguageChanged += HandleLanguageChanged;
+        ApplyResumeLabel();
+    }
+
+    private void HandleLanguageChanged(Language _language)
+    {
+        ApplyResumeLabel();
+    }
+
+    private void ApplyResumeLabel()
+    {
+        if (null == resumeButton || true == string.IsNullOrEmpty(resumeLabelKey))
+        {
+            return;
+        }
+        if (null == resumeLabel)
+        {
+            TMP_Text found = resumeButton.GetComponentInChildren<TMP_Text>(true);
+            // LocalizedText 가 관리하는 라벨이면 덮어쓰지 않는다
+            if (null != found && null != found.GetComponent<LocalizedText>())
+            {
+                return;
+            }
+            resumeLabel = found;
+        }
+        if (null != resumeLabel)
+        {
+            resumeLabel.text = StringTable.Get(resumeLabelKey);
+        }
     }
 
     private void OnDisable()
     {
+        StringTable.OnLanguageChanged -= HandleLanguageChanged;
+
         // 열린 채로 씬이 바뀌면(재시작·타이틀) 다음 씬이 멈춘 채 시작하지 않도록 일시정지 요청을 푼다
         if (true == isOpen)
         {

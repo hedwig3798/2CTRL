@@ -13,11 +13,11 @@ MonoBehaviour:
   m_Name: ShockwaveReward
   m_EditorClassIdentifier: Assembly-CSharp::RewardData
   image: {fileID: 21300000, guid: 3ce5265709b602c449aaf43807bb7762, type: 3}
-  rewardName: "\uCDA9\uACA9\uD30C"
+  rewardName: reward.weapon.shockwave.name
   hasKey: 0
   key: 0
   hasValue: 0
   value: 0
-  explain1: "\uC8FC\uAE30\uC801\uC73C\uB85C \uC8FC\uBCC0\uC5D0 \uCDA9\uACA9\uD30C\uB97C \uD37C\uB728\uB824 \uB2FF\uC740 \uC801\uC5D0\uAC8C \uD53C\uD574\uB97C \uC8FC\uACE0 \uBA40\uB9AC \uBC00\uCCD0\uB0C5\uB2C8\uB2E4."
+  explain1: reward.weapon.shockwave.explain
   explain2: 
   effect: {fileID: 11400000, guid: c02170e609dc4e34becdee704a9844fd, type: 2}

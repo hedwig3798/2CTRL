@@ -31,7 +31,7 @@ namespace Builders
         private struct Def
         {
             public string id;
-            public string displayName;
+            public string displayNameKey; // StringTable 키
             public Color theme;
             public string[] weapons;
             public string loader;
@@ -40,12 +40,12 @@ namespace Builders
 
         private static readonly Def[] DEFS =
         {
-            new Def { id = "Forest", displayName = "숲", theme = new Color(0.35f, 0.75f, 0.35f, 1f),
+            new Def { id = "Forest", displayNameKey = "dimension.forest.name", theme = new Color(0.35f, 0.75f, 0.35f, 1f),
                 weapons = new[] { "Boomerang", "PoisonZone", "Sweep", "SplitShot", "Vine", "Spirit", "Root" }, loader = FOREST_LOADER, preview = FOREST_PREVIEW },
-            new Def { id = "Factory", displayName = "공장", theme = new Color(0.85f, 0.55f, 0.2f, 1f),
+            new Def { id = "Factory", displayNameKey = "dimension.factory.name", theme = new Color(0.85f, 0.55f, 0.2f, 1f),
                 weapons = new[] { "Laser", "Drone", "Mine", "Saw", "Flame" }, loader = FACTORY_LOADER, preview = FACTORY_PREVIEW },
             // 폭풍 맵은 임시로 공장 맵 (전용 타일 셋은 아트 단계)
-            new Def { id = "Storm", displayName = "폭풍", theme = new Color(0.45f, 0.55f, 1f, 1f),
+            new Def { id = "Storm", displayNameKey = "dimension.storm.name", theme = new Color(0.45f, 0.55f, 1f, 1f),
                 weapons = new[] { "Chain", "Shockwave", "Explosive", "Tornado", "Lightning" }, loader = FACTORY_LOADER, preview = FACTORY_PREVIEW },
         };
 
@@ -133,7 +133,7 @@ namespace Builders
                 WaveData[] waves = Wave30Builder.LoadWaves(def.id);
 
                 var so = new SerializedObject(data);
-                so.FindProperty("displayName").stringValue = def.displayName;
+                so.FindProperty("displayNameKey").stringValue = def.displayNameKey;
                 so.FindProperty("themeColor").colorValue = def.theme;
                 so.FindProperty("previewSprite").objectReferenceValue = null != previewRenderer ? previewRenderer.sprite : null;
                 so.FindProperty("startWeapon").objectReferenceValue = start;
@@ -147,7 +147,7 @@ namespace Builders
                 EditorUtility.SetDirty(data);
 
                 RewardData startReward = data.FindStartWeaponReward();
-                sb.AppendLine(def.id + "(" + def.displayName + "): start=" + (null != start ? start.name : "null")
+                sb.AppendLine(def.id + "(" + def.displayNameKey + "): start=" + (null != start ? start.name : "null")
                     + " startReward=" + (null != startReward ? startReward.name : "없음")
                     + " rewards=[" + string.Join(",", rewards.Select(r => null != r ? r.name : "null")) + "]"
                     + " waves=" + waves.Length

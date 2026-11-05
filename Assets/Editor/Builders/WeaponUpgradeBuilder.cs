@@ -43,6 +43,7 @@ namespace Builders
         public static string Build()
         {
             var sb = new StringBuilder();
+            LocalizationBuilderUtil.Reload();
             EnsureFolder(TABLE_DIR);
             EnsureFolder(CHAIN_DIR);
 
@@ -70,6 +71,19 @@ namespace Builders
                 var so = new SerializedObject(effect);
                 so.FindProperty("upgradeTable").objectReferenceValue = tables[w];
                 so.ApplyModifiedPropertiesWithoutUndo();
+
+                // 기존 무기 보상 이름 / 설명을 StringTable 키로 (다른 필드는 건드리지 않음)
+                var reward = AssetDatabase.LoadAssetAtPath<RewardData>($"{REWARD_DIR}/{w}Reward.asset");
+                if (null == reward)
+                {
+                    sb.AppendLine($"missing reward {w}");
+                    continue;
+                }
+                var rso = new SerializedObject(reward);
+                rso.FindProperty("rewardName").stringValue = LocalizationBuilderUtil.WeaponRewardNameKey(w);
+                rso.FindProperty("explain1").stringValue = LocalizationBuilderUtil.WeaponRewardExplainKey(w);
+                rso.ApplyModifiedPropertiesWithoutUndo();
+                EditorUtility.SetDirty(reward);
             }
 
             // 무기 프리팹 기본값 (0 이면 설정)
@@ -132,10 +146,10 @@ namespace Builders
                 {
                     so.FindProperty("image").objectReferenceValue = new SerializedObject(reference).FindProperty("image").objectReferenceValue;
                 }
-                so.FindProperty("rewardName").stringValue = "체인 라이트닝";
+                so.FindProperty("rewardName").stringValue = LocalizationBuilderUtil.WeaponRewardNameKey("Chain");
                 so.FindProperty("hasKey").boolValue = false;
                 so.FindProperty("hasValue").boolValue = false;
-                so.FindProperty("explain1").stringValue = "가장 가까운 적에게 번개를 쏘고, 주변의 다른 적에게 차례로 전이하며 타격하는 무기를 얻습니다.";
+                so.FindProperty("explain1").stringValue = LocalizationBuilderUtil.WeaponRewardExplainKey("Chain");
                 so.FindProperty("explain2").stringValue = string.Empty;
                 so.FindProperty("effect").objectReferenceValue = chainEffect;
                 so.ApplyModifiedPropertiesWithoutUndo();
@@ -346,7 +360,9 @@ namespace Builders
 
         private static WeaponModifier M(WeaponParam _p, StatModifierMode _m, float _v) => new WeaponModifier(_p, _m, _v);
 
-        private static WeaponUpgradeStep S(string _title, string _desc, params WeaponModifier[] _mods) => new WeaponUpgradeStep(_title, _desc, _mods);
+        // 표는 한국어 원문으로 적고, 단계에는 StringTable 키를 기록한다 (원문 → 키 역조회. 표에 없으면 경고 후 원문)
+        private static WeaponUpgradeStep S(string _title, string _desc, params WeaponModifier[] _mods)
+            => new WeaponUpgradeStep(LocalizationBuilderUtil.KeyOfKorean(_title), LocalizationBuilderUtil.KeyOfKorean(_desc), _mods);
 
         private static WeaponUpgradeStep Dmg() => S("데미지 +20%", "데미지 +20%", M(WeaponParam.Damage, MUL, 0.2f));
         private static WeaponUpgradeStep As() => S("공속 +15%", "공격 속도 +15%", M(WeaponParam.AttackSpeed, MUL, 0.15f));

@@ -88,7 +88,9 @@ namespace Builders
             SettingsUIKit.Slice(window, "PanelDark", Color.white);
             SettingsUIKit.Center(window.rectTransform, WINDOW_SIZE, Vector2.zero);
 
-            TextMeshProUGUI title = SettingsUIKit.MakeLabel("Title", window.transform, "일시정지", TITLE_SIZE, TextAlignmentOptions.Center);
+            LocalizationBuilderUtil.Reload();
+            TextMeshProUGUI title = SettingsUIKit.MakeLabel("Title", window.transform, string.Empty, TITLE_SIZE, TextAlignmentOptions.Center);
+            LocalizationBuilderUtil.Bind(title, "ui.pause.title");
             RectTransform titleRt = title.rectTransform;
             titleRt.anchorMin = new Vector2(0f, 1f);
             titleRt.anchorMax = new Vector2(1f, 1f);
@@ -103,9 +105,12 @@ namespace Builders
             buttons.offsetMax = new Vector2(-40f, -176f);
             SettingsUIKit.AddVertical(buttons.gameObject, 24f, TextAnchor.UpperCenter);
 
-            Button resume = SettingsUIKit.MakeButton("ResumeButton", buttons, "계속하기", BUTTON_SIZE.x, BUTTON_SIZE.y, BUTTON_TEXT_SIZE);
-            Button settings = SettingsUIKit.MakeButton("SettingsButton", buttons, "설정", BUTTON_SIZE.x, BUTTON_SIZE.y, BUTTON_TEXT_SIZE);
-            Button toTitle = SettingsUIKit.MakeButton("TitleButton", buttons, "타이틀로", BUTTON_SIZE.x, BUTTON_SIZE.y, BUTTON_TEXT_SIZE);
+            Button resume = SettingsUIKit.MakeButton("ResumeButton", buttons, string.Empty, BUTTON_SIZE.x, BUTTON_SIZE.y, BUTTON_TEXT_SIZE);
+            Button settings = SettingsUIKit.MakeButton("SettingsButton", buttons, string.Empty, BUTTON_SIZE.x, BUTTON_SIZE.y, BUTTON_TEXT_SIZE);
+            Button toTitle = SettingsUIKit.MakeButton("TitleButton", buttons, string.Empty, BUTTON_SIZE.x, BUTTON_SIZE.y, BUTTON_TEXT_SIZE);
+            LocalizationBuilderUtil.BindChildLabel(resume, "ui.pause.resume");
+            LocalizationBuilderUtil.BindChildLabel(settings, "ui.pause.settings");
+            LocalizationBuilderUtil.BindChildLabel(toTitle, "ui.pause.to_title");
 
             SettingsUIKit.StyleButton(resume);
             SettingsUIKit.StyleButton(settings);

@@ -13,11 +13,11 @@ MonoBehaviour:
   m_Name: MineReward
   m_EditorClassIdentifier: Assembly-CSharp::RewardData
   image: {fileID: 21300000, guid: 10946fc30f701f648aec33c314fdc74b, type: 3}
-  rewardName: "\uC9C0\uB8B0"
+  rewardName: reward.weapon.mine.name
   hasKey: 0
   key: 0
   hasValue: 0
   value: 0
-  explain1: "\uBC1C\uBC11\uC5D0 \uC9C0\uB8B0\uB97C \uC124\uCE58\uD569\uB2C8\uB2E4. \uC7A0\uC2DC \uD6C4 \uD65C\uC131\uD654\uB41C \uC9C0\uB8B0\uB97C \uC801\uC774 \uBC1F\uC73C\uBA74 \uD3ED\uBC1C\uD574 \uC8FC\uBCC0 \uC801\uC5D0\uAC8C \uD53C\uD574\uB97C \uC8FC\uACE0 \uBC00\uC5B4\uB0C5\uB2C8\uB2E4."
+  explain1: reward.weapon.mine.explain
   explain2: 
   effect: {fileID: 11400000, guid: 7b13db159f8f4722ac37989b3afcd189, type: 2}

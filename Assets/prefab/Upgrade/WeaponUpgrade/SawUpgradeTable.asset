@@ -14,62 +14,62 @@ MonoBehaviour:
   m_EditorClassIdentifier: Game.Runtime::WeaponUpgradeTable
   rewardWeight: 1.5
   steps:
-  - title: "\uB370\uBBF8\uC9C0 +20%"
-    description: "\uB370\uBBF8\uC9C0 +20%"
+  - title: upgrade.damage_plus_20pct
+    description: upgrade.damage_plus_20pct
     modifiers:
     - param: 0
       mode: 1
       value: 0.2
-  - title: "\uD06C\uAE30 +20%"
-    description: "\uD06C\uAE30 +20%"
+  - title: upgrade.size_plus_20pct
+    description: upgrade.size_plus_20pct
     modifiers:
     - param: 100
       mode: 1
       value: 0.2
-  - title: "\uC774\uB3D9 \uC18D\uB3C4 +20%"
-    description: "\uC774\uB3D9 \uC18D\uB3C4 +20%"
+  - title: upgrade.move_speed_plus_20pct
+    description: upgrade.move_speed_plus_20pct
     modifiers:
     - param: 8
       mode: 1
       value: 0.2
-  - title: "\uB370\uBBF8\uC9C0 +20%"
-    description: "\uB370\uBBF8\uC9C0 +20%"
+  - title: upgrade.damage_plus_20pct
+    description: upgrade.damage_plus_20pct
     modifiers:
     - param: 0
       mode: 1
       value: 0.2
-  - title: "\u2605 \uD1B1\uB0A0 +2 (4\uAC1C)"
-    description: "\uD1B1\uB0A0 +2 (4\uAC1C)"
+  - title: upgrade.star_blades_plus_2_4_total
+    description: upgrade.blades_plus_2_4_total
     modifiers:
     - param: 3
       mode: 0
       value: 2
-  - title: "\uB370\uBBF8\uC9C0 +20%"
-    description: "\uB370\uBBF8\uC9C0 +20%"
+  - title: upgrade.damage_plus_20pct
+    description: upgrade.damage_plus_20pct
     modifiers:
     - param: 0
       mode: 1
       value: 0.2
-  - title: "\uACF5\uC18D +15%"
-    description: "\uACF5\uC18D +15%"
+  - title: upgrade.atk_speed_plus_15pct
+    description: upgrade.atk_speed_plus_15pct
     modifiers:
     - param: 1
       mode: 1
       value: 0.15
-  - title: "\uB370\uBBF8\uC9C0 +20%"
-    description: "\uB370\uBBF8\uC9C0 +20%"
+  - title: upgrade.damage_plus_20pct
+    description: upgrade.damage_plus_20pct
     modifiers:
     - param: 0
       mode: 1
       value: 0.2
-  - title: "\uB370\uBBF8\uC9C0 +20%"
-    description: "\uB370\uBBF8\uC9C0 +20%"
+  - title: upgrade.damage_plus_20pct
+    description: upgrade.damage_plus_20pct
     modifiers:
     - param: 0
       mode: 1
       value: 0.2
-  - title: "\u2605 \uD295\uAE40"
-    description: "\uD295\uAE40"
+  - title: upgrade.star_bounce
+    description: upgrade.bounce
     modifiers:
     - param: 210
       mode: 0

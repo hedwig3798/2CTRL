@@ -39,6 +39,7 @@ namespace Builders
                 scene = EditorSceneManager.OpenScene(SCENE_PATH, OpenSceneMode.Single);
             }
 
+            LocalizationBuilderUtil.Reload();
             TMP_FontAsset font = AssetDatabase.LoadAssetAtPath<TMP_FontAsset>(FONT_PATH);
             if (null == font)
             {
@@ -75,16 +76,22 @@ namespace Builders
 
             // 상단 디버그 IMGUI 박스(720p 기준 약 210px = 29%)를 피해 제목은 아래로
             TMP_Text title = MakeLabel(panelGo.transform, panelGo.transform, "Title", font, 96f, TextAlignmentOptions.Center,
-                new Vector2(0f, 0.58f), new Vector2(1f, 0.70f), "게임 오버");
+                new Vector2(0f, 0.58f), new Vector2(1f, 0.70f), LocalizationBuilderUtil.Ko("gameover.title"));
             title.fontStyle = FontStyles.Bold;
+            // 제목 / 통계 라벨은 GameOverUI 가 키로 채운다 (LocalizedText 를 붙이지 않음)
+            LocalizationBuilderUtil.Unbind(title);
 
             Transform leftCard = MakeCard(panelGo.transform, "LeftCard", 0.07f, 0.48f);
             Transform rightCard = MakeCard(panelGo.transform, "RightCard", 0.52f, 0.93f);
-            TMP_Text left = MakeCardLabel(panelGo.transform, leftCard, "LeftLabel", font, "왼쪽 화면");
-            TMP_Text right = MakeCardLabel(panelGo.transform, rightCard, "RightLabel", font, "오른쪽 화면");
+            TMP_Text left = MakeCardLabel(panelGo.transform, leftCard, "LeftLabel", font, LocalizationBuilderUtil.Ko("gameover.left_header"));
+            TMP_Text right = MakeCardLabel(panelGo.transform, rightCard, "RightLabel", font, LocalizationBuilderUtil.Ko("gameover.right_header"));
+            LocalizationBuilderUtil.Unbind(left);
+            LocalizationBuilderUtil.Unbind(right);
 
-            Button restart = MakeButton(panelGo.transform, "RestartButton", font, "재시작", 0.30f, 0.48f);
-            Button toTitle = MakeButton(panelGo.transform, "TitleButton", font, "타이틀", 0.52f, 0.70f);
+            Button restart = MakeButton(panelGo.transform, "RestartButton", font, string.Empty, 0.30f, 0.48f);
+            Button toTitle = MakeButton(panelGo.transform, "TitleButton", font, string.Empty, 0.52f, 0.70f);
+            LocalizationBuilderUtil.BindChildLabel(restart, "gameover.restart");
+            LocalizationBuilderUtil.BindChildLabel(toTitle, "gameover.to_title");
 
             // 에디터에서 패널은 꺼 둔다 (런타임 Awake 에서도 끈다)
             panelGo.SetActive(false);
@@ -96,9 +103,9 @@ namespace Builders
             uiSo.FindProperty("rightLabel").objectReferenceValue = right;
             uiSo.FindProperty("restartButton").objectReferenceValue = restart;
             uiSo.FindProperty("titleButton").objectReferenceValue = toTitle;
-            // 싱글 게임: 좌우는 플레이어가 아니라 화면 구분
-            uiSo.FindProperty("leftHeader").stringValue = "왼쪽 화면";
-            uiSo.FindProperty("rightHeader").stringValue = "오른쪽 화면";
+            // 싱글 게임: 좌우는 플레이어가 아니라 화면 구분 (StringTable 키)
+            uiSo.FindProperty("leftHeaderKey").stringValue = "gameover.left_header";
+            uiSo.FindProperty("rightHeaderKey").stringValue = "gameover.right_header";
             uiSo.ApplyModifiedPropertiesWithoutUndo();
 
             // 4. GameOverManager

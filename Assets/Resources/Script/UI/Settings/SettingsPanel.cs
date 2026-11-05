@@ -6,7 +6,9 @@ using UnityEngine.UI;
 
 /// <summary>
 /// 재사용 설정 창 (Assets/prefab/UI/SettingsPanel.prefab, SettingsPanelBuilder 가 생성)
-/// - 화면 크기 드롭다운 / 적 체력바 표시 / 데미지 표시 / 볼륨 3줄(VolumeSettingRow)
+/// - 언어 드롭다운 / 화면 크기 드롭다운 / 적 체력바 표시 / 데미지 표시 / 볼륨 3줄(VolumeSettingRow)
+/// - 언어 드롭다운 항목은 문자열 테이블을 거치지 않는 각 언어 고유 표기 (LanguageInfo.GetNativeName)
+/// - 언어가 바뀌면 화면 크기 드롭다운 옵션("전체 화면")을 다시 만든다 (고정 라벨은 LocalizedText 가 갱신)
 /// - 이 컴포넌트가 붙은 오브젝트 자체를 켜고 끈다. 씬에는 꺼진 상태로 두고 Open() 으로 연다.
 /// - 값은 바뀌는 즉시 GameSettings 에 반영되고, 닫을 때 GameSettings.Save() 로 디스크에 저장한다.
 /// - ESC 처리는 여는 쪽(TitleMenu, PauseMenu)이 한다. (같은 프레임에 두 번 처리되지 않도록)
@@ -18,6 +20,9 @@ using UnityEngine.UI;
 public class SettingsPanel
     : MonoBehaviour
 {
+    [Header("언어")]
+    [SerializeField] private TMP_Dropdown languageDropdown;
+
     [Header("화면")]
     [SerializeField] private TMP_Dropdown screenModeDropdown;
 
@@ -73,6 +78,10 @@ public class SettingsPanel
         {
             screenModeDropdown.Hide();
         }
+        if (null != languageDropdown && true == languageDropdown.IsExpanded)
+        {
+            languageDropdown.Hide();
+        }
 
         gameObject.SetActive(false);
         GameSettings.Save();
@@ -91,6 +100,10 @@ public class SettingsPanel
     {
         Refresh();
 
+        if (null != languageDropdown)
+        {
+            languageDropdown.onValueChanged.AddListener(HandleLanguageDropdownChanged);
+        }
         if (null != screenModeDropdown)
         {
             screenModeDropdown.onValueChanged.AddListener(HandleScreenModeChanged);
@@ -111,10 +124,15 @@ public class SettingsPanel
         GameSettings.OnScreenModeChanged += HandleSettingsScreenModeChanged;
         GameSettings.OnShowEnemyHPBarChanged += HandleSettingsEnemyHPBarChanged;
         GameSettings.OnShowDamageTextChanged += HandleSettingsDamageTextChanged;
+        GameSettings.OnLanguageChanged += HandleSettingsLanguageChanged;
     }
 
     private void OnDisable()
     {
+        if (null != languageDropdown)
+        {
+            languageDropdown.onValueChanged.RemoveListener(HandleLanguageDropdownChanged);
+        }
         if (null != screenModeDropdown)
         {
             screenModeDropdown.onValueChanged.RemoveListener(HandleScreenModeChanged);
@@ -135,6 +153,7 @@ public class SettingsPanel
         GameSettings.OnScreenModeChanged -= HandleSettingsScreenModeChanged;
         GameSettings.OnShowEnemyHPBarChanged -= HandleSettingsEnemyHPBarChanged;
         GameSettings.OnShowDamageTextChanged -= HandleSettingsDamageTextChanged;
+        GameSettings.OnLanguageChanged -= HandleSettingsLanguageChanged;
 
         UnhookDropdownItems();
         wasDropdownExpanded = false;
@@ -218,18 +237,8 @@ public class SettingsPanel
     /// </summary>
     public void Refresh()
     {
-        if (null != screenModeDropdown)
-        {
-            optionBuffer.Clear();
-            for (int i = 0; i < ScreenModes.Count; ++i)
-            {
-                optionBuffer.Add(ScreenModes.GetLabel(i));
-            }
-            screenModeDropdown.ClearOptions();
-            screenModeDropdown.AddOptions(optionBuffer);
-            screenModeDropdown.SetValueWithoutNotify(GameSettings.ScreenModeIndex);
-            screenModeDropdown.RefreshShownValue();
-        }
+        RefreshLanguageOptions();
+        RefreshScreenModeOptions();
         if (null != enemyHPBarToggle)
         {
             enemyHPBarToggle.SetIsOnWithoutNotify(GameSettings.ShowEnemyHPBar);
@@ -248,6 +257,63 @@ public class SettingsPanel
                 }
             }
         }
+    }
+
+    /// <summary>
+    /// 언어 드롭다운 옵션 (각 언어 고유 표기, 언어와 무관하게 고정) 과 현재 언어
+    /// </summary>
+    private void RefreshLanguageOptions()
+    {
+        if (null == languageDropdown)
+        {
+            return;
+        }
+
+        optionBuffer.Clear();
+        for (int i = 0; i < LanguageInfo.Count; ++i)
+        {
+            optionBuffer.Add(LanguageInfo.GetNativeName((Language)i));
+        }
+        languageDropdown.ClearOptions();
+        languageDropdown.AddOptions(optionBuffer);
+        languageDropdown.SetValueWithoutNotify((int)GameSettings.Language);
+        languageDropdown.RefreshShownValue();
+    }
+
+    /// <summary>
+    /// 화면 크기 드롭다운 옵션 (현재 언어의 "전체 화면" 라벨) 과 현재 화면 모드
+    /// </summary>
+    private void RefreshScreenModeOptions()
+    {
+        if (null == screenModeDropdown)
+        {
+            return;
+        }
+
+        optionBuffer.Clear();
+        for (int i = 0; i < ScreenModes.Count; ++i)
+        {
+            optionBuffer.Add(ScreenModes.GetLabel(i));
+        }
+        screenModeDropdown.ClearOptions();
+        screenModeDropdown.AddOptions(optionBuffer);
+        screenModeDropdown.SetValueWithoutNotify(GameSettings.ScreenModeIndex);
+        screenModeDropdown.RefreshShownValue();
+    }
+
+    private void HandleLanguageDropdownChanged(int _index)
+    {
+        GameSettings.Language = LanguageInfo.Clamp(_index);
+    }
+
+    private void HandleSettingsLanguageChanged(Language _language)
+    {
+        if (null != languageDropdown)
+        {
+            languageDropdown.SetValueWithoutNotify((int)_language);
+            languageDropdown.RefreshShownValue();
+        }
+        RefreshScreenModeOptions();
     }
 
     private void HandleScreenModeChanged(int _index)

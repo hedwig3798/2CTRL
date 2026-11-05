@@ -1,4 +1,5 @@
 using UnityEngine;
+using UnityEngine.Serialization;
 
 /// <summary>
 /// 차원 하나의 설정 (선택 카드, 시작 무기, 무기 풀, 상대 진영 웨이브, 몬스터·플레이어 외형, 맵)
@@ -10,8 +11,10 @@ public class DimensionData
     : ScriptableObject
 {
     [Header("Card")]
+    [Tooltip("카드에 표시할 이름 StringTable 키 (예: dimension.forest.name. 키가 없으면 그대로 표시, 비우면 에셋 이름)")]
+    [FormerlySerializedAs("displayName")]
     [SerializeField]
-    private string displayName;
+    private string displayNameKey;
 
     [SerializeField]
     private Sprite previewSprite;
@@ -50,7 +53,11 @@ public class DimensionData
     [SerializeField]
     private Sprite playerSprite;
 
-    public string DisplayName => true == string.IsNullOrEmpty(displayName) ? name : displayName;
+    /// <summary>
+    /// 현재 언어 표시 이름
+    /// </summary>
+    public string DisplayName => true == string.IsNullOrEmpty(displayNameKey) ? name : StringTable.Resolve(displayNameKey);
+    public string DisplayNameKey => displayNameKey;
     public Sprite PreviewSprite => previewSprite;
     public Color ThemeColor => themeColor;
     public Weapon StartWeapon => startWeapon;

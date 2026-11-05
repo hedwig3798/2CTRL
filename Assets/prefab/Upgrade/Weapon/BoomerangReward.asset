@@ -13,11 +13,11 @@ MonoBehaviour:
   m_Name: BoomerangReward
   m_EditorClassIdentifier: Assembly-CSharp::RewardData
   image: {fileID: 21300000, guid: 9bcd85619210454449030f927a6d002d, type: 3}
-  rewardName: "\uBD80\uBA54\uB791"
+  rewardName: reward.weapon.boomerang.name
   hasKey: 0
   key: 0
   hasValue: 0
   value: 0
-  explain1: "\uC801\uC744 \uD5A5\uD574 \uB0A0\uC544\uAC14\uB2E4\uAC00 \uB3CC\uC544\uC624\uBA70 \uD55C \uBC88 \uB354 \uD0C0\uACA9\uD558\uB294 \uBD80\uBA54\uB791\uC744 \uC5BB\uC2B5\uB2C8\uB2E4."
+  explain1: reward.weapon.boomerang.explain
   explain2: 
   effect: {fileID: 11400000, guid: cc9113f34bfb4f1c9bc12b749d75d80d, type: 2}

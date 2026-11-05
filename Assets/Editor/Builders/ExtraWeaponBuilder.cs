@@ -28,30 +28,22 @@ namespace Builders
         // 업그레이드 보상 가중치 (docs/balance-design.md 4.3)
         private const float UPGRADE_REWARD_WEIGHT = 1.5f;
 
+        // 이름 / 설명은 StringTable 키 reward.weapon.<id>.name / .explain (원문은 StringTable.csv)
         private struct RewardDef
         {
             public string name;
-            public string displayName;
-            public string explain;
             public string iconFrom; // 임시 아이콘을 가져올 기존 보상
         }
 
         private static readonly RewardDef[] REWARDS =
         {
-            new RewardDef { name = "Vine", displayName = "덩굴", iconFrom = "PoisonZone",
-                explain = "지나간 자리에 가시 덩굴을 남겨, 덩굴 위의 적들에게 지속적으로 피해를 줍니다." },
-            new RewardDef { name = "Spirit", displayName = "정령", iconFrom = "Drone",
-                explain = "주변을 떠다니는 정령을 소환합니다. 정령은 가까운 적을 쫓아가 여러 번 공격합니다." },
-            new RewardDef { name = "Root", displayName = "뿌리 속박", iconFrom = "PoisonZone",
-                explain = "주변 무작위 위치에 뿌리 지역을 만들어, 지역 위의 적에게 피해를 주고 느리게 만듭니다." },
-            new RewardDef { name = "Saw", displayName = "톱날", iconFrom = "Boomerang",
-                explain = "화면 끝에서 톱날을 날려 가로로 지나가며 닿는 모든 적을 벱니다." },
-            new RewardDef { name = "Flame", displayName = "화염 방사", iconFrom = "Laser",
-                explain = "이동 방향으로 부채꼴 화염을 주기적으로 뿜어 범위 안의 모든 적을 태웁니다." },
-            new RewardDef { name = "Tornado", displayName = "회오리", iconFrom = "Shockwave",
-                explain = "주변을 떠도는 회오리를 만들어 적을 끌어당기고 지속적으로 타격합니다." },
-            new RewardDef { name = "Lightning", displayName = "낙뢰", iconFrom = "Chain",
-                explain = "사거리 안의 무작위 적 위에 표식을 남기고, 잠시 뒤 낙뢰를 떨어뜨려 주변에 피해를 줍니다." },
+            new RewardDef { name = "Vine", iconFrom = "PoisonZone" },
+            new RewardDef { name = "Spirit", iconFrom = "Drone" },
+            new RewardDef { name = "Root", iconFrom = "PoisonZone" },
+            new RewardDef { name = "Saw", iconFrom = "Boomerang" },
+            new RewardDef { name = "Flame", iconFrom = "Laser" },
+            new RewardDef { name = "Tornado", iconFrom = "Shockwave" },
+            new RewardDef { name = "Lightning", iconFrom = "Chain" },
         };
 
         [MenuItem("Tools/Builders/ExtraWeapon")]
@@ -64,6 +56,7 @@ namespace Builders
         {
             var sb = new StringBuilder();
             sb.AppendLine("[ExtraWeaponBuilder]");
+            LocalizationBuilderUtil.Reload();
             EnsureFolder(TABLE_DIR);
             EnsureFolder(EFFECT_DIR);
             EnsureFolder(REWARD_DIR);
@@ -117,10 +110,10 @@ namespace Builders
                 {
                     rso.FindProperty("image").objectReferenceValue = new SerializedObject(iconRef).FindProperty("image").objectReferenceValue;
                 }
-                rso.FindProperty("rewardName").stringValue = def.displayName;
+                rso.FindProperty("rewardName").stringValue = LocalizationBuilderUtil.WeaponRewardNameKey(def.name);
                 rso.FindProperty("hasKey").boolValue = false;
                 rso.FindProperty("hasValue").boolValue = false;
-                rso.FindProperty("explain1").stringValue = def.explain;
+                rso.FindProperty("explain1").stringValue = LocalizationBuilderUtil.WeaponRewardExplainKey(def.name);
                 rso.FindProperty("explain2").stringValue = string.Empty;
                 rso.FindProperty("effect").objectReferenceValue = effect;
                 rso.ApplyModifiedPropertiesWithoutUndo();
@@ -466,9 +459,13 @@ namespace Builders
 
         private static WeaponModifier M(WeaponParam _p, StatModifierMode _m, float _v) => new WeaponModifier(_p, _m, _v);
 
-        private static WeaponUpgradeStep S(string _text, params WeaponModifier[] _mods) => new WeaponUpgradeStep(_text, _text, _mods);
+        // 표는 한국어 원문으로 적고, 단계에는 StringTable 키를 기록한다 (원문 → 키 역조회. 표에 없으면 경고 후 원문)
+        private static WeaponUpgradeStep S(string _text, params WeaponModifier[] _mods) => Step(_text, _text, _mods);
 
-        private static WeaponUpgradeStep Star(string _text, params WeaponModifier[] _mods) => new WeaponUpgradeStep("★ " + _text, _text, _mods);
+        private static WeaponUpgradeStep Star(string _text, params WeaponModifier[] _mods) => Step("★ " + _text, _text, _mods);
+
+        private static WeaponUpgradeStep Step(string _title, string _desc, WeaponModifier[] _mods)
+            => new WeaponUpgradeStep(LocalizationBuilderUtil.KeyOfKorean(_title), LocalizationBuilderUtil.KeyOfKorean(_desc), _mods);
 
         private static WeaponUpgradeStep Dmg() => S("데미지 +20%", M(WeaponParam.Damage, MUL, 0.2f));
 

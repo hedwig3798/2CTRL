@@ -12,7 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f28bc59546b359e4685b706a3d741f0f, type: 3}
   m_Name: Factory
   m_EditorClassIdentifier: Game.Runtime::DimensionData
-  displayName: "\uACF5\uC7A5"
+  displayNameKey: dimension.factory.name
   previewSprite: {fileID: 21300000, guid: 6eb6f7066acf9b446a0a971deaeeb561, type: 3}
   themeColor: {r: 0.85, g: 0.55, b: 0.2, a: 1}
   startWeapon: {fileID: 5536439645276528640, guid: 384bb9388fa9441a852324600bf99205, type: 3}

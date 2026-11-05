@@ -13,11 +13,11 @@ MonoBehaviour:
   m_Name: PoisonZoneReward
   m_EditorClassIdentifier: Assembly-CSharp::RewardData
   image: {fileID: 21300000, guid: 347e99b9fdf0e464abb39398fb8e2dcf, type: 3}
-  rewardName: "\uB3C5 \uC7A5\uD310"
+  rewardName: reward.weapon.poison_zone.name
   hasKey: 0
   key: 0
   hasValue: 0
   value: 0
-  explain1: "\uAC00\uC7A5 \uAC00\uAE4C\uC6B4 \uC801\uC5D0\uAC8C \uB3C5 \uC7A5\uD310\uC744 \uB358\uC838, \uC7A5\uD310 \uC704\uC758 \uC801\uB4E4\uC5D0\uAC8C \uC9C0\uC18D\uC801\uC73C\uB85C \uD53C\uD574\uB97C \uC90D\uB2C8\uB2E4."
+  explain1: reward.weapon.poison_zone.explain
   explain2: 
   effect: {fileID: 11400000, guid: fbc748ce3d61448ba46d2c07a116c99b, type: 2}

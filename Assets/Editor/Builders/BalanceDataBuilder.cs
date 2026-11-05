@@ -63,24 +63,25 @@ namespace Builders
         {
             public string path;
             public float value;
-            public string explain;
+            public string explain; // StringTable 키
             public bool isNerf;
-            public PassiveSpec(string _path, float _value, string _explain, bool _isNerf) { path = _path; value = _value; explain = _explain; isNerf = _isNerf; }
+            public string nameKey; // StringTable 키 (비우면 이름 없음)
+            public PassiveSpec(string _path, float _value, string _explain, bool _isNerf, string _nameKey = "") { path = _path; value = _value; explain = _explain; isNerf = _isNerf; nameKey = _nameKey; }
         }
 
-        // 버프는 "+5%", 너프는 음수 값을 절대값 % 로 표시
-        private const string BUFF_FMT_GA = "{0}가 {1:0.#%} 증가합니다.";
-        private const string BUFF_FMT_I = "{0}이 {1:0.#%} 증가합니다.";
-        private const string NERF_FMT_GA = "{0}가 {1:0.#%;0.#%} 감소합니다.";
-        private const string NERF_FMT_I = "{0}이 {1:0.#%;0.#%} 감소합니다.";
+        // 버프는 "+5%", 너프는 음수 값을 절대값 % 로 표시 (StringTable 키. 원문 "{0}가 {1:0.#%} 증가합니다." 등)
+        private const string BUFF_FMT_GA = "reward.passive.buff_ga";
+        private const string BUFF_FMT_I = "reward.passive.buff_i";
+        private const string NERF_FMT_GA = "reward.passive.nerf_ga";
+        private const string NERF_FMT_I = "reward.passive.nerf_i";
 
         private static readonly PassiveSpec[] Passives =
         {
-            new PassiveSpec("Assets/prefab/Upgrade/PassiveBuff/DamageUpgrade.asset", 0.05f, BUFF_FMT_GA, false),
-            new PassiveSpec("Assets/prefab/Upgrade/PassiveBuff/ASUpgrade.asset", 0.05f, BUFF_FMT_GA, false),
-            new PassiveSpec("Assets/prefab/Upgrade/PassiveBuff/SpeedUpgrade.asset", 0.05f, BUFF_FMT_GA, false),
-            new PassiveSpec("Assets/prefab/Upgrade/PassiveBuff/RangeUpgrade.asset", 0.10f, BUFF_FMT_GA, false),
-            new PassiveSpec("Assets/prefab/Upgrade/PassiveBuff/HPUpgrade.asset", 0.10f, BUFF_FMT_I, false),
+            new PassiveSpec("Assets/prefab/Upgrade/PassiveBuff/DamageUpgrade.asset", 0.05f, BUFF_FMT_GA, false, "reward.passive.damage.name"),
+            new PassiveSpec("Assets/prefab/Upgrade/PassiveBuff/ASUpgrade.asset", 0.05f, BUFF_FMT_GA, false, "reward.passive.attack_speed.name"),
+            new PassiveSpec("Assets/prefab/Upgrade/PassiveBuff/SpeedUpgrade.asset", 0.05f, BUFF_FMT_GA, false, "reward.passive.move_speed.name"),
+            new PassiveSpec("Assets/prefab/Upgrade/PassiveBuff/RangeUpgrade.asset", 0.10f, BUFF_FMT_GA, false, "reward.passive.range.name"),
+            new PassiveSpec("Assets/prefab/Upgrade/PassiveBuff/HPUpgrade.asset", 0.10f, BUFF_FMT_I, false, "reward.passive.hp.name"),
             new PassiveSpec("Assets/prefab/Upgrade/PassiveNuff/DamageNuff.asset", -0.03f, NERF_FMT_GA, true),
             new PassiveSpec("Assets/prefab/Upgrade/PassiveNuff/AttackNuff.asset", -0.03f, NERF_FMT_GA, true),
             new PassiveSpec("Assets/prefab/Upgrade/PassiveNuff/MovespeedNuff.asset", -0.03f, NERF_FMT_GA, true),
@@ -176,6 +177,7 @@ namespace Builders
                 so.FindProperty("effect").objectReferenceValue = percent;
                 so.FindProperty("hasValue").boolValue = true;
                 so.FindProperty("value").floatValue = spec.value;
+                so.FindProperty("rewardName").stringValue = spec.nameKey;
                 so.FindProperty("explain1").stringValue = spec.explain;
                 if (true == spec.isNerf)
                 {

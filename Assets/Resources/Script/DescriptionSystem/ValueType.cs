@@ -12,27 +12,36 @@ public enum ValueType
 }
 
 /// <summary>
-/// ValueType 의 화면 표시용 이름 (한글)
-/// - ValueType 에 값을 추가하면 여기에도 이름을 추가한다 (없으면 enum 이름 그대로 표시)
+/// ValueType 의 화면 표시용 이름 (StringTable 키 stat.*)
+/// - ValueType 에 값을 추가하면 여기와 StringTable.csv 에도 키를 추가한다 (키가 없으면 enum 이름 그대로 표시)
 /// </summary>
 public static class ValueTypeExtensions
 {
-    public static string ToDisplayName(this ValueType _type)
+    public static string ToStringKey(this ValueType _type)
     {
         switch (_type)
         {
             case ValueType.Damage:
-                return "데미지";
+                return "stat.damage";
             case ValueType.HP:
-                return "체력";
+                return "stat.hp";
             case ValueType.MoveSpeed:
-                return "이동 속도";
+                return "stat.move_speed";
             case ValueType.AttackSpeed:
-                return "공격 속도";
+                return "stat.attack_speed";
             case ValueType.Range:
-                return "범위";
+                return "stat.range";
             default:
-                return _type.ToString();
+                return null;
         }
+    }
+
+    /// <summary>
+    /// 현재 언어 표시 이름
+    /// </summary>
+    public static string ToDisplayName(this ValueType _type)
+    {
+        string key = _type.ToStringKey();
+        return null != key && true == StringTable.TryGet(key, out string value) ? value : _type.ToString();
     }
 }

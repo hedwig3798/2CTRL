@@ -13,11 +13,11 @@ MonoBehaviour:
   m_Name: ASUpgrade
   m_EditorClassIdentifier: Assembly-CSharp::RewardData
   image: {fileID: 21300000, guid: 5fd37d9e090be754991d9e2a2401d80d, type: 3}
-  rewardName: "\uACF5\uACA9\uC18D\uB3C4"
+  rewardName: reward.passive.attack_speed.name
   hasKey: 1
   key: 3
   hasValue: 1
   value: 0.05
-  explain1: "{0}\uAC00 {1:0.#%} \uC99D\uAC00\uD569\uB2C8\uB2E4."
+  explain1: reward.passive.buff_ga
   explain2: 
   effect: {fileID: 11400000, guid: e4c3656f1c5b4de1a2fa7f0a8722220c, type: 2}

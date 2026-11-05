@@ -13,11 +13,11 @@ MonoBehaviour:
   m_Name: SpiritReward
   m_EditorClassIdentifier: Game.Runtime::RewardData
   image: {fileID: 21300000, guid: 3517be029f2ca7d479fb134aff17a5e4, type: 3}
-  rewardName: "\uC815\uB839"
+  rewardName: reward.weapon.spirit.name
   hasKey: 0
   key: 0
   hasValue: 0
   value: 0
-  explain1: "\uC8FC\uBCC0\uC744 \uB5A0\uB2E4\uB2C8\uB294 \uC815\uB839\uC744 \uC18C\uD658\uD569\uB2C8\uB2E4. \uC815\uB839\uC740 \uAC00\uAE4C\uC6B4 \uC801\uC744 \uCAD3\uC544\uAC00 \uC5EC\uB7EC \uBC88 \uACF5\uACA9\uD569\uB2C8\uB2E4."
+  explain1: reward.weapon.spirit.explain
   explain2: 
   effect: {fileID: 11400000, guid: 44aadfe0fa73304439c5fb6d1181abdb, type: 2}

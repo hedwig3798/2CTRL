@@ -18,6 +18,6 @@ MonoBehaviour:
   key: 0
   hasValue: 1
   value: -0.03
-  explain1: "{0}\uAC00 {1:0.#%;0.#%} \uAC10\uC18C\uD569\uB2C8\uB2E4."
-  explain2: "{0}\uAC00 {1:0.#%;0.#%} \uAC10\uC18C\uD569\uB2C8\uB2E4."
+  explain1: reward.passive.nerf_ga
+  explain2: reward.passive.nerf_ga
   effect: {fileID: 11400000, guid: e4c3656f1c5b4de1a2fa7f0a8722220c, type: 2}

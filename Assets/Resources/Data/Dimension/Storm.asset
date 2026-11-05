@@ -12,7 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f28bc59546b359e4685b706a3d741f0f, type: 3}
   m_Name: Storm
   m_EditorClassIdentifier: Game.Runtime::DimensionData
-  displayName: "\uD3ED\uD48D"
+  displayNameKey: dimension.storm.name
   previewSprite: {fileID: 21300000, guid: aee4f21e22dbdfb44b3569ff7c8300f0, type: 3}
   themeColor: {r: 0.45, g: 0.55, b: 1, a: 1}
   startWeapon: {fileID: 7092167963846720789, guid: 66053baba310708419383e1369626dd8, type: 3}

@@ -11,18 +11,22 @@ namespace Builders
     /// 재사용 설정 창 프리팹 Assets/prefab/UI/SettingsPanel.prefab 을 새로 만든다 (멱등, 매번 덮어씀)
     /// - SettingsPanel (전체 화면 반투명 검정, 뒤 클릭 차단)
     ///   └ Window ─ Title "설정"
-    ///            ├ Content : [화면] 화면 크기 드롭다운
+    ///            ├ Content : [일반] 언어 드롭다운 (항목은 "한국어" / "English" 고정)
+    ///            │           [화면] 화면 크기 드롭다운
     ///            │           [정보 표시] 적 체력바 표시 / 데미지 표시 토글
     ///            │           [소리] 전체 음량 / 효과음 / 배경음 (슬라이더 + % + 음소거 버튼, VolumeSettingRow)
     ///            └ CloseButton "닫기"
     /// - 기준 해상도 1920x1080 좌표. 텍스트는 갈무리 픽셀 폰트, 크기는 12 의 배수
+    /// - 고정 라벨은 LocalizedText(key) 로 StringTable 을 쓴다 (미리보기 글자는 한국어)
     /// - 씬 배치는 TitleSceneBuilder(SettingsCanvas) / PauseMenuBuilder(PauseCanvas) 가 InstantiateInto 로 한다.
     /// </summary>
     public static class SettingsPanelBuilder
     {
         public const string PREFAB_PATH = "Assets/prefab/UI/SettingsPanel.prefab";
 
-        private static readonly Vector2 WINDOW_SIZE = new Vector2(1080f, 900f);
+        // 언어 줄(헤더 + 한 줄)을 넣으며 높이를 900 에서 1008 로 늘림
+        private static readonly Vector2 WINDOW_SIZE = new Vector2(1080f, 1008f);
+        private const int DROPDOWN_VISIBLE_ROWS = 4;
         private const float TITLE_SIZE = 60f;
         private const float HEADER_SIZE = 36f;
         private const float TEXT_SIZE = 36f;
@@ -81,6 +85,7 @@ namespace Builders
             var sb = new StringBuilder();
             sb.AppendLine("[SettingsPanelBuilder]");
             SettingsUIKit.ResetCache();
+            LocalizationBuilderUtil.Reload();
             if (null == SettingsUIKit.Font)
             {
                 sb.AppendLine("경고: 갈무리 폰트 생성 실패 (TMP 기본 폰트 사용)");
@@ -104,7 +109,8 @@ namespace Builders
                 SettingsUIKit.Slice(window, "PanelDark", Color.white);
                 SettingsUIKit.Center(window.rectTransform, WINDOW_SIZE, Vector2.zero);
 
-                TextMeshProUGUI title = SettingsUIKit.MakeLabel("Title", window.transform, "설정", TITLE_SIZE, TextAlignmentOptions.Center);
+                TextMeshProUGUI title = SettingsUIKit.MakeLabel("Title", window.transform, string.Empty, TITLE_SIZE, TextAlignmentOptions.Center);
+                LocalizationBuilderUtil.Bind(title, "ui.settings.title");
                 RectTransform titleRt = title.rectTransform;
                 titleRt.anchorMin = new Vector2(0f, 1f);
                 titleRt.anchorMax = new Vector2(1f, 1f);
@@ -120,24 +126,40 @@ namespace Builders
                 content.offsetMax = new Vector2(-60f, -132f);
                 SettingsUIKit.AddVertical(content.gameObject, 12f, TextAnchor.UpperLeft);
 
-                MakeHeader(content, "ScreenHeader", "화면");
-                RectTransform screenRow = MakeRow(content, "ScreenModeRow", "화면 크기");
-                TMP_Dropdown dropdown = MakeDropdown(screenRow);
+                MakeHeader(content, "GeneralHeader", "ui.settings.header.general");
+                RectTransform languageRow = MakeRow(content, "LanguageRow", "ui.settings.language");
+                var languageOptions = new List<string>();
+                for (int i = 0; i < LanguageInfo.Count; ++i)
+                {
+                    // 각 언어 고유 표기 (문자열 테이블을 거치지 않는다)
+                    languageOptions.Add(LanguageInfo.GetNativeName((Language)i));
+                }
+                TMP_Dropdown languageDropdown = MakeDropdown(languageRow, "LanguageDropdown", languageOptions, (int)LanguageInfo.DEFAULT);
 
-                MakeHeader(content, "InfoHeader", "정보 표시");
-                Toggle hpToggle = MakeToggle(MakeRow(content, "EnemyHPBarRow", "적 체력바 표시"));
-                Toggle damageToggle = MakeToggle(MakeRow(content, "DamageTextRow", "데미지 표시"));
+                MakeHeader(content, "ScreenHeader", "ui.settings.header.screen");
+                RectTransform screenRow = MakeRow(content, "ScreenModeRow", "ui.settings.screen_mode");
+                var screenOptions = new List<string>();
+                for (int i = 0; i < ScreenModes.Count; ++i)
+                {
+                    screenOptions.Add(ScreenModes.GetLabel(i));
+                }
+                TMP_Dropdown dropdown = MakeDropdown(screenRow, "ScreenModeDropdown", screenOptions, ScreenModes.DEFAULT_INDEX);
 
-                MakeHeader(content, "SoundHeader", "소리");
+                MakeHeader(content, "InfoHeader", "ui.settings.header.info");
+                Toggle hpToggle = MakeToggle(MakeRow(content, "EnemyHPBarRow", "ui.settings.enemy_hp_bar"));
+                Toggle damageToggle = MakeToggle(MakeRow(content, "DamageTextRow", "ui.settings.damage_text"));
+
+                MakeHeader(content, "SoundHeader", "ui.settings.header.sound");
                 var rows = new List<VolumeSettingRow>
                 {
-                    MakeVolumeRow(content, "MasterVolumeRow", "전체 음량", AudioChannel.Master),
-                    MakeVolumeRow(content, "EffectVolumeRow", "효과음", AudioChannel.Effect),
-                    MakeVolumeRow(content, "BGMVolumeRow", "배경음", AudioChannel.BGM),
+                    MakeVolumeRow(content, "MasterVolumeRow", "ui.settings.volume.master", AudioChannel.Master),
+                    MakeVolumeRow(content, "EffectVolumeRow", "ui.settings.volume.effect", AudioChannel.Effect),
+                    MakeVolumeRow(content, "BGMVolumeRow", "ui.settings.volume.bgm", AudioChannel.BGM),
                 };
 
                 // 4. 닫기
-                Button close = SettingsUIKit.MakeButton("CloseButton", window.transform, "닫기", 300f, 84f, TEXT_SIZE);
+                Button close = SettingsUIKit.MakeButton("CloseButton", window.transform, string.Empty, 300f, 84f, TEXT_SIZE);
+                LocalizationBuilderUtil.BindChildLabel(close, "ui.settings.close");
                 RectTransform closeRt = close.GetComponent<RectTransform>();
                 closeRt.anchorMin = closeRt.anchorMax = new Vector2(0.5f, 0f);
                 closeRt.pivot = new Vector2(0.5f, 0f);
@@ -147,6 +169,7 @@ namespace Builders
                 // 5. 연결
                 SettingsPanel panel = rootGo.AddComponent<SettingsPanel>();
                 var so = new SerializedObject(panel);
+                so.FindProperty("languageDropdown").objectReferenceValue = languageDropdown;
                 so.FindProperty("screenModeDropdown").objectReferenceValue = dropdown;
                 so.FindProperty("enemyHPBarToggle").objectReferenceValue = hpToggle;
                 so.FindProperty("damageTextToggle").objectReferenceValue = damageToggle;
@@ -172,9 +195,11 @@ namespace Builders
             return sb.ToString();
         }
 
-        private static void MakeHeader(Transform _content, string _name, string _text)
+        /// <param name="_key">헤더 글자 StringTable 키</param>
+        private static void MakeHeader(Transform _content, string _name, string _key)
         {
-            TextMeshProUGUI header = SettingsUIKit.MakeLabel(_name, _content, _text, HEADER_SIZE, TextAlignmentOptions.MidlineLeft);
+            TextMeshProUGUI header = SettingsUIKit.MakeLabel(_name, _content, string.Empty, HEADER_SIZE, TextAlignmentOptions.MidlineLeft);
+            LocalizationBuilderUtil.Bind(header, _key);
             header.color = SettingsUIKit.ACCENT_COLOR;
             SettingsUIKit.SetLayoutSize(header.gameObject, LABEL_WIDTH * 3f, HEADER_HEIGHT);
         }
@@ -182,7 +207,8 @@ namespace Builders
         /// <summary>
         /// 왼쪽 이름 + 오른쪽 컨트롤 한 줄
         /// </summary>
-        private static RectTransform MakeRow(Transform _content, string _name, string _label)
+        /// <param name="_labelKey">왼쪽 이름 StringTable 키</param>
+        private static RectTransform MakeRow(Transform _content, string _name, string _labelKey)
         {
             RectTransform row = SettingsUIKit.MakeRect(_name, _content);
             SettingsUIKit.AddHorizontal(row.gameObject, ROW_SPACING, TextAnchor.MiddleLeft);
@@ -190,7 +216,12 @@ namespace Builders
             row.GetComponent<LayoutElement>().minWidth = -1f;
             row.GetComponent<LayoutElement>().flexibleWidth = 1f;
 
-            TextMeshProUGUI label = SettingsUIKit.MakeLabel("Label", row, _label, TEXT_SIZE, TextAlignmentOptions.MidlineLeft);
+            TextMeshProUGUI label = SettingsUIKit.MakeLabel("Label", row, string.Empty, TEXT_SIZE, TextAlignmentOptions.MidlineLeft);
+            LocalizationBuilderUtil.Bind(label, _labelKey);
+            label.enableAutoSizing = true;
+            label.fontSizeMin = 22f;
+            label.fontSizeMax = TEXT_SIZE;
+            label.overflowMode = TextOverflowModes.Ellipsis;
             SettingsUIKit.SetLayoutSize(label.gameObject, LABEL_WIDTH, ROW_HEIGHT);
             return row;
         }
@@ -223,10 +254,13 @@ namespace Builders
             };
         }
 
-        private static TMP_Dropdown MakeDropdown(Transform _row)
+        /// <summary>
+        /// 줄 오른쪽 드롭다운 (옵션 글자는 런타임에 SettingsPanel 이 다시 채운다)
+        /// </summary>
+        private static TMP_Dropdown MakeDropdown(Transform _row, string _name, List<string> _options, int _value)
         {
             GameObject go = TMP_DefaultControls.CreateDropdown(TmpResources());
-            go.name = "ScreenModeDropdown";
+            go.name = _name;
             go.transform.SetParent(_row, false);
             SettingsUIKit.SetLayoutSize(go, DROPDOWN_WIDTH, ROW_HEIGHT);
 
@@ -241,7 +275,8 @@ namespace Builders
             RectTransform template = Find(go.transform, "Template");
             if (null != template)
             {
-                template.sizeDelta = new Vector2(0f, ROW_HEIGHT * 4f + 12f);
+                int visibleRows = Mathf.Clamp(_options.Count, 1, DROPDOWN_VISIBLE_ROWS);
+                template.sizeDelta = new Vector2(0f, ROW_HEIGHT * visibleRows + 12f);
             }
             RectTransform scrollbar = Find(go.transform, "Template/Scrollbar");
             if (null != scrollbar)
@@ -271,13 +306,8 @@ namespace Builders
 
             var dropdown = go.GetComponent<TMP_Dropdown>();
             dropdown.ClearOptions();
-            var options = new List<string>();
-            for (int i = 0; i < ScreenModes.Count; ++i)
-            {
-                options.Add(ScreenModes.GetLabel(i));
-            }
-            dropdown.AddOptions(options);
-            dropdown.SetValueWithoutNotify(ScreenModes.DEFAULT_INDEX);
+            dropdown.AddOptions(_options);
+            dropdown.SetValueWithoutNotify(_value);
             dropdown.RefreshShownValue();
             return dropdown;
         }
@@ -316,9 +346,9 @@ namespace Builders
             return toggle;
         }
 
-        private static VolumeSettingRow MakeVolumeRow(Transform _content, string _name, string _label, AudioChannel _channel)
+        private static VolumeSettingRow MakeVolumeRow(Transform _content, string _name, string _labelKey, AudioChannel _channel)
         {
-            RectTransform row = MakeRow(_content, _name, _label);
+            RectTransform row = MakeRow(_content, _name, _labelKey);
 
             GameObject sliderGo = DefaultControls.CreateSlider(UiResources());
             sliderGo.name = "Slider";
@@ -339,7 +369,8 @@ namespace Builders
             TextMeshProUGUI value = SettingsUIKit.MakeLabel("Value", row, "100%", TEXT_SIZE, TextAlignmentOptions.MidlineRight);
             SettingsUIKit.SetLayoutSize(value.gameObject, VALUE_WIDTH, ROW_HEIGHT);
 
-            Button mute = SettingsUIKit.MakeButton("MuteButton", row, "켜짐", MUTE_WIDTH, ROW_HEIGHT, TEXT_SIZE);
+            // 음소거 버튼 글자는 VolumeSettingRow 가 상태에 따라 넣는다 (LocalizedText 를 붙이지 않음)
+            Button mute = SettingsUIKit.MakeButton("MuteButton", row, LocalizationBuilderUtil.Ko("ui.settings.volume.on"), MUTE_WIDTH, ROW_HEIGHT, TEXT_SIZE);
             SettingsUIKit.StyleButton(mute);
             TMP_Text muteLabel = mute.GetComponentInChildren<TMP_Text>(true);
 

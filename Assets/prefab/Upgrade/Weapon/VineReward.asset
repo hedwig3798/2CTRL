@@ -13,11 +13,11 @@ MonoBehaviour:
   m_Name: VineReward
   m_EditorClassIdentifier: Game.Runtime::RewardData
   image: {fileID: 21300000, guid: f696dc614896cbe42922c3a1bfa1e662, type: 3}
-  rewardName: "\uB369\uAD74"
+  rewardName: reward.weapon.vine.name
   hasKey: 0
   key: 0
   hasValue: 0
   value: 0
-  explain1: "\uC9C0\uB098\uAC04 \uC790\uB9AC\uC5D0 \uAC00\uC2DC \uB369\uAD74\uC744 \uB0A8\uACA8, \uB369\uAD74 \uC704\uC758 \uC801\uB4E4\uC5D0\uAC8C \uC9C0\uC18D\uC801\uC73C\uB85C \uD53C\uD574\uB97C \uC90D\uB2C8\uB2E4."
+  explain1: reward.weapon.vine.explain
   explain2: 
   effect: {fileID: 11400000, guid: 8f49b945cccfd0b49b332f69a15c1a08, type: 2}

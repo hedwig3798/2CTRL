@@ -200,7 +200,8 @@ public class WeaponHUD
 
         RewardData reward = FindReward(_prefab);
         Sprite icon = null != reward ? reward.GetImage() : null;
-        _fallbackName = null != reward && true == reward.HasName ? reward.GetName() : _prefab.name;
+        // 번역 전 키를 넘긴다 (WeaponSlotUI 가 현재 언어로 표시하고 언어가 바뀌면 다시 표시)
+        _fallbackName = null != reward && true == reward.HasName ? reward.GetNameKey() : _prefab.name;
 
         if (null == icon)
         {

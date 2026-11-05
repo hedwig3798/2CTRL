@@ -19,7 +19,8 @@ public static class ScreenModes
         new Vector2Int(1920, 1080),
     };
 
-    private const string FULLSCREEN_LABEL = "전체 화면";
+    // 전체 화면 라벨 StringTable 키 (창 크기는 숫자라 번역하지 않는다)
+    private const string FULLSCREEN_LABEL_KEY = "ui.settings.screen_mode.fullscreen";
     private const string WINDOW_LABEL_FORMAT = "{0} x {1}";
 
     public static int Count => WINDOW_SIZES.Length + 1;
@@ -45,14 +46,14 @@ public static class ScreenModes
     }
 
     /// <summary>
-    /// 드롭다운에 표시할 이름
+    /// 드롭다운에 표시할 이름 (현재 언어. 언어가 바뀌면 드롭다운 옵션을 다시 만들 것)
     /// </summary>
     public static string GetLabel(int _index)
     {
         int index = Clamp(_index);
         if (true == IsFullScreen(index))
         {
-            return FULLSCREEN_LABEL;
+            return StringTable.Get(FULLSCREEN_LABEL_KEY);
         }
 
         Vector2Int size = WINDOW_SIZES[index];

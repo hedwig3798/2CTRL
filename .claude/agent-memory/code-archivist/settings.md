@@ -10,6 +10,8 @@ PlayerPrefs 기반 게임 설정(화면 모드, 적 체력바/데미지 텍스�
   GetVolume/SetVolume/IsMuted/SetMuted, Save()(디스크 저장), Reload().
   GetChannelVolume(채널): Master 미포함, AudioSource용 (Master는 SettingsApplier가 AudioListener.volume으로 담당).
   GetEffectiveVolume: 표시·계산용(음소거면 0).
+  Language 프로퍼티(PlayerPrefs `Settings.Language`, 기본 한국어, Clamp) + 이벤트 OnLanguageChanged(Language). 상세는 localization.md.
+  SettingsPanel: 언어 드롭다운("한국어"/"English" 고정 표기). 라벨은 LocalizedText/키 사용. ScreenModes 전체화면 라벨은 키.
   이벤트 OnScreenModeChanged(int), OnShowEnemyHPBarChanged(bool), OnShowDamageTextChanged(bool), OnVolumeChanged(AudioChannel).
   값이 실제로 바뀔 때만 이벤트(forceNotify 예외). 구독은 OnEnable/OnDisable.
   DEFAULT_*: 체력바 true, 데미지텍스트 true, 볼륨 1, 음소거 false.

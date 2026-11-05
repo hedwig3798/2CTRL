@@ -14,38 +14,38 @@ MonoBehaviour:
   m_EditorClassIdentifier: Game.Runtime::WeaponUpgradeTable
   rewardWeight: 1.5
   steps:
-  - title: "\uB4DC\uB860 \uD0C4 \uB370\uBBF8\uC9C0 +20%"
-    description: "\uB4DC\uB860 \uD0C4 \uB370\uBBF8\uC9C0 +20%"
+  - title: upgrade.drone_shot_damage_plus_20pct
+    description: upgrade.drone_shot_damage_plus_20pct
     modifiers:
     - param: 101
       mode: 1
       value: 0.2
-  - title: "\uB4DC\uB860 \uD0C4 \uACF5\uC18D +15%"
-    description: "\uB4DC\uB860 \uD0C4 \uACF5\uACA9 \uC18D\uB3C4 +15%"
+  - title: upgrade.drone_shot_atk_speed_plus_15pct
+    description: upgrade.drone_shot_attack_speed_plus_15pct
     modifiers:
     - param: 102
       mode: 1
       value: 0.15
-  - title: "\uB4DC\uB860 \uD0C4 \uB370\uBBF8\uC9C0 +20%"
-    description: "\uB4DC\uB860 \uD0C4 \uB370\uBBF8\uC9C0 +20%"
+  - title: upgrade.drone_shot_damage_plus_20pct
+    description: upgrade.drone_shot_damage_plus_20pct
     modifiers:
     - param: 101
       mode: 1
       value: 0.2
-  - title: "\uB4DC\uB860 \uD0C4 \uB370\uBBF8\uC9C0 +20%"
-    description: "\uB4DC\uB860 \uD0C4 \uB370\uBBF8\uC9C0 +20%"
+  - title: upgrade.drone_shot_damage_plus_20pct
+    description: upgrade.drone_shot_damage_plus_20pct
     modifiers:
     - param: 101
       mode: 1
       value: 0.2
-  - title: "\u2605 \uB4DC\uB860 \uD0C4 2\uC5F0\uBC1C"
-    description: "\uB4DC\uB860\uC774 \uD0C4\uC744 2\uC5F0\uBC1C\uB85C \uC3DC\uB2E4"
+  - title: upgrade.star_drone_double_shot
+    description: upgrade.drones_fire_2_shots_in_a_row
     modifiers:
     - param: 103
       mode: 0
       value: 1
-  - title: "\uACF5\uC804 \uBC18\uACBD +0.4, \uB4DC\uB860 \uD0C4 \uC0AC\uAC70\uB9AC +1.5"
-    description: "\uB4DC\uB860 \uACF5\uC804 \uBC18\uACBD +0.4, \uB4DC\uB860 \uD0C4 \uC0AC\uAC70\uB9AC +1.5"
+  - title: upgrade.orbit_radius_plus_0_4_drone_shot_range_plus_1_5
+    description: upgrade.drone_orbit_radius_plus_0_4_drone_shot_range_plus_1_5
     modifiers:
     - param: 106
       mode: 0
@@ -53,26 +53,26 @@ MonoBehaviour:
     - param: 105
       mode: 0
       value: 1.5
-  - title: "\uB4DC\uB860 +1"
-    description: "\uB4DC\uB860 +1"
+  - title: upgrade.drone_plus_1
+    description: upgrade.drone_plus_1
     modifiers:
     - param: 3
       mode: 0
       value: 1
-  - title: "\uB4DC\uB860 \uD0C4 \uB370\uBBF8\uC9C0 +20%"
-    description: "\uB4DC\uB860 \uD0C4 \uB370\uBBF8\uC9C0 +20%"
+  - title: upgrade.drone_shot_damage_plus_20pct
+    description: upgrade.drone_shot_damage_plus_20pct
     modifiers:
     - param: 101
       mode: 1
       value: 0.2
-  - title: "\uB4DC\uB860 \uD0C4 \uACF5\uC18D +15%"
-    description: "\uB4DC\uB860 \uD0C4 \uACF5\uACA9 \uC18D\uB3C4 +15%"
+  - title: upgrade.drone_shot_atk_speed_plus_15pct
+    description: upgrade.drone_shot_attack_speed_plus_15pct
     modifiers:
     - param: 102
       mode: 1
       value: 0.15
-  - title: "\u2605 \uB4DC\uB860 \uD0C4 \uAD00\uD1B5 +1"
-    description: "\uB4DC\uB860 \uD0C4 \uAD00\uD1B5 +1"
+  - title: upgrade.star_drone_shot_pierce_plus_1
+    description: upgrade.drone_shot_pierce_plus_1
     modifiers:
     - param: 104
       mode: 0

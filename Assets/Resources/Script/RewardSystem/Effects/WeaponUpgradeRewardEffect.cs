@@ -29,6 +29,8 @@ public class WeaponUpgradeRewardEffect
     /// <summary>
     /// _table 의 _level 단계 업그레이드 보상을 만든다 (단계가 없으면 null)
     /// - 이름 "<_weaponName> Lv.N", 이미지 _image, explain1 = 단계 이름, explain2 = 단계 설명
+    /// - _weaponName 은 무기 이름 StringTable 키 (또는 그대로 표시할 이름). 표시할 때 현재 언어로 바뀐다
+    /// - 단계 이름 / 설명도 키다 (번역문은 포멧 문자열로 쓰이므로 중괄호를 넣지 말 것. 키가 아닌 원문은 중괄호를 이스케이프)
     /// </summary>
     public static RewardData CreateRewardData(WeaponUpgradeTable _table, Weapon _prefab, string _weaponName, Sprite _image, int _level)
     {
@@ -55,7 +57,8 @@ public class WeaponUpgradeRewardEffect
 
         RewardData data = CreateInstance<RewardData>();
         data.name = rewardName;
-        data.SetName(rewardName);
+        data.SetName(_weaponName);
+        data.SetNameLevel(_level);
         if (null != _image)
         {
             data.SetImage(_image);
@@ -66,8 +69,8 @@ public class WeaponUpgradeRewardEffect
         }
         data.ClearKey();
         data.ClearValue();
-        data.SetExplain1(EscapeFormat(step.Title));
-        data.SetExplain2(EscapeFormat(step.Description));
+        data.SetExplain1(ToExplain(step.Title));
+        data.SetExplain2(ToExplain(step.Description));
         data.SetEffect(effect);
         return data;
     }
@@ -141,6 +144,14 @@ public class WeaponUpgradeRewardEffect
             manager.RemoveFor(_context.Side, RewardPoolType.WeaponUpgrade, _data);
         }
         return manager;
+    }
+
+    /// <summary>
+    /// StringTable 키면 그대로, 원문이면 중괄호를 이스케이프 (RewardData 가 포멧팅하므로)
+    /// </summary>
+    private static string ToExplain(string _text)
+    {
+        return true == StringTable.HasKey(_text) ? _text : EscapeFormat(_text);
     }
 
     /// <summary>

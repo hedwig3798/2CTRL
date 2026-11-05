@@ -13,11 +13,11 @@ MonoBehaviour:
   m_Name: DamageUpgrade
   m_EditorClassIdentifier: Assembly-CSharp::RewardData
   image: {fileID: 21300000, guid: 2e51bfec864ef4841a7ea04de69c9479, type: 3}
-  rewardName: "\uB370\uBBF8\uC9C0"
+  rewardName: reward.passive.damage.name
   hasKey: 1
   key: 0
   hasValue: 1
   value: 0.05
-  explain1: "{0}\uAC00 {1:0.#%} \uC99D\uAC00\uD569\uB2C8\uB2E4."
+  explain1: reward.passive.buff_ga
   explain2: 
   effect: {fileID: 11400000, guid: e4c3656f1c5b4de1a2fa7f0a8722220c, type: 2}

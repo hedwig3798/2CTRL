@@ -28,10 +28,10 @@ public struct WeaponModifier
 [Serializable]
 public class WeaponUpgradeStep
 {
-    [Tooltip("선택지에 표시할 이름 (예: 데미지 +20%)")]
+    [Tooltip("선택지에 표시할 이름 StringTable 키 (예: upgrade.chain_lightning.1.title. 번역문에 중괄호 금지)")]
     [SerializeField]
     private string title;
-    [Tooltip("선택지에 표시할 설명")]
+    [Tooltip("선택지에 표시할 설명 StringTable 키 (번역문에 중괄호 금지)")]
     [TextArea]
     [SerializeField]
     private string description;

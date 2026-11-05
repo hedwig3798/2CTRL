@@ -8,7 +8,9 @@ using UnityEngine.Serialization;
 ///   - name / explain1 / explain2 : 빈 문자열이면 비어 있음
 ///   - key / value : hasKey / hasValue 가 false 면 비어 있음
 /// - key / value 는 직접 표시하지 않고 explain1 / explain2 에 포멧팅해서 표시한다
-/// - explain1 / explain2 는 string.Format 포멧 문자열이다 ({0} = key 의 한글 이름, {1} = value, {2} = name)
+/// - name / explain1 / explain2 는 StringTable 키다 (키가 없으면 적힌 문자열을 그대로 쓴다)
+///   - 예) rewardName = "reward.hp.name", explain1 = "reward.hp.explain1"
+/// - explain1 / explain2 (또는 그 번역) 는 string.Format 포멧 문자열이다 ({0} = key 의 현재 언어 이름, {1} = value, {2} = name)
 ///   - 예) "{0} 이(가) {1} 증가합니다", "{0} +{1:0.#}", "{0} {1:P0} 증가"
 ///   - 비어 있는 key / value 자리는 빈 문자열로 채운다
 /// - RewardManager 의 풀에 넣고 Get / GetAny 로 꺼내 쓴다
@@ -23,6 +25,7 @@ public class RewardData
     [SerializeField]
     private Sprite image;
 
+    [Tooltip("이름 StringTable 키 (키가 없으면 그대로 표시)")]
     [SerializeField]
     private string rewardName;
 
@@ -40,13 +43,13 @@ public class RewardData
     [SerializeField]
     private float value;
 
-    [Tooltip("SelectPanel 의 Explain Text 1 에 표시할 포멧 문자열 ({0} = key, {1} = value, {2} = name)")]
+    [Tooltip("SelectPanel 의 Explain Text 1 에 표시할 포멧 StringTable 키 또는 포멧 문자열 ({0} = key, {1} = value, {2} = name)")]
     [TextArea]
     [FormerlySerializedAs("explain")]
     [SerializeField]
     private string explain1 = "{0}";
 
-    [Tooltip("SelectPanel 의 Explain Text 2 에 표시할 포멧 문자열 ({0} = key, {1} = value, {2} = name)")]
+    [Tooltip("SelectPanel 의 Explain Text 2 에 표시할 포멧 StringTable 키 또는 포멧 문자열 ({0} = key, {1} = value, {2} = name)")]
     [TextArea]
     [SerializeField]
     private string explain2 = "+{1:0.##}";
@@ -54,6 +57,12 @@ public class RewardData
     [Tooltip("이 보상을 골랐을 때 실행할 효과 (비어 있으면 표시만 하고 아무것도 하지 않음)")]
     [SerializeField]
     private RewardEffect effect;
+
+    // 런타임에 만든 업그레이드 보상의 단계 (0 이면 없음). 0 보다 크면 이름을 reward.upgrade.name 포멧("{0} Lv.{1}")으로 표시
+    [System.NonSerialized]
+    private int nameLevel;
+
+    private const string UPGRADE_NAME_KEY = "reward.upgrade.name";
 
     public bool HasEffect => null != effect;
 
@@ -88,9 +97,33 @@ public class RewardData
         return image;
     }
 
+    /// <summary>
+    /// 현재 언어 이름 (단계가 있으면 "이름 Lv.N")
+    /// </summary>
     public string GetName()
     {
+        string baseName = StringTable.Resolve(rewardName);
+        if (nameLevel <= 0)
+        {
+            return baseName;
+        }
+        return StringTable.Format(UPGRADE_NAME_KEY, baseName, nameLevel);
+    }
+
+    /// <summary>
+    /// 번역 전 이름 키 (언어와 무관한 식별 · 다른 보상 이름 조합용)
+    /// </summary>
+    public string GetNameKey()
+    {
         return null != rewardName ? rewardName : string.Empty;
+    }
+
+    /// <summary>
+    /// 이름 뒤에 붙는 업그레이드 단계 (0 이면 없음)
+    /// </summary>
+    public int GetNameLevel()
+    {
+        return nameLevel;
     }
 
     /// <summary>
@@ -142,12 +175,13 @@ public class RewardData
     }
 
     /// <summary>
-    /// 포멧 문자열의 자리에 key / value / name 을 넣는다
-    /// 포멧 문자열이 잘못되었으면 경고 후 원본을 그대로 반환한다
+    /// 포멧 키(또는 포멧 문자열)를 현재 언어로 바꾼 뒤 자리에 key / value / name 을 넣는다
+    /// 포멧 문자열이 잘못되었으면 경고 후 번역된 포멧을 그대로 반환한다
     /// </summary>
-    private string FormatExplain(string _format)
+    private string FormatExplain(string _formatKey)
     {
-        if (true == string.IsNullOrEmpty(_format))
+        string format = StringTable.Resolve(_formatKey);
+        if (true == string.IsNullOrEmpty(format))
         {
             return string.Empty;
         }
@@ -157,12 +191,12 @@ public class RewardData
 
         try
         {
-            return string.Format(_format, keyArg, valueArg, GetName());
+            return string.Format(System.Globalization.CultureInfo.InvariantCulture, format, keyArg, valueArg, GetName());
         }
         catch (System.FormatException)
         {
-            Debug.LogWarning($"[RewardData] explain 포멧 문자열이 잘못되었습니다. ({name}) : {_format}", this);
-            return _format;
+            Debug.LogWarning($"[RewardData] explain 포멧 문자열이 잘못되었습니다. ({name}) : {format}", this);
+            return format;
         }
     }
 
@@ -187,9 +221,20 @@ public class RewardData
         image = _image;
     }
 
+    /// <summary>
+    /// 이름 키 (또는 표시할 문자열)
+    /// </summary>
     public void SetName(string _name)
     {
         rewardName = _name;
+    }
+
+    /// <summary>
+    /// 이름 뒤에 붙일 업그레이드 단계 (0 이하면 붙이지 않음. 런타임 전용, 저장되지 않음)
+    /// </summary>
+    public void SetNameLevel(int _level)
+    {
+        nameLevel = _level > 0 ? _level : 0;
     }
 
     public void SetKey(ValueType _key)
@@ -230,6 +275,7 @@ public class RewardData
     public void ClearName()
     {
         rewardName = string.Empty;
+        nameLevel = 0;
     }
 
     public void ClearExplain1()

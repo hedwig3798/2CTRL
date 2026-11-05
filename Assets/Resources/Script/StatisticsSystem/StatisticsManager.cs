@@ -197,7 +197,8 @@ public class StatisticsManager
         string key = null;
         if (true == _weapon.TryGetComponent(out DescriptionHolder holder))
         {
-            key = holder.GetName();
+            // 언어를 바꿔도 같은 무기가 한 항목으로 모이도록 번역 전 키를 쓴다 (표시할 때 GameOverUI 가 번역)
+            key = holder.GetNameKey();
         }
 
         if (true == string.IsNullOrEmpty(key))
