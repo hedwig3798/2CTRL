@@ -29,3 +29,5 @@
 - `SetWaves(WaveData[])`: waveArray 교체 + PreparePools(Awake의 풀 생성 분리). Start 전에 호출해야 첫 웨이브부터 적용.
 - `SetMonsterSkins(MonsterSkin[])`: MonsterData->MonsterSkin skinMap 갱신(중복은 경고 후 덮어씀). 이후 스폰부터 적용.
 - `SpawnAt`에서 `ApplySkin(sa)`: SkinTarget(원본 컨트롤러/스프라이트 저장)으로 Animator 있으면 컨트롤러, 없으면 스프라이트 교체. 스킨 없으면 원본 복구. 상세: dimension.md
+
+- 웨이브 시간 API(IsStarted/RemainingTime 등) 추가: [hud.md](hud.md)

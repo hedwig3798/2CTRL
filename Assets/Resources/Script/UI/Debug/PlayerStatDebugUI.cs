@@ -18,8 +18,9 @@ public class PlayerStatDebugUI
     [SerializeField]
     private Key toggleKey = Key.F1;
 
+    [Tooltip("시작 시 표시 여부 (HUD 를 가리므로 기본 꺼짐, toggleKey 로 켠다)")]
     [SerializeField]
-    private bool isVisible = true;
+    private bool isVisible = false;
 
     [Tooltip("무기 / 체력 컴포넌트를 다시 찾는 간격 (초, 일시정지 중에도 동작)")]
     [SerializeField]

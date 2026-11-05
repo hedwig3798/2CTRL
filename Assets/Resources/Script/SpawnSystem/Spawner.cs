@@ -82,6 +82,16 @@ public class Spawner
 
     private bool isFinished = false;
 
+    // 웨이브 진행 시간 (Wave 코루틴이 기록, Time.time 기준이라 일시정지 동안 멈춘다)
+    private bool isStarted = false;
+    private float waveStartTime = 0f;
+    private float totalWaveTime = 0f;
+    // 진행 중인 웨이브가 시작된 시각과 길이, 그 뒤 남은 웨이브들의 time 합
+    // (WaitForSeconds 는 프레임 단위로 끝나 웨이브마다 조금씩 늦어지므로 웨이브마다 다시 맞춘다)
+    private float currentWaveStartTime = 0f;
+    private float currentWaveTime = 0f;
+    private float timeAfterCurrentWave = 0f;
+
     /// <summary>
     /// 마지막 웨이브의 time 이 끝났을 때 한 번 호출 (이후에도 마지막 웨이브 스폰은 계속된다)
     /// </summary>
@@ -91,6 +101,64 @@ public class Spawner
     /// 모든 웨이브의 time 이 끝났는지
     /// </summary>
     public bool IsFinished => isFinished;
+
+    /// <summary>
+    /// 웨이브가 시작됐는지 (Start 의 Wave 코루틴 시작 시점부터 true)
+    /// </summary>
+    public bool IsStarted => isStarted;
+
+    /// <summary>
+    /// 첫 웨이브를 시작한 Time.time (시작 전이면 -1)
+    /// </summary>
+    public float WaveStartTime => true == isStarted ? waveStartTime : -1f;
+
+    /// <summary>
+    /// 모든 웨이브 time 의 합 (Wave 코루틴이 건너뛰는 null 웨이브 / spwanArray 가 null 인 웨이브는 제외)
+    /// - 시작 전이면 지금 웨이브 목록으로 계산하고, 시작 후에는 시작할 때 계산한 값
+    /// </summary>
+    public float TotalWaveTime => true == isStarted ? totalWaveTime : CalculateWaveTime(0);
+
+    /// <summary>
+    /// 마지막 웨이브가 끝날 때까지 남은 시간 (스케일 게임 시간, 0 미만은 0)
+    /// - 시작 전이면 TotalWaveTime, 모든 웨이브가 끝나면 0
+    /// </summary>
+    public float RemainingTime
+    {
+        get
+        {
+            if (false == isStarted)
+            {
+                return TotalWaveTime;
+            }
+            if (true == isFinished)
+            {
+                return 0f;
+            }
+            return Mathf.Max(0f, timeAfterCurrentWave + currentWaveTime - (Time.time - currentWaveStartTime));
+        }
+    }
+
+    /// <summary>
+    /// _startIndex 번 웨이브부터 끝까지 time 합 (Wave 코루틴이 건너뛰는 웨이브 제외, 음수 time 은 0)
+    /// </summary>
+    private float CalculateWaveTime(int _startIndex)
+    {
+        if (null == waveArray)
+        {
+            return 0f;
+        }
+
+        float sum = 0f;
+        for (int i = _startIndex; i < waveArray.Length; i++)
+        {
+            if (null == waveArray[i] || null == waveArray[i].spwanArray)
+            {
+                continue;
+            }
+            sum += Mathf.Max(0f, waveArray[i].time);
+        }
+        return sum;
+    }
 
     /// <summary>
     /// 보상으로 몬스터 비율을 보정한다
@@ -485,6 +553,14 @@ public class Spawner
     {
         List<Coroutine> spawCoroutine = new List<Coroutine>();
 
+        // SetWaves 로 Start 전에 웨이브가 바뀔 수 있으므로 총 시간은 여기서 계산한다
+        totalWaveTime = CalculateWaveTime(0);
+        waveStartTime = Time.time;
+        currentWaveStartTime = waveStartTime;
+        currentWaveTime = 0f;
+        timeAfterCurrentWave = totalWaveTime;
+        isStarted = true;
+
         for (int i = 0; i < waveArray.Length; i++)
         {
             if (null == waveArray[i] || null == waveArray[i].spwanArray)
@@ -503,6 +579,11 @@ public class Spawner
 
             // 이후 스폰부터 이 웨이브의 HP / 데미지 / 속도 배율을 쓴다
             currentWaveIndex = i;
+
+            // 남은 시간 계산용 (이전 웨이브가 프레임 단위로 늦게 끝난 만큼 다시 맞춘다)
+            currentWaveStartTime = Time.time;
+            currentWaveTime = Mathf.Max(0f, waveArray[i].time);
+            timeAfterCurrentWave = CalculateWaveTime(i + 1);
 
             for (int j = 0; j < waveArray[i].spwanArray.Length; j++)
             {

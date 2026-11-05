@@ -20,3 +20,5 @@
 - WeaponRewardEffect: 보유 상한(PlayerStats.IsWeaponFull) 도달 시 Weapon 풀 차단, 미보유일 때는 ExcludeFor 안 함.
 - SelectPanelGroup: 디버프(Data2)는 PassiveBuff 패널에만(DebuffPairedPoolTypes, IsDebuffPaired). SelectPanel.debuffArea는 Data2 없으면 숨김. LevelUpUI는 Data2 null이면 상대 디버프 적용 생략.
 - PlayerStats: minMultiplier 0.5, GetMultiplier, maxWeaponCount 4, WeaponCount/IsWeaponFull. PlayerStatDebugUI는 GetMultiplier 표기.
+
+- PlayerStats.OnWeaponAdded/AcquiredWeapons 추가, 무기 HUD: [hud.md](hud.md)

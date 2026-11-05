@@ -44,10 +44,19 @@ public class PlayerStats
     // AddWeapon 으로 얻은 무기 (프리팹 → 생성된 무기), 같은 무기를 두 번 얻지 않도록 사용
     private readonly Dictionary<Weapon, Weapon> acquiredWeapons = new Dictionary<Weapon, Weapon>();
 
+    // 획득 순서 (Dictionary 는 순서를 보장하지 않으므로 따로 기록, 같은 인덱스끼리 프리팹 / 생성된 무기)
+    private readonly List<Weapon> acquiredPrefabOrder = new List<Weapon>();
+    private readonly List<Weapon> acquiredWeaponOrder = new List<Weapon>();
+
     /// <summary>
     /// 스텟이 바뀔 때 호출
     /// </summary>
     public event Action<PlayerStats> OnStatChanged;
+
+    /// <summary>
+    /// AddWeapon 으로 무기를 새로 얻었을 때 호출 (플레이어, 프리팹, 생성된 무기)
+    /// </summary>
+    public event Action<PlayerStats, Weapon, Weapon> OnWeaponAdded;
 
     public PlayerSide Side => side;
 
@@ -185,8 +194,21 @@ public class PlayerStats
         }
 
         acquiredWeapons.Add(_prefab, weapon);
+        acquiredPrefabOrder.Add(_prefab);
+        acquiredWeaponOrder.Add(weapon);
+        OnWeaponAdded?.Invoke(this, _prefab, weapon);
         return true;
     }
+
+    /// <summary>
+    /// AddWeapon 으로 얻은 무기 프리팹 (획득 순서, 시작 무기 포함)
+    /// </summary>
+    public IReadOnlyList<Weapon> AcquiredWeaponPrefabs => acquiredPrefabOrder;
+
+    /// <summary>
+    /// AddWeapon 으로 생성한 무기 (획득 순서, AcquiredWeaponPrefabs 와 같은 인덱스. 파괴됐으면 null 로 비교된다)
+    /// </summary>
+    public IReadOnlyList<Weapon> AcquiredWeapons => acquiredWeaponOrder;
 
     public bool HasWeapon(Weapon _prefab)
     {
