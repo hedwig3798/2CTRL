@@ -13,6 +13,7 @@
 
 ## 차원 연동 변경 (미커밋)
 - RewardManager: `SetPoolFor(side,type,items,weight)`(그 플레이어 type 풀을 전용 항목으로 교체, 공유 풀 미사용), `IsPoolOverriddenFor(side,type)`. SideState.overridden 추가. GetRandomUnique(side): overridden type 은 공유 풀 제외, `ExcludeFor` 는 전용 풀(side pool)에도 적용.
+- LevelUpUI 열기/닫기: Awake 시점 직계 자식을 contentObjects 에 저장해 그것만 On/Off. LetterboxCanvas 가 런타임에 자식을 LetterboxRoot 아래로 옮겨도 MainPanel 을 직접 켠다 (전에는 직계 자식=LetterboxRoot 만 켜져 패널이 안 보였음).
 - LevelUpUI/SelectPanelGroup: 게임 시작 무기 보상(grantStartReward, OpenStartReward, RefreshStartRewards 등) 제거. 시작 무기는 DimensionApplier 가 지급. 상세: dimension.md
 
 ## 밸런스 변경 (2026-11-02, 상세 balance.md)

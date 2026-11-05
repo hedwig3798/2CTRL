@@ -24,9 +24,19 @@ public class LevelUpUI
     // 선택해야 재개할 수 있는 선택지 그룹
     private SelectPanelGroup[] selectPanelGroups;
 
+    // 열고 닫을 패널들 (Awake 시점의 직계 자식)
+    // - LetterboxCanvas 가 나중에 자식을 LetterboxRoot 아래로 옮겨도 같은 오브젝트를 켜고 끄도록 미리 저장한다
+    private GameObject[] contentObjects;
+
     private void Awake()
     {
         ValidateSetup();
+
+        contentObjects = new GameObject[transform.childCount];
+        for (int i = 0; i < contentObjects.Length; ++i)
+        {
+            contentObjects[i] = transform.GetChild(i).gameObject;
+        }
 
         // 자식이 꺼지면 Awake 가 호출되지 않으므로, 끄기 전에 레벨업 구독을 위한 초기화를 해 둠
         selectPanelGroups = GetComponentsInChildren<SelectPanelGroup>(true);
@@ -215,13 +225,16 @@ public class LevelUpUI
     }
 
     /// <summary>
-    /// 루트는 이벤트 구독을 위해 켜둔 채, 직계 자식 전체를 On/Off
+    /// 루트는 이벤트 구독을 위해 켜둔 채, Awake 시점의 직계 자식 전체를 On/Off
     /// </summary>
     private void SetChildrenActive(bool _active)
     {
-        foreach (Transform child in transform)
+        foreach (GameObject content in contentObjects)
         {
-            child.gameObject.SetActive(_active);
+            if (null != content)
+            {
+                content.SetActive(_active);
+            }
         }
     }
 
