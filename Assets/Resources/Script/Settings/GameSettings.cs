@@ -11,6 +11,7 @@ using UnityEngine;
 ///   GameSettings.ShowDamageText = false;
 ///   float sfx = GameSettings.GetEffectiveVolume(AudioChannel.Effect);
 ///   GameSettings.OnShowEnemyHPBarChanged += HandleChanged;
+///   GameSettings.Language = Language.English; // 문자열 테이블 언어 (StringTable.CurrentLanguage 와 같음)
 ///
 /// 사운드 재생 쪽 규약 (실제 오디오 추가 시)
 /// - Master 는 SettingsApplier 가 AudioListener.volume 으로 전체 음량에 이미 적용한다.
@@ -31,6 +32,7 @@ public static class GameSettings
     private const string KEY_SHOW_DAMAGE_TEXT = KEY_PREFIX + "ShowDamageText";
     private const string KEY_VOLUME = KEY_PREFIX + "Volume.";
     private const string KEY_MUTE = KEY_PREFIX + "Mute.";
+    private const string KEY_LANGUAGE = KEY_PREFIX + "Language";
     // 채널별 키 (매번 문자열을 만들지 않도록 캐시)
     private static readonly string[] VOLUME_KEYS = BuildChannelKeys(KEY_VOLUME);
     private static readonly string[] MUTE_KEYS = BuildChannelKeys(KEY_MUTE);
@@ -48,6 +50,7 @@ public static class GameSettings
     private static bool showDamageText;
     private static readonly float[] volumes = new float[CHANNEL_COUNT];
     private static readonly bool[] mutes = new bool[CHANNEL_COUNT];
+    private static Language language;
 
     /// <summary>
     /// 화면 모드 인덱스가 바뀔 때 (새 인덱스, ScreenModes 기준)
@@ -65,6 +68,10 @@ public static class GameSettings
     /// 채널 볼륨 또는 음소거가 바뀔 때 (바뀐 채널. Master 가 바뀌면 다른 채널의 실제 음량도 바뀐다)
     /// </summary>
     public static event Action<AudioChannel> OnVolumeChanged;
+    /// <summary>
+    /// 표시 언어가 바뀔 때 (새 언어). StringTable.OnLanguageChanged 도 이 이벤트다
+    /// </summary>
+    public static event Action<Language> OnLanguageChanged;
 
     #region Public API
 
@@ -147,6 +154,31 @@ public static class GameSettings
             showDamageText = value;
             PlayerPrefs.SetInt(KEY_SHOW_DAMAGE_TEXT, value ? 1 : 0);
             OnShowDamageTextChanged?.Invoke(value);
+        }
+    }
+
+    /// <summary>
+    /// 표시 언어 (기본 한국어). StringTable.CurrentLanguage 가 이 값을 쓴다
+    /// </summary>
+    public static Language Language
+    {
+        get
+        {
+            EnsureLoaded();
+            return language;
+        }
+        set
+        {
+            EnsureLoaded();
+            Language next = LanguageInfo.Clamp((int)value);
+            if (next == language)
+            {
+                return;
+            }
+
+            language = next;
+            PlayerPrefs.SetInt(KEY_LANGUAGE, (int)next);
+            OnLanguageChanged?.Invoke(next);
         }
     }
 
@@ -251,6 +283,7 @@ public static class GameSettings
         bool prevDamage = showDamageText;
         float[] prevVolumes = (float[])volumes.Clone();
         bool[] prevMutes = (bool[])mutes.Clone();
+        Language prevLanguage = language;
         bool wasLoaded = isLoaded;
 
         Load();
@@ -278,6 +311,10 @@ public static class GameSettings
                 OnVolumeChanged?.Invoke((AudioChannel)i);
             }
         }
+        if (prevLanguage != language)
+        {
+            OnLanguageChanged?.Invoke(language);
+        }
     }
 
     #endregion
@@ -296,6 +333,7 @@ public static class GameSettings
         screenModeIndex = ScreenModes.Clamp(PlayerPrefs.GetInt(KEY_SCREEN_MODE, ScreenModes.DEFAULT_INDEX));
         showEnemyHPBar = 0 != PlayerPrefs.GetInt(KEY_SHOW_ENEMY_HP_BAR, DEFAULT_SHOW_ENEMY_HP_BAR ? 1 : 0);
         showDamageText = 0 != PlayerPrefs.GetInt(KEY_SHOW_DAMAGE_TEXT, DEFAULT_SHOW_DAMAGE_TEXT ? 1 : 0);
+        language = LanguageInfo.Clamp(PlayerPrefs.GetInt(KEY_LANGUAGE, (int)LanguageInfo.DEFAULT));
 
         for (int i = 0; i < CHANNEL_COUNT; ++i)
         {
@@ -324,5 +362,6 @@ public static class GameSettings
         OnShowEnemyHPBarChanged = null;
         OnShowDamageTextChanged = null;
         OnVolumeChanged = null;
+        OnLanguageChanged = null;
     }
 }

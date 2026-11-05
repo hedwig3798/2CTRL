@@ -1,0 +1,213 @@
+key,ko,en
+# 공통 UI : 타이틀
+ui.title.start,게임 시작,Start Game
+ui.title.settings,설정,Settings
+# 일시정지
+ui.pause.title,일시정지,Paused
+ui.pause.resume,계속하기,Resume
+ui.pause.settings,설정,Settings
+ui.pause.to_title,타이틀로,Back to Title
+# 설정 창
+ui.settings.title,설정,Settings
+ui.settings.header.general,일반,General
+ui.settings.language,언어,Language
+ui.settings.header.screen,화면,Display
+ui.settings.screen_mode,화면 크기,Screen Size
+ui.settings.screen_mode.fullscreen,전체 화면,Fullscreen
+ui.settings.header.info,정보 표시,Information
+ui.settings.enemy_hp_bar,적 체력바 표시,Enemy HP Bars
+ui.settings.damage_text,데미지 표시,Damage Numbers
+ui.settings.header.sound,소리,Sound
+ui.settings.volume.master,전체 음량,Master Volume
+ui.settings.volume.effect,효과음,Sound Effects
+ui.settings.volume.bgm,배경음,Music
+ui.settings.volume.on,켜짐,On
+ui.settings.volume.muted,음소거,Muted
+ui.settings.close,닫기,Close
+# 레벨업
+ui.levelup.resume,계속하기,Continue
+# HUD
+hud.weapon_slot.level,{0},{0}
+# 게임 오버
+gameover.title,게임 오버,Game Over
+gameover.victory,승리,Victory
+gameover.left_header,왼쪽 화면,Left Screen
+gameover.right_header,오른쪽 화면,Right Screen
+gameover.kill,킬 : {0},Kills : {0}
+gameover.damage_taken,받은 데미지 : {0:0},Damage Taken : {0:0}
+gameover.weapon_header,무기별 데미지,Damage by Weapon
+gameover.weapon_line,"  {0} : {1:0}","  {0} : {1:0}"
+gameover.no_weapon,"  없음","  None"
+gameover.exp,획득 EXP : {0:0},EXP Gained : {0:0}
+gameover.restart,재시작,Restart
+gameover.to_title,타이틀,Title
+# 스탯 이름 (ValueType)
+stat.damage,데미지,Damage
+stat.hp,체력,HP
+stat.move_speed,이동 속도,Move Speed
+stat.attack_speed,공격 속도,Attack Speed
+stat.range,범위,Range
+# 차원
+dimension.forest.name,숲,Forest
+dimension.factory.name,공장,Factory
+dimension.storm.name,폭풍,Storm
+"# 보상 : 패시브 ({0} = 스탯 이름, {1} = 값)"
+reward.passive.damage.name,데미지,Damage
+reward.passive.attack_speed.name,공격속도,Attack Speed
+reward.passive.move_speed.name,이동속도,Move Speed
+reward.passive.range.name,범위,Range
+reward.passive.hp.name,체력,HP
+reward.passive.buff_ga,{0}가 {1:0.#%} 증가합니다.,{0} increases by {1:0.#%}.
+reward.passive.buff_i,{0}이 {1:0.#%} 증가합니다.,{0} increases by {1:0.#%}.
+reward.passive.nerf_ga,{0}가 {1:0.#%;0.#%} 감소합니다.,{0} decreases by {1:0.#%;0.#%}.
+reward.passive.nerf_i,{0}이 {1:0.#%;0.#%} 감소합니다.,{0} decreases by {1:0.#%;0.#%}.
+reward.upgrade.name,{0} Lv.{1},{0} Lv.{1}
+# 보상 : 무기
+reward.weapon.boomerang.name,부메랑,Boomerang
+reward.weapon.boomerang.explain,적을 향해 날아갔다가 돌아오며 한 번 더 타격하는 부메랑을 얻습니다.,Gain a boomerang that flies toward enemies and strikes again on its way back.
+reward.weapon.chain.name,체인 라이트닝,Chain Lightning
+reward.weapon.chain.explain,"가장 가까운 적에게 번개를 쏘고, 주변의 다른 적에게 차례로 전이하며 타격하는 무기를 얻습니다.","Gain a weapon that strikes the nearest enemy with lightning, which then jumps from enemy to enemy nearby."
+reward.weapon.drone.name,드론,Drone
+reward.weapon.drone.explain,주변을 천천히 맴돌며 가장 가까운 적에게 탄을 쏘는 드론 2기를 얻습니다.,Gain 2 drones that slowly circle you and shoot at the nearest enemy.
+reward.weapon.explosive.name,폭발탄,Explosive Shell
+reward.weapon.explosive.explain,가장 가까운 적에게 포탄을 쏩니다. 적에게 맞으면 폭발해 주변의 모든 적에게 피해를 주고 밀어냅니다.,"Fires a shell at the nearest enemy. On hit, it explodes, damaging and knocking back all nearby enemies."
+reward.weapon.flame.name,화염 방사,Flamethrower
+reward.weapon.flame.explain,이동 방향으로 부채꼴 화염을 주기적으로 뿜어 범위 안의 모든 적을 태웁니다.,"Periodically sprays a cone of fire in your movement direction, burning every enemy in range."
+reward.weapon.laser.name,레이저,Laser
+reward.weapon.laser.explain,가장 가까운 적을 향해 즉시 광선을 쏘아 일직선 위의 적들을 관통하는 레이저를 얻습니다.,"Gain a laser that instantly fires a beam at the nearest enemy, piercing every enemy in a straight line."
+reward.weapon.lightning.name,낙뢰,Thunderbolt
+reward.weapon.lightning.explain,"사거리 안의 무작위 적 위에 표식을 남기고, 잠시 뒤 낙뢰를 떨어뜨려 주변에 피해를 줍니다.","Marks a random enemy in range, then calls down a thunderbolt a moment later that damages the area."
+reward.weapon.mine.name,지뢰,Mine
+reward.weapon.mine.explain,발밑에 지뢰를 설치합니다. 잠시 후 활성화된 지뢰를 적이 밟으면 폭발해 주변 적에게 피해를 주고 밀어냅니다.,"Plants a mine at your feet. Once armed, it explodes when an enemy steps on it, damaging and knocking back nearby enemies."
+reward.weapon.poison_zone.name,독 장판,Poison Pool
+reward.weapon.poison_zone.explain,"가장 가까운 적에게 독 장판을 던져, 장판 위의 적들에게 지속적으로 피해를 줍니다.",Throws a poison pool at the nearest enemy that continuously damages enemies standing in it.
+reward.weapon.root.name,뿌리 속박,Root Snare
+reward.weapon.root.explain,"주변 무작위 위치에 뿌리 지역을 만들어, 지역 위의 적에게 피해를 주고 느리게 만듭니다.",Creates root patches at random spots nearby that damage and slow enemies inside them.
+reward.weapon.saw.name,톱날,Saw Blade
+reward.weapon.saw.explain,화면 끝에서 톱날을 날려 가로로 지나가며 닿는 모든 적을 벱니다.,"Launches saw blades from the edge of the screen that sweep across, cutting every enemy they touch."
+reward.weapon.shockwave.name,충격파,Shockwave
+reward.weapon.shockwave.explain,주기적으로 주변에 충격파를 퍼뜨려 닿은 적에게 피해를 주고 멀리 밀쳐냅니다.,Periodically releases a shockwave that damages enemies it touches and pushes them far away.
+reward.weapon.spirit.name,정령,Spirit
+reward.weapon.spirit.explain,주변을 떠다니는 정령을 소환합니다. 정령은 가까운 적을 쫓아가 여러 번 공격합니다.,Summons spirits that float around you. They chase nearby enemies and attack several times.
+reward.weapon.split_shot.name,분열탄,Split Shot
+reward.weapon.split_shot.explain,"가장 가까운 적에게 탄을 쏘고, 맞은 자리에서 작은 조각 6개가 사방으로 퍼져 주변 적을 타격합니다.","Fires a shot at the nearest enemy that bursts into 6 fragments on impact, hitting enemies all around."
+reward.weapon.sweep.name,휘두르기,Sweep
+reward.weapon.sweep.explain,가까운 적을 향해 칼날을 크게 휘둘러 닿은 모든 적을 타격하고 밀쳐내는 근접 무기를 얻습니다.,"Gain a melee weapon that swings a wide blade toward nearby enemies, hitting and knocking back all it touches."
+reward.weapon.tornado.name,회오리,Tornado
+reward.weapon.tornado.explain,주변을 떠도는 회오리를 만들어 적을 끌어당기고 지속적으로 타격합니다.,Creates a wandering tornado that pulls enemies in and hits them continuously.
+reward.weapon.vine.name,덩굴,Thorn Vine
+reward.weapon.vine.explain,"지나간 자리에 가시 덩굴을 남겨, 덩굴 위의 적들에게 지속적으로 피해를 줍니다.",Leaves thorny vines along your path that continuously damage enemies standing on them.
+# 무기 업그레이드 단계 (빌더가 한국어 원문으로 키를 역조회. 번역문에 중괄호 금지)
+upgrade.damage_plus_20pct,데미지 +20%,Damage +20%
+upgrade.count_plus_1,개수 +1,Count +1
+upgrade.projectile_speed_plus_20pct,투사체 속도 +20%,Projectile Speed +20%
+upgrade.star_size_plus_40pct_hits_plus_10,"★ 크기 +40%, 타격 수 +10","★ Size +40%, Hits +10"
+upgrade.boomerang_size_plus_40pct_hits_plus_10,"부메랑 크기 +40%, 타격 수 +10","Boomerang Size +40%, Hits +10"
+upgrade.atk_speed_plus_15pct,공속 +15%,Atk Speed +15%
+upgrade.attack_speed_plus_15pct,공격 속도 +15%,Attack Speed +15%
+upgrade.range_plus_1_5,사거리 +1.5,Range +1.5
+upgrade.star_return_smash,★ 귀환 강타,★ Return Smash
+upgrade.1_5x_damage_on_the_way_back,돌아올 때 데미지 1.5배,1.5x damage on the way back
+upgrade.drone_shot_damage_plus_20pct,드론 탄 데미지 +20%,Drone Shot Damage +20%
+upgrade.drone_shot_atk_speed_plus_15pct,드론 탄 공속 +15%,Drone Shot Atk Speed +15%
+upgrade.drone_shot_attack_speed_plus_15pct,드론 탄 공격 속도 +15%,Drone Shot Attack Speed +15%
+upgrade.star_drone_double_shot,★ 드론 탄 2연발,★ Drone Double Shot
+upgrade.drones_fire_2_shots_in_a_row,드론이 탄을 2연발로 쏜다,Drones fire 2 shots in a row
+upgrade.orbit_radius_plus_0_4_drone_shot_range_plus_1_5,"공전 반경 +0.4, 드론 탄 사거리 +1.5","Orbit Radius +0.4, Drone Shot Range +1.5"
+upgrade.drone_orbit_radius_plus_0_4_drone_shot_range_plus_1_5,"드론 공전 반경 +0.4, 드론 탄 사거리 +1.5","Drone Orbit Radius +0.4, Drone Shot Range +1.5"
+upgrade.drone_plus_1,드론 +1,Drone +1
+upgrade.star_drone_shot_pierce_plus_1,★ 드론 탄 관통 +1,★ Drone Shot Pierce +1
+upgrade.drone_shot_pierce_plus_1,드론 탄 관통 +1,Drone Shot Pierce +1
+upgrade.explosion_radius_plus_20pct,폭발 반경 +20%,Explosion Radius +20%
+upgrade.star_count_plus_1,★ 개수 +1,★ Count +1
+upgrade.bomb_count_plus_1,폭탄 개수 +1,Bomb Count +1
+upgrade.knockback_plus_30pct,넉백 +30%,Knockback +30%
+upgrade.star_aftershock,★ 2차 폭발,★ Aftershock
+upgrade.after_0_3s_a_second_blast_with_60pct_radius_and_50pct_damage_hits_the_same_spot,"0.3초 뒤 같은 자리에 반경 60%, 데미지 50% 폭발","After 0.3s, a second blast with 60% radius and 50% damage hits the same spot"
+upgrade.pierce_plus_2,관통 +2,Pierce +2
+upgrade.width_plus_30pct,두께 +30%,Width +30%
+upgrade.beam_width_plus_30pct,광선 두께 +30%,Beam Width +30%
+upgrade.beam_plus_1_fan,광선 +1 (부채꼴),Beam +1 (fan)
+upgrade.pierce_plus_3,관통 +3,Pierce +3
+upgrade.star_count_plus_1_fan_angle_plus_5,"★ 개수 +1, 부채꼴 각도 +5","★ Count +1, Fan Angle +5"
+upgrade.beam_plus_1_fan_angle_plus_5,"광선 +1, 부채꼴 각도 +5","Beam +1, Fan Angle +5"
+upgrade.mine_plus_1,지뢰 +1,Mine +1
+upgrade.arm_delay_minus_50pct,활성화 지연 -50%,Arm Delay -50%
+upgrade.star_explosion_radius_plus_25pct_knockback_plus_50pct,"★ 폭발 반경 +25%, 넉백 +50%","★ Explosion Radius +25%, Knockback +50%"
+upgrade.explosion_radius_plus_25pct_knockback_plus_50pct,"폭발 반경 +25%, 넉백 +50%","Explosion Radius +25%, Knockback +50%"
+upgrade.mine_lifetime_plus_5s,지뢰 수명 +5초,Mine Lifetime +5s
+upgrade.star_chain_reaction,★ 연쇄 폭발,★ Chain Reaction
+upgrade.armed_mines_within_the_blast_also_explode,폭발 범위 안의 활성 지뢰도 터진다,Armed mines within the blast also explode
+upgrade.pool_size_plus_20pct,장판 크기 +20%,Pool Size +20%
+upgrade.duration_plus_0_5s,지속 +0.5초,Duration +0.5s
+upgrade.duration_plus_0_5s_2,지속 시간 +0.5초,Duration +0.5s
+upgrade.tick_interval_minus_10pct,틱 간격 -10%,Tick Interval -10%
+upgrade.damage_interval_minus_10pct,피해 간격 -10%,Damage Interval -10%
+upgrade.pool_count_plus_1,장판 개수 +1,Pool Count +1
+upgrade.star_slowing_pool,★ 둔화 장판,★ Slowing Pool
+upgrade.enemies_in_the_pool_move_30pct_slower,장판 위 적 이동속도 -30%,Enemies in the pool move 30% slower
+upgrade.radius_plus_15pct,반경 +15%,Radius +15%
+upgrade.wave_radius_plus_15pct,파동 반경 +15%,Wave Radius +15%
+upgrade.knockback_plus_25pct,넉백 +25%,Knockback +25%
+upgrade.star_double_wave,★ 2연속 파동,★ Double Wave
+upgrade.releases_2_waves_in_a_row,파동을 2번 연속으로 낸다,Releases 2 waves in a row
+upgrade.star_contracting_wave,★ 수축 파동,★ Contracting Wave
+upgrade.shrinks_back_from_max_radius_hitting_once_more_for_50pct_damage,최대 반경에서 다시 줄어들며 데미지 50%로 한 번 더 타격,"Shrinks back from max radius, hitting once more for 50% damage"
+upgrade.fragments_plus_2,조각 +2,Fragments +2
+upgrade.fragment_count_plus_2,조각 수 +2,Fragment Count +2
+upgrade.fragment_damage_ratio_plus_0_15,조각 데미지 비율 +0.15,Fragment Damage Ratio +0.15
+upgrade.star_main_shot_plus_1,★ 본탄 개수 +1,★ Main Shot +1
+upgrade.main_shot_count_plus_1,본탄 개수 +1,Main Shot Count +1
+upgrade.fragment_distance_plus_30pct,조각 거리 +30%,Fragment Distance +30%
+upgrade.fragment_travel_distance_plus_30pct,조각 비행 거리 +30%,Fragment Travel Distance +30%
+upgrade.star_reminus_split,★ 재분열,★ Re-split
+upgrade.fragments_split_once_more_into_3_where_they_first_hit_an_enemy,조각이 처음 맞힌 적 자리에서 3개로 1회 재분열,Fragments split once more into 3 where they first hit an enemy
+upgrade.blade_length_plus_20pct,칼날 길이 +20%,Blade Length +20%
+upgrade.star_both_ways,★ 양방향,★ Both Ways
+upgrade.also_swings_in_the_opposite_direction_at_the_same_time,반대 방향으로도 동시에 휘두른다,Also swings in the opposite direction at the same time
+upgrade.star_sword_wave,★ 검기,★ Sword Wave
+upgrade.each_swing_fires_a_piercing_sword_wave_toward_your_aim_for_60pct_damage,휘두를 때 조준 방향으로 데미지 60% 관통 검기 발사,Each swing fires a piercing sword wave toward your aim for 60% damage
+upgrade.chain_plus_1,전이 +1,Chain +1
+upgrade.chain_count_plus_1,전이 횟수 +1,Chain Count +1
+upgrade.chain_range_plus_20pct,전이 범위 +20%,Chain Range +20%
+upgrade.lightning_count_plus_1,번개 개수 +1,Lightning Count +1
+upgrade.chain_plus_2,전이 +2,Chain +2
+upgrade.chain_count_plus_2,전이 횟수 +2,Chain Count +2
+upgrade.star_amplify,★ 증폭,★ Amplify
+upgrade.damage_stacks_plus_15pct_with_each_jump,전이할 때마다 데미지 +15% 누적,Damage stacks +15% with each jump
+upgrade.area_plus_20pct,범위 +20%,Area +20%
+upgrade.star_vine_lifetime_plus_50pct,★ 덩굴 수명 +50%,★ Vine Lifetime +50%
+upgrade.vine_lifetime_plus_50pct,덩굴 수명 +50%,Vine Lifetime +50%
+upgrade.star_thorn_shot,★ 가시 발사,★ Thorn Shot
+upgrade.thorn_shot,가시 발사,Thorn Shot
+upgrade.chase_speed_plus_20pct,추적 속도 +20%,Chase Speed +20%
+upgrade.star_spirits_plus_2_max_5,★ 정령 +2 (최대 5),★ Spirits +2 (max 5)
+upgrade.spirits_plus_2_max_5,정령 +2 (최대 5),Spirits +2 (max 5)
+upgrade.star_attacks_plus_4,★ 공격 횟수 +4,★ Attacks +4
+upgrade.attacks_plus_4,공격 횟수 +4,Attacks +4
+upgrade.star_patches_plus_1_2_total,★ 지역 +1 (2개),★ Patches +1 (2 total)
+upgrade.patches_plus_1_2_total,지역 +1 (2개),Patches +1 (2 total)
+upgrade.lifetime_plus_1s,수명 +1초,Lifetime +1s
+upgrade.star_homing,★ 추적,★ Homing
+upgrade.homing,추적,Homing
+upgrade.size_plus_20pct,크기 +20%,Size +20%
+upgrade.move_speed_plus_20pct,이동 속도 +20%,Move Speed +20%
+upgrade.star_blades_plus_2_4_total,★ 톱날 +2 (4개),★ Blades +2 (4 total)
+upgrade.blades_plus_2_4_total,톱날 +2 (4개),Blades +2 (4 total)
+upgrade.star_bounce,★ 튕김,★ Bounce
+upgrade.bounce,튕김,Bounce
+upgrade.range_plus_20pct,사거리 +20%,Range +20%
+upgrade.star_fan_angle_plus_30,★ 부채꼴 각도 +30°,★ Fan Angle +30°
+upgrade.fan_angle_plus_30,부채꼴 각도 +30°,Fan Angle +30°
+upgrade.spray_time_plus_0_3s,분사 시간 +0.3초,Spray Time +0.3s
+upgrade.star_burn,★ 화상,★ Burn
+upgrade.burn,화상,Burn
+upgrade.star_tornadoes_plus_1_2_total,★ 회오리 +1 (2개),★ Tornadoes +1 (2 total)
+upgrade.tornadoes_plus_1_2_total,회오리 +1 (2개),Tornadoes +1 (2 total)
+upgrade.pull_plus_30pct,끌어당김 +30%,Pull +30%
+upgrade.star_permanent,★ 영구,★ Permanent
+upgrade.permanent,영구,Permanent
+upgrade.star_targets_plus_2_max_3,★ 대상 +2 (최대 3),★ Targets +2 (max 3)
+upgrade.targets_plus_2_max_3,대상 +2 (최대 3),Targets +2 (max 3)
+upgrade.star_linked_storm,★ 연결,★ Linked Storm
+upgrade.linked_storm,연결,Linked Storm

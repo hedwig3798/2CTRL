@@ -16,4 +16,5 @@
 - [dimension.md](dimension.md) — DimensionData/Applier/Selection, 차원 선택 UI, Spawner/RewardManager 연동
 - [balance.md](balance.md) — 웨이브 배율, 스탯 하한 0.5, 무기 상한 4, 몬스터 EXP, 레벨 공식, 디버프 규칙, 빌더
 - [settings.md](settings.md) — GameSettings(PlayerPrefs)/16:9 Letterbox/SettingsApplier, 설정창·일시정지 UI, 설정 빌더 5종과 실행 순서
+- [localization.md](localization.md) — StringTable(CSV ko/en)/LocalizedText/Language, 키 필드 목록, 새 텍스트 추가 절차, LocalizationBuilderUtil
 - [hud.md](hud.md) — 인게임 HUD: WaveTimerUI/WeaponHUD/WeaponSlotUI, Spawner 남은 시간, PlayerStats 무기 이벤트
