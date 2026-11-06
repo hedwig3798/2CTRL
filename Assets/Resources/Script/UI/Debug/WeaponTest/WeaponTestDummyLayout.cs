@@ -1,3 +1,4 @@
+#if UNITY_EDITOR || DEVELOPMENT_BUILD
 using System;
 using System.Collections.Generic;
 using UnityEngine;
@@ -106,3 +107,4 @@ public class WeaponTestDummyLayout
     }
     #endregion
 }
+#endif

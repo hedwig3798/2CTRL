@@ -31,3 +31,4 @@
 - `SpawnAt`에서 `ApplySkin(sa)`: SkinTarget(원본 컨트롤러/스프라이트 저장)으로 Animator 있으면 컨트롤러, 없으면 스프라이트 교체. 스킨 없으면 원본 복구. 상세: dimension.md
 
 - 웨이브 시간 API(IsStarted/RemainingTime 등) 추가: [hud.md](hud.md)
+- (2026-11-06) 디버그: `Spawner.DebugSkipWave()`(`#if UNITY_EDITOR || DEVELOPMENT_BUILD`). 그 조건에서 Wave() 대기는 WaitForSeconds 대신 `Time.time < currentWaveStartTime+currentWaveTime` 루프(yield null) + 스킵 플래그. 릴리스 빌드는 기존 WaitForSeconds.

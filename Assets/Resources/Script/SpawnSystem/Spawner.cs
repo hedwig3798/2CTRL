@@ -470,6 +470,26 @@ public class Spawner
         StartCoroutine(Wave());
     }
 
+#if UNITY_EDITOR || DEVELOPMENT_BUILD
+    private bool debugSkipWaveRequested = false;
+
+    /// <summary>
+    /// 디버그 전용 : 진행 중인 웨이브의 남은 시간을 건너뛰고 다음 웨이브로 넘어간다
+    /// - 마지막 웨이브에서 호출하면 모든 웨이브가 끝난 것으로 처리된다 (OnAllWavesFinished)
+    /// - 시작 전이거나 이미 끝났으면 false
+    /// </summary>
+    public bool DebugSkipWave()
+    {
+        if (false == isStarted || true == isFinished)
+        {
+            return false;
+        }
+
+        debugSkipWaveRequested = true;
+        return true;
+    }
+#endif
+
     private Spawnable CreateObject(Spawnable _sa)
     {
         Spawnable sa = Instantiate(_sa);
@@ -590,7 +610,18 @@ public class Spawner
                 spawCoroutine.Add(StartCoroutine(Spawn(waveArray[i].spwanArray[j])));
             }
 
+#if UNITY_EDITOR || DEVELOPMENT_BUILD
+            // 디버그 : DebugSkipWave 가 요청되면 대기를 끊고 다음 웨이브로 넘어간다
+            debugSkipWaveRequested = false;
+            float waveEndTime = currentWaveStartTime + currentWaveTime;
+            while (Time.time < waveEndTime && false == debugSkipWaveRequested)
+            {
+                yield return null;
+            }
+            debugSkipWaveRequested = false;
+#else
             yield return new WaitForSeconds(waveArray[i].time);
+#endif
         }
 
         isFinished = true;
