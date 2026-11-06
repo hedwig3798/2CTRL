@@ -212,17 +212,39 @@ public class Weapon
     }
 
     /// <summary>
-    /// 발사체 수명 (초) = (lifetime + 플레이어 Duration Add) × 배율
+    /// 지속 시간 하한 = 최초 지속 시간(프리팹 값, 업그레이드 전) × MinDurationRate
+    /// </summary>
+    public const float MinDurationRate = 0.5f;
+
+    /// <summary>
+    /// 발사체 수명 (초) = (lifetime + 플레이어 Duration Add) × 배율, 최초 lifetime × MinDurationRate 미만으로는 내려가지 않는다
     /// lifetime 이 0 이하면 발사체 Lifetime 기본값을 쓰라는 뜻이므로 0 그대로 둔다
     /// </summary>
-    public float FinalLifetime => lifetime > 0f ? Mathf.Max(0f, ApplyOwnerStat(lifetime, ValueType.Duration)) : 0f;
+    public float FinalLifetime
+    {
+        get
+        {
+            if (lifetime <= 0f)
+            {
+                return 0f;
+            }
+            EnsureBaseValues();
+            return ApplyDuration(lifetime, baseLifetime);
+        }
+    }
 
     /// <summary>
     /// 무기 필드가 아닌 지속 시간(Flame 분사 시간 등) 에 플레이어 Duration 을 적용한다 (태그 없으면 그대로)
+    /// - _initialSeconds(최초 지속 시간) 를 넘기면 그 × MinDurationRate 미만으로 내려가지 않는다 (0 이하면 하한 없음)
     /// </summary>
-    public float ApplyDuration(float _seconds)
+    public float ApplyDuration(float _seconds, float _initialSeconds = 0f)
     {
-        return Mathf.Max(0f, ApplyOwnerStat(_seconds, ValueType.Duration));
+        if (false == statTags.Has(ValueType.Duration))
+        {
+            return _seconds;
+        }
+        float value = Mathf.Max(0f, ApplyOwnerStat(_seconds, ValueType.Duration));
+        return _initialSeconds > 0f ? Mathf.Max(_initialSeconds * MinDurationRate, value) : value;
     }
 
     /// <summary>
