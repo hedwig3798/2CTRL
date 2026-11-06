@@ -32,7 +32,7 @@ public enum WEAPON_TYPE
 /// 타겟 탐색 / 공격 로직은 Projectile 이 담당한다
 /// - 무기 스텟(damage / attackSpeed / range) 은 플레이어 스텟과 따로 있으며, 실제 공격에는 Final* 값을 쓴다
 ///   Final = (무기 스텟 + 플레이어 ΣAdd) × 플레이어 배율 (PlayerStats.GetMultiplier, 모든 무기에 곱해짐)
-///   (주인 PlayerStats 가 없으면 무기 스텟 그대로)
+///   (주인 PlayerStats 가 없거나 statTags 에 해당 수치 태그가 없으면 무기 스텟 그대로)
 /// </summary>
 public class Weapon
     : MonoBehaviour
@@ -57,6 +57,10 @@ public class Weapon
     public float attackSpeed = 1f;
     [Tooltip("타겟 탐색 범위. 실제 값 = (range + 플레이어 Range Add) × 플레이어 Range 배율")]
     public float range;
+
+    [Header("weapon tag")]
+    [Tooltip("플레이어 버프 / 디버프를 받을 수치. 태그가 없는 수치는 플레이어 스텟을 무시하고 무기 값 그대로 쓴다")]
+    public WeaponStatTag statTags = WeaponStatTag.All;
 
     [Header("weapon spec")]
     [Tooltip("Repeat: 한 번에 발사하는 발사체 수 / Persistent: 유지하는 발사체 수")]
@@ -167,15 +171,22 @@ public class Weapon
     }
 
     /// <summary>
-    /// (_weaponValue + 주인 ΣAdd) × 주인 배율 (주인이 없으면 _weaponValue 그대로)
+    /// (_weaponValue + 주인 ΣAdd) × 주인 배율 (주인이 없거나 statTags 에 _type 태그가 없으면 _weaponValue 그대로)
     /// </summary>
     private float ApplyOwnerStat(float _weaponValue, ValueType _type)
     {
-        if (null == ownerStats)
+        if (null == ownerStats || false == statTags.Has(_type))
         {
             return _weaponValue;
         }
         return (_weaponValue + ownerStats.GetAdd(_type)) * ownerStats.GetMultiplier(_type);
+    }
+    /// <summary>
+    /// _type 수치가 플레이어 버프 / 디버프를 받는지 (statTags 에 태그가 있는지)
+    /// </summary>
+    public bool IsAffectedBy(ValueType _type)
+    {
+        return statTags.Has(_type);
     }
     #endregion
 

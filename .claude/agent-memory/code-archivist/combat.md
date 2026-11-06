@@ -32,6 +32,12 @@
 - (2026-11-03) WEAPON_TYPE 추가: Capped(공격 간격마다 1개 발사, 살아 있는 발사체 >= fireCount 면 발사/타이머 정지), Wave(발사체가 모두 사라진 뒤 간격 후 fireCount개 일괄). Weapon.cs UpdateCapped/UpdateWave, 살아있는 발사체 목록으로 셈.
 - PoisonZoneProjectile 상속 훅(protected virtual): LaunchZone(발사, 기본 AimAtNearest), IsSlowActive(기본 FlagSlowZone), OnLandedUpdate(착지 후 매 프레임), OnTick(radius, hitCount; ApplyAreaDamage가 hitCount 반환). 파생은 Awake/Update 선언 금지(가려짐). Vine/Root가 사용. 신규 무기 상세 weapon-upgrade.md.
 
+## 무기 태그 (2026-11-06, [balance.md](balance.md))
+- `Weapon.statTags`(기본 All), `Weapon.IsAffectedBy(ValueType)`. ApplyOwnerStat 이 태그 없는 수치는 플레이어 보정 무시. FinalCoolTime/FinalFireDelay 도 따라감.
+- `DroneProjectile.SetupChildWeapon`: 자식 무기에 부모 statTags 복사(Drone 프리팹 한 곳 관리).
+- `PlayerStatDebugUI.FormatWeaponStat`: 태그 없으면 "태그 없음: 버프 무시" 표시.
+- `Editor/Builders/WeaponTagBuilder.cs` (Tools/Builders/WeaponTag, 멱등): 무기 프리팹 재생성 빌더 뒤에 다시 실행 필요.
+
 ## 추가 무기 후속 (2026-11-03)
 - `Projectile.RefreshDamage()`(protected): weapon.FinalDamage × 발사 배율(LaunchAt damageRate)과 knockback 재기록. 오래 사는 발사체(Saw 튕김, Tornado 영구, Spirit)가 타격 직전 호출.
 - `PoisonZoneProjectile.SlowRate`(protected virtual) 훅. Root 는 `rootSlowRate` 0.4 로 override.

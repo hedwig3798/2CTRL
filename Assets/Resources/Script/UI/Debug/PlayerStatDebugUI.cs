@@ -160,9 +160,9 @@ public class PlayerStatDebugUI
                 }
 
                 builder.Append($"\n<b>무기 : {weapon.name}</b>{(weapon.isActiveAndEnabled ? string.Empty : " <color=#ff6666>(꺼짐)</color>")}\n");
-                builder.Append($"데미지  <b>{weapon.FinalDamage:0.##}</b>  <color=#999999>(({weapon.damage:0.##} {stats.GetAdd(ValueType.Damage):+0.##;-0.##;+0}) × {stats.GetMultiplier(ValueType.Damage):0.##})</color>\n");
-                builder.Append($"공격 속도  <b>{weapon.FinalAttackSpeed:0.##}</b>/s  <color=#999999>(({weapon.attackSpeed:0.##} {stats.GetAdd(ValueType.AttackSpeed):+0.##;-0.##;+0}) × {stats.GetMultiplier(ValueType.AttackSpeed):0.##}, 간격 {weapon.FinalCoolTime:0.##}s)</color>\n");
-                builder.Append($"범위  <b>{weapon.FinalRange:0.##}</b>  <color=#999999>(({weapon.range:0.##} {stats.GetAdd(ValueType.Range):+0.##;-0.##;+0}) × {stats.GetMultiplier(ValueType.Range):0.##})</color>\n");
+                builder.Append($"데미지  <b>{weapon.FinalDamage:0.##}</b>  <color=#999999>({FormatWeaponStat(weapon, stats, ValueType.Damage, weapon.damage)})</color>\n");
+                builder.Append($"공격 속도  <b>{weapon.FinalAttackSpeed:0.##}</b>/s  <color=#999999>({FormatWeaponStat(weapon, stats, ValueType.AttackSpeed, weapon.attackSpeed)}, 간격 {weapon.FinalCoolTime:0.##}s)</color>\n");
+                builder.Append($"범위  <b>{weapon.FinalRange:0.##}</b>  <color=#999999>({FormatWeaponStat(weapon, stats, ValueType.Range, weapon.range)})</color>\n");
                 if (weapon.fireDelay > 0f)
                 {
                     builder.Append($"발사 딜레이  <b>{weapon.FinalFireDelay:0.###}</b>s  <color=#999999>(기본 {weapon.fireDelay:0.###}s)</color>\n");
@@ -175,6 +175,16 @@ public class PlayerStatDebugUI
         }
 
         DrawBox(_position);
+    }
+
+    // 무기 수치 계산식. 태그가 없으면 플레이어 스텟을 무시하므로 그 사실을 표시한다
+    private static string FormatWeaponStat(Weapon _weapon, PlayerStats _stats, ValueType _type, float _weaponValue)
+    {
+        if (false == _weapon.IsAffectedBy(_type))
+        {
+            return $"{_weaponValue:0.##}, 태그 없음: 버프 무시";
+        }
+        return $"({_weaponValue:0.##} {_stats.GetAdd(_type):+0.##;-0.##;+0}) × {_stats.GetMultiplier(_type):0.##}";
     }
 
     private void DrawSpawner(Vector2 _position)

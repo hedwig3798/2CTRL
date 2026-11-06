@@ -11,6 +11,7 @@ metadata:
 ## 플레이어 스탯
 - PlayerStats: GetMultiplier = max(minMultiplier 0.5, 1+ΣMul). Get = (base+ΣAdd) x 배율. maxWeaponCount 4(시작 무기 포함), AddWeapon은 상한이면 false.
 - Weapon: Final* = (무기값 + 플레이어 GetAdd) x 플레이어 GetMultiplier (ApplyOwnerStat). Damage/AttackSpeed/Range 모두 곱연산.
+- 무기 태그 (2026-11-06): `StatSystem/WeaponStatTag.cs` [Flags] {None, Damage, AttackSpeed, Range, All}, `WeaponStatTagUtils.FromValueType`/`Has(tags, ValueType)` (HP·MoveSpeed 는 항상 false). 태그 없는 수치는 플레이어 ΣAdd/배율 무시(무기 값 그대로). Weapon.statTags 기본 All. 빌더 `WeaponTagBuilder`: Saw/Shockwave/Tornado/Vine = Damage|AttackSpeed, 나머지 All. 테스트 `Tests/EditMode/WeaponStatTagTests.cs`.
 ## EXP / 레벨
 - MonsterData.expValue(기본 1) -> DropManager가 죽은 MonsterBrain.Data.expValue를 아이템 expRate로(없으면 defaultExpRate 1).
 - LevelTable: baseExp/coef/power/formulaLevelOffset(1). 필요 EXP = baseExp + coef x L^power, L=currLevel+offset. UseFormula/HasData/GetNeedExp(level). 둘 다 0이면 expTable 사용. ExpSystem은 GetNeedExp 위임.
