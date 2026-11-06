@@ -39,6 +39,15 @@ namespace Builders.Visual
         // UI 픽셀을 화면에서 2배로 보이게 (Canvas 기준 PPU 100 / 스프라이트 PPU 32 / 2)
         private const float UI_PIXEL_MULT = 100f / PPU / 2f;
 
+        // 가시성 조정: 그림(visual)만 키우고 충돌 판정·HP 바는 그대로 둔다
+        private const float PLAYER_VISUAL_SCALE = 1.3f;
+        private const float MONSTER_VISUAL_SCALE = 1.15f;
+        private const float WEAPON_VISUAL_SCALE = 1.15f;
+        private const float EXP_GEM_WORLD_SCALE = 0.4f;    // 16px 그림 기준 (이전 0.6)
+        // 분할 화면에서 플레이어가 화면 경계(가운데) 쪽으로 보이도록 카메라를 바깥으로 미는 거리 (유닛)
+        // 스폰 반경(11~13)보다 화면 바깥쪽 모서리가 멀어지지 않게 작게 둔다
+        private const float CAMERA_CENTER_BIAS = 1.2f;
+
         // tools/art/tiles.py 의 SHAPES 순서와 같아야 한다
         private static readonly string[] TILE_SHAPES =
         {
@@ -336,7 +345,7 @@ namespace Builders.Visual
             EditPrefab("Assets/prefab/Player/Player.prefab", root =>
             {
                 Transform visual = root.transform.Find("visual");
-                visual.localScale = Vector3.one;
+                visual.localScale = Vector3.one * PLAYER_VISUAL_SCALE;
                 var sr = visual.GetComponent<SpriteRenderer>();
                 sr.sprite = Frames(ART + "/Player/" + PLAYERS[0].strip + "_Idle.png")[0];
                 visual.GetComponent<Animator>().runtimeAnimatorController = ctrl;
@@ -402,6 +411,7 @@ namespace Builders.Visual
                 EditPrefab(MONSTER_DIR + "/" + prefab + "/" + prefab + ".prefab", root =>
                 {
                     Transform visual = root.transform.Find("visual");
+                    visual.localScale = Vector3.one * MONSTER_VISUAL_SCALE;
                     var sr = visual.GetComponent<SpriteRenderer>();
                     sr.sprite = Frames(ART + "/Monster/" + strip + "_Walk.png")[0];
                     sr.color = Color.white;
@@ -610,6 +620,23 @@ namespace Builders.Visual
                 SetVisual(W + p + ".prefab", "visual", "Common_Weapon_Bullet", white, "attack");
             }
 
+            // 개체형 탄(크기 = 그림)만 소폭 키운다. 범위형(오라·장판·폭발·충격파 등)은 판정 반경과 맞물려 있어 그대로
+            var projectileScales = new (string prefab, float baseScale)[]
+            {
+                ("bullet/bullet", 1f), ("bullet/OrbitProjectile", 1f), ("Boomerang/BoomerangProjectile", 1f),
+                ("SplitShot/SplitShotProjectile", 0.5f), ("SplitShot/SplitShotFragment", 0.25f),
+                ("Drone/DroneProjectile", 0.4f), ("Drone/DroneBullet", 0.22f), ("Mine/MineProjectile", 0.4f),
+                ("Explosive/ExplosiveProjectile", 0.5f),
+            };
+            foreach (var (p, baseScale) in projectileScales)
+            {
+                EditPrefab(W + p + ".prefab", root =>
+                {
+                    Transform v = root.transform.Find("visual");
+                    v.localScale = new Vector3(baseScale * WEAPON_VISUAL_SCALE, baseScale * WEAPON_VISUAL_SCALE, 1f);
+                });
+            }
+
             // 몬스터 자폭 폭발 / 위험 지대
             EditPrefab(MONSTER_DIR + "/Bomber/BomberExplosion.prefab", root =>
             {
@@ -671,7 +698,7 @@ namespace Builders.Visual
             {
                 Transform v = root.transform.Find("visual");
                 StyleSprite(v.GetComponent<SpriteRenderer>(), "D1_Weapon_Vine_Thorn", 1);
-                SetScaleAt(v, 0f, 0f, 0.5f, 0.5f);
+                SetScaleAt(v, 0f, 0f, 0.5f * WEAPON_VISUAL_SCALE, 0.5f * WEAPON_VISUAL_SCALE);
             });
             EditPrefab(W + "Root/RootProjectile.prefab", root =>
             {
@@ -683,7 +710,7 @@ namespace Builders.Visual
             EditPrefab(W + "Spirit/SpiritProjectile.prefab", root =>
             {
                 StyleSprite(root.GetComponent<SpriteRenderer>(), "D1_Weapon_Spirit_Body", 1);
-                root.transform.localScale = new Vector3(0.8f, 0.8f, 1f);
+                root.transform.localScale = new Vector3(0.8f * WEAPON_VISUAL_SCALE, 0.8f * WEAPON_VISUAL_SCALE, 1f);
             });
             EditPrefab(W + "Saw/SawProjectile.prefab", root =>
             {
@@ -748,7 +775,7 @@ namespace Builders.Visual
                 Transform visual = root.transform.Find("visual");
                 // 루트가 커져 있어도 월드 크기가 플레이어보다 작게 (16px 그림 기준 0.6배)
                 float parent = null != visual.parent ? visual.parent.lossyScale.x : 1f;
-                visual.localScale = Vector3.one * (0.6f / Mathf.Max(0.01f, parent));
+                visual.localScale = Vector3.one * (EXP_GEM_WORLD_SCALE / Mathf.Max(0.01f, parent));
                 // 초록 슬라임과 헷갈리지 않게 노란 보석
                 visual.GetComponent<SpriteRenderer>().sprite = Single("Item/Common_Item_ExpGem_Yellow");
             });
@@ -767,6 +794,10 @@ namespace Builders.Visual
             ("RangeUpgrade", "RangeUp"), ("SpeedUpgrade", "SpeedUp"),
             ("AttackNuff", "AttackSpeedDown"), ("DamageNuff", "DamageDown"), ("HPNuff", "HPDown"),
             ("MovespeedNuff", "SpeedDown"), ("RangeNuff", "RangeDown"),
+            // 추가 패시브 (tools/art/passive_icons.py)
+            ("DurationUpgrade", "DurationUp"), ("ProjectileUpgrade", "ProjectileUp"), ("HPRegenUpgrade", "HPRegenUp"),
+            ("MonsterDecrease", "MonsterDown"), ("DurationNuff", "DurationDown"), ("HPRegenNuff", "HPRegenDown"),
+            ("MonsterIncreaseNuff", "MonsterUp"),
         };
 
         private static void BuildIcons()
@@ -794,10 +825,6 @@ namespace Builders.Visual
                     while (it.Next(true))
                     {
                         if (SerializedPropertyType.ObjectReference == it.propertyType && "image" == it.name)
-            // 추가 패시브 (tools/art/passive_icons.py)
-            ("DurationUpgrade", "DurationUp"), ("ProjectileUpgrade", "ProjectileUp"), ("HPRegenUpgrade", "HPRegenUp"),
-            ("MonsterDecrease", "MonsterDown"), ("DurationNuff", "DurationDown"), ("HPRegenNuff", "HPRegenDown"),
-            ("MonsterIncreaseNuff", "MonsterUp"),
                         {
                             it.objectReferenceValue = icon;
                             changed = true;
@@ -1120,6 +1147,18 @@ namespace Builders.Visual
                 foreach (Button b in roots.SelectMany(r => r.GetComponentsInChildren<Button>(true)))
                 {
                     StyleButton(b);
+                }
+                // 좌우 분할 카메라를 바깥쪽으로 밀어 플레이어가 화면 가운데 경계 쪽에 보이게
+                foreach (Follow follow in roots.SelectMany(r => r.GetComponentsInChildren<Follow>(true)))
+                {
+                    Camera cam = follow.GetComponent<Camera>();
+                    if (null == cam || cam.rect.width >= 1f)
+                    {
+                        continue;
+                    }
+                    float side = cam.rect.center.x < 0.5f ? -1f : 1f;
+                    follow.offset = new Vector2(side * CAMERA_CENTER_BIAS, 0f);
+                    EditorUtility.SetDirty(follow);
                 }
                 foreach (Transform r in roots)
                 {
