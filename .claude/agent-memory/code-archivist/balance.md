@@ -26,3 +26,7 @@ metadata:
 ## 데이터 빌더 (2026-11-02)
 - `Assets/Editor/Builders/BalanceDataBuilder.cs` (메뉴 Tools/Builders/BalanceData, 멱등): 플레이어 HP, 몬스터 HP·접촉 데미지·EXP, 레벨 공식, 무기 데미지, 패시브 %, 보상 가중치를 기획서 값으로 SerializedObject 로 적용. `ApplyWeaponDamage()` 로 다른 빌더가 덮어쓴 무기 데미지를 복구.
 - 순서: WeaponUpgradeBuilder → Wave30Builder → (필요 시) BalanceDataBuilder.
+
+## 지속시간 하한 / 풀 가중치 (2026-11-06)
+- Weapon.MinDurationRate 0.5: FinalLifetime/ApplyDuration(sec, initial) 이 최초(프리팹) 지속 시간 x0.5 아래로 안 내려감. Flame 은 burstDuration 기준.
+- BalanceDataBuilder.SetPoolWeights 는 PassiveRewardBuilder.TryGetWeight 를 우선 적용 (ProjectileUpgrade 0.3).

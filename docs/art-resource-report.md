@@ -41,6 +41,7 @@
 - `Editor/Builders/Visual/ArtResourceBuilder.cs` (신규, 멱등): 임포트·슬라이스·애니메이션·타일·프리팹·씬 적용 전체. `Game.Editor.asmdef` 에 `Unity.2D.Sprite.Editor` 참조 추가.
   - 다시 적용: `unity command script eval --code 'return Builders.Visual.ArtResourceBuilder.Build();'`
 - 이미지 재생성: `tools/art/tiles.py`, `actors.py`, `fx.py` (Ninja Adventure 압축 해제 경로를 인자로 받음)
+- 추가 패시브 아이콘 7종: `tools/art/passive_icons.py <pack_root> Assets/Resources/Textuer/Art/Icon` 후 `ArtResourceBuilder.Build()`
 
 ## 확인한 것
 - 플레이 모드 캡처: GameScene(숲 vs 공장, 폭풍 vs 공장, 숲 vs 폭풍), 타이틀, 차원 선택, 레벨업 선택창, 게임 오버(승패 표시).

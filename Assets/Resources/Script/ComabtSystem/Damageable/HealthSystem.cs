@@ -89,6 +89,28 @@ public class HealthSystem
         OnHPChanged?.Invoke(currHP, maxHP);
     }
 
+    /// <summary>
+    /// 초당 _rate 만큼 회복한다 (0 이하면 회복 없음, 죽었거나 다운이면 무시, 최대 HP 를 넘지 않음)
+    /// </summary>
+    public void ApplyRegen(float _rate, float _deltaTime)
+    {
+        if (_rate <= 0f || _deltaTime <= 0f || true == isDead || CurrHP >= MaxHP)
+        {
+            return;
+        }
+        CurrHP = Mathf.Min(MaxHP, CurrHP + _rate * _deltaTime);
+    }
+
+    // 플레이어만 체력 재생 (PlayerStats HPRegen, 기본 0. PlayerStats.Get 이 0 미만을 0 으로 자른다)
+    private void Update()
+    {
+        if (null == playerStats)
+        {
+            return;
+        }
+        ApplyRegen(playerStats.Get(ValueType.HPRegen), Time.deltaTime);
+    }
+
     public void SetMaxHP(float _val)
     {
         if (true == Mathf.Approximately(maxHP, _val))

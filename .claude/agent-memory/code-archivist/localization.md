@@ -42,3 +42,6 @@ WeaponRewardNameKey/ExplainKey(id), ToSnake(id), KeyOfKorean(원문) (CSV 첫 ko
 2. 고정 라벨: LocalizedText(빌더에서 Bind). 코드가 넣는 텍스트: StringTable.Get/Format 후 OnLanguageChanged 구독/해제(OnEnable/OnDisable)로 재적용.
 3. 데이터 SO 필드: 키를 저장하고 표시 시 StringTable.Resolve.
 4. 빌더는 LocalizationBuilderUtil 사용 후 씬/프리팹 빌더 재실행 (ArtResourceBuilder 도 재실행 주의 - CLAUDE.md).
+
+## 추가 키 (2026-11-06)
+reward.passive.duration.name / projectile_count.name / monster.name / count_up / monster_down / monster_up

@@ -23,3 +23,10 @@
 - PlayerStats: minMultiplier 0.5, GetMultiplier, maxWeaponCount 4, WeaponCount/IsWeaponFull. PlayerStatDebugUI는 GetMultiplier 표기.
 
 - PlayerStats.OnWeaponAdded/AcquiredWeapons 추가, 무기 HUD: [hud.md](hud.md)
+
+## 추가 패시브 (2026-11-06, 미커밋)
+- SpawnerRewardEffect.extraTypes: type 과 같은 value 로 함께 변경. 에셋 Upgrade/Effects/MonsterCountHPEffect.asset (Count+HP, Add).
+- 보상 5개: PassiveBuff/MonsterDecrease(-5% 스폰율·체력, 내 쪽), DurationUpgrade(+10%, StatPercentEffect), ProjectileUpgrade(+1, StatAddEffect, 풀 가중치 0.3) / PassiveNuff/MonsterIncreaseNuff(+3%, 상대 쪽), DurationNuff(-6%). 투사체 수 디버프 없음. 아이콘 없음(image 비움).
+- 빌더 Editor/Builders/PassiveRewardBuilder.cs (Tools/Builders/PassiveReward, 멱등): 에셋 생성 + RewardManager 프리팹·GameScene 풀 등록, TryGetWeight 제공.
+- 테스트 Tests/EditMode/PassiveRewardTests.cs.
+- 체력 재생 (2026-11-06): ValueType.HPRegen(끝에 추가, base 0, Get 이 0 미만을 0 으로). HealthSystem.ApplyRegen(rate, dt)(죽음/다운/최대치면 무시), Update 에서 playerStats 있을 때만 Get(HPRegen) 적용. 보상 PassiveBuff/HPRegenUpgrade(+0.5/s, StatAddEffect), PassiveNuff/HPRegenNuff(-0.3/s). StringTable stat.hp_regen, reward.passive.hp_regen.name/regen_up/regen_down. PassiveRewardBuilder 는 GameScene 열기 전 SaveCurrentModifiedScenesIfUserWantsTo.

@@ -47,10 +47,11 @@ stat.hp,체력,HP
 stat.move_speed,이동 속도,Move Speed
 stat.attack_speed,공격 속도,Attack Speed
 stat.range,범위,Range
-# 차원
 stat.duration,지속 시간,Duration
 stat.projectile_count,투사체 수,Projectile Count
 dimension.forest.name,숲,Forest
+stat.hp_regen,체력 재생,HP Regen
+# 차원
 dimension.factory.name,공장,Factory
 dimension.storm.name,폭풍,Storm
 "# 보상 : 패시브 ({0} = 스탯 이름, {1} = 값)"
@@ -60,6 +61,15 @@ reward.passive.move_speed.name,이동속도,Move Speed
 reward.passive.range.name,범위,Range
 reward.passive.hp.name,체력,HP
 reward.passive.buff_ga,{0}가 {1:0.#%} 증가합니다.,{0} increases by {1:0.#%}.
+reward.passive.duration.name,지속 시간,Duration
+reward.passive.projectile_count.name,투사체 수,Projectile Count
+reward.passive.monster.name,몬스터 감소,Fewer Monsters
+reward.passive.count_up,{0}가 {1:0}개 증가합니다.,{0} increases by {1:0}.
+reward.passive.monster_down,몬스터 스폰율과 체력이 {1:0.#%;0.#%} 감소합니다.,Monster spawn rate and HP decrease by {1:0.#%;0.#%}.
+reward.passive.hp_regen.name,체력 재생,HP Regen
+reward.passive.regen_up,{0}이 초당 {1:0.#} 증가합니다.,{0} increases by {1:0.#}/s.
+reward.passive.regen_down,{0}이 초당 {1:0.#;0.#} 감소합니다.,{0} decreases by {1:0.#;0.#}/s.
+reward.passive.monster_up,몬스터 스폰율과 체력이 {1:0.#%} 증가합니다.,Monster spawn rate and HP increase by {1:0.#%}.
 reward.passive.buff_i,{0}이 {1:0.#%} 증가합니다.,{0} increases by {1:0.#%}.
 reward.passive.nerf_ga,{0}가 {1:0.#%;0.#%} 감소합니다.,{0} decreases by {1:0.#%;0.#%}.
 reward.passive.nerf_i,{0}이 {1:0.#%;0.#%} 감소합니다.,{0} decreases by {1:0.#%;0.#%}.

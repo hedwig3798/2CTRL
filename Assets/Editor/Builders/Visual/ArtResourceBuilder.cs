@@ -794,6 +794,10 @@ namespace Builders.Visual
                     while (it.Next(true))
                     {
                         if (SerializedPropertyType.ObjectReference == it.propertyType && "image" == it.name)
+            // 추가 패시브 (tools/art/passive_icons.py)
+            ("DurationUpgrade", "DurationUp"), ("ProjectileUpgrade", "ProjectileUp"), ("HPRegenUpgrade", "HPRegenUp"),
+            ("MonsterDecrease", "MonsterDown"), ("DurationNuff", "DurationDown"), ("HPRegenNuff", "HPRegenDown"),
+            ("MonsterIncreaseNuff", "MonsterUp"),
                         {
                             it.objectReferenceValue = icon;
                             changed = true;

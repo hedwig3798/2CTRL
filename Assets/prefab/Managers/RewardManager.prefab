@@ -73,8 +73,22 @@ MonoBehaviour:
       entries: []
   - type: 2
     pool:
-      entries: []
+      entries:
+      - item: {fileID: 11400000, guid: b3551b29145677347bc656ee6e7f953a, type: 2}
+        weight: 1
+      - item: {fileID: 11400000, guid: 6b9f253ad7ad01b48bea5a7fab3003a5, type: 2}
+        weight: 1
+      - item: {fileID: 11400000, guid: e60c815f60ddfac4eb25baa1daa390a4, type: 2}
+        weight: 0.3
+      - item: {fileID: 11400000, guid: e6fbca26381eb084ab3de55a55129874, type: 2}
+        weight: 1
   - type: 3
     pool:
-      entries: []
+      entries:
+      - item: {fileID: 11400000, guid: e79d5f1aa84d15240a570fb47bd9d1ea, type: 2}
+        weight: 1
+      - item: {fileID: 11400000, guid: 3f5c5c4e5af9c5042a62e1dfe2901921, type: 2}
+        weight: 1
+      - item: {fileID: 11400000, guid: f7819a030bd55544bbb54fd16798f0c7, type: 2}
+        weight: 1
   spawner: {fileID: 0}

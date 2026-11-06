@@ -13,6 +13,8 @@ public enum ValueType
     // 보상 에셋에 정수로 직렬화되므로 순서를 바꾸지 말고 끝에만 추가한다
     Duration,
     ProjectileCount,
+    // 플레이어 초당 체력 회복량 (base 0, HealthSystem 이 사용. 0 미만은 0)
+    HPRegen,
 }
 
 /// <summary>
@@ -39,6 +41,8 @@ public static class ValueTypeExtensions
                 return "stat.duration";
             case ValueType.ProjectileCount:
                 return "stat.projectile_count";
+            case ValueType.HPRegen:
+                return "stat.hp_regen";
             default:
                 return null;
         }

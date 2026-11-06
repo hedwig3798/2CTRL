@@ -355,7 +355,10 @@ namespace Builders
                 }
                 for (int e = 0; e < entries.arraySize; ++e)
                 {
-                    entries.GetArrayElementAtIndex(e).FindPropertyRelative("weight").floatValue = weight;
+                    SerializedProperty entry = entries.GetArrayElementAtIndex(e);
+                    // PassiveRewardBuilder 가 정한 가중치(투사체 수 0.3 등) 는 유지한다
+                    float entryWeight = PassiveRewardBuilder.TryGetWeight(entry.FindPropertyRelative("item").objectReferenceValue, out float custom) ? custom : weight;
+                    entry.FindPropertyRelative("weight").floatValue = entryWeight;
                 }
                 sb.Append($"{typeName} x{entries.arraySize}={weight} ");
             }
