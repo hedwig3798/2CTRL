@@ -7,7 +7,7 @@ using UnityEngine;
 /// 대상 위에 표식을 markDelay 초 띄운 뒤 그 자리에 낙뢰를 떨어뜨려 반경(areaRadius) 안의 적 모두에게 데미지를 준다
 /// - 표식은 대상을 따라간다. 대상이 표식 중 죽거나 사라지면 마지막으로 본 위치에 떨어진다
 /// - 낙뢰 표시가 effectDuration 초 보인 뒤 풀로 돌아간다 (Lifetime 을 붙이지 않는다)
-/// - 대상 수 : weapon.GetParamInt(StrikeCount, strikeCount)
+/// - 대상 수 : weapon.GetParamInt(StrikeCount, strikeCount) + (weapon.FinalFireCount - 1). 무기는 발사체를 1 개만 꺼낸다 (HandlesFireCount)
 /// - ★ FlagStormLink : 낙뢰 직후 낙뢰 지점들을 전기선으로 잇는다
 ///   3 지점 이상이면 볼록 껍질(3 명이면 삼각형) 안쪽 + 테두리 선 위, 2 지점이면 두 점 사이 선(두께 linkWidth) 위의 적에게 데미지 * linkDamageRate (같은 적 1 회)
 /// </summary>
@@ -127,11 +127,16 @@ public class LightningProjectile
         }
     }
 
+    // 무기는 낙뢰 발사체를 1 개만 꺼내고, 발사 수(FinalFireCount) 는 낙뢰 수로 더한다
+    public override bool HandlesFireCount => true;
+
     protected override bool OnLaunch()
     {
         ResetState(true);
 
-        int want = Mathf.Max(1, weapon.GetParamInt(WeaponParam.StrikeCount, strikeCount));
+        // 낙뢰 수 = StrikeCount(업그레이드 포함) + (최종 발사 수 - 1). 기본 fireCount 1 이면 StrikeCount 그대로
+        int extra = Mathf.Max(0, weapon.FinalFireCount - 1);
+        int want = Mathf.Max(1, weapon.GetParamInt(WeaponParam.StrikeCount, strikeCount) + extra);
         int found = FindAll(weapon.transform.position, weapon.FinalRange, candidates);
         if (0 == found)
         {

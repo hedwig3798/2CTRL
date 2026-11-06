@@ -166,7 +166,7 @@ public class Weapon
             }
 
             float delay = fireDelay * (attackSpeed / speed);
-            return Mathf.Min(delay, FinalCoolTime / Mathf.Max(1, fireCount));
+            return Mathf.Min(delay, FinalCoolTime / Mathf.Max(1, LaunchCount));
         }
     }
 
@@ -181,6 +181,50 @@ public class Weapon
         }
         return (_weaponValue + ownerStats.GetAdd(_type)) * ownerStats.GetMultiplier(_type);
     }
+    /// <summary>
+    /// 한 번에 발사하는 발사체 수 = round((fireCount + 플레이어 ProjectileCount Add) × 배율)
+    /// fireCount 가 0 이하면 발사하지 않는 무기로 보고 0, 아니면 최소 1 (디버프로 0 발이 되지 않게)
+    /// </summary>
+    public int FinalFireCount
+    {
+        get
+        {
+            if (fireCount <= 0)
+            {
+                return 0;
+            }
+            // RoundToInt 는 .5 를 짝수로 반올림하므로(2.5 → 2) .5 는 항상 올린다
+            return Mathf.Max(1, Mathf.FloorToInt(ApplyOwnerStat(fireCount, ValueType.ProjectileCount) + 0.5f));
+        }
+    }
+
+    /// <summary>
+    /// 실제로 꺼내는 발사체 수
+    /// 발사체가 발사 수를 직접 처리하면(Projectile.HandlesFireCount, 예: Lightning 은 낙뢰 수로 씀) 1 개만 꺼낸다
+    /// </summary>
+    public int LaunchCount
+    {
+        get
+        {
+            int count = FinalFireCount;
+            return null != projectile && true == projectile.HandlesFireCount ? Mathf.Min(1, count) : count;
+        }
+    }
+
+    /// <summary>
+    /// 발사체 수명 (초) = (lifetime + 플레이어 Duration Add) × 배율
+    /// lifetime 이 0 이하면 발사체 Lifetime 기본값을 쓰라는 뜻이므로 0 그대로 둔다
+    /// </summary>
+    public float FinalLifetime => lifetime > 0f ? Mathf.Max(0f, ApplyOwnerStat(lifetime, ValueType.Duration)) : 0f;
+
+    /// <summary>
+    /// 무기 필드가 아닌 지속 시간(Flame 분사 시간 등) 에 플레이어 Duration 을 적용한다 (태그 없으면 그대로)
+    /// </summary>
+    public float ApplyDuration(float _seconds)
+    {
+        return Mathf.Max(0f, ApplyOwnerStat(_seconds, ValueType.Duration));
+    }
+
     /// <summary>
     /// _type 수치가 플레이어 버프 / 디버프를 받는지 (statTags 에 태그가 있는지)
     /// </summary>
@@ -211,11 +255,12 @@ public class Weapon
         }
 
         float delay = FinalFireDelay;
-        if (delay <= 0f || fireCount <= 1)
+        int count = LaunchCount;
+        if (delay <= 0f || count <= 1)
         {
-            for (int i = 0; i < fireCount; ++i)
+            for (int i = 0; i < count; ++i)
             {
-                if (false == FireOne(i, fireCount))
+                if (false == FireOne(i, count))
                 {
                     // 타겟이 없으면 이번 발사는 전부 취소
                     return;
@@ -229,7 +274,7 @@ public class Weapon
 
     private IEnumerator FireRoutine(float _delay)
     {
-        int count = fireCount;
+        int count = LaunchCount;
         WaitForSeconds wait = new WaitForSeconds(_delay);
         for (int i = 0; i < count; ++i)
         {
@@ -710,7 +755,8 @@ public class Weapon
     private void UpdateCapped()
     {
         aliveProjectiles.RemoveAll(p => null == p || false == p.gameObject.activeSelf);
-        if (aliveProjectiles.Count >= fireCount)
+        int count = LaunchCount;
+        if (aliveProjectiles.Count >= count)
         {
             return;
         }
@@ -725,7 +771,7 @@ public class Weapon
         if (timer >= coolTime)
         {
             // 발사하지 못하면(타겟 없음) 다음 프레임에 다시 시도한다
-            if (true == FireOne(aliveProjectiles.Count, fireCount))
+            if (true == FireOne(aliveProjectiles.Count, count))
             {
                 timer = 0f;
             }
@@ -754,9 +800,10 @@ public class Weapon
         if (timer >= coolTime)
         {
             timer = 0f;
-            for (int i = 0; i < fireCount; ++i)
+            int count = LaunchCount;
+            for (int i = 0; i < count; ++i)
             {
-                if (false == FireOne(i, fireCount))
+                if (false == FireOne(i, count))
                 {
                     break;
                 }
@@ -772,8 +819,9 @@ public class Weapon
     private void UpdatePersistent()
     {
         bool changed = 0 < persistentProjectiles.RemoveAll(p => null == p || false == p.gameObject.activeSelf);
+        int count = LaunchCount;
 
-        while (persistentProjectiles.Count < fireCount)
+        while (persistentProjectiles.Count < count)
         {
             Projectile p = projectilePool.Get();
             if (null == p)
@@ -781,8 +829,8 @@ public class Weapon
                 break;
             }
 
-            p.SetFormation(persistentProjectiles.Count, fireCount);
-            WriteBlackBoard(p, persistentProjectiles.Count, fireCount);
+            p.SetFormation(persistentProjectiles.Count, count);
+            WriteBlackBoard(p, persistentProjectiles.Count, count);
             if (false == p.Launch(this))
             {
                 projectilePool.Release(p);
@@ -793,7 +841,7 @@ public class Weapon
             changed = true;
         }
 
-        while (persistentProjectiles.Count > Mathf.Max(0, fireCount))
+        while (persistentProjectiles.Count > Mathf.Max(0, count))
         {
             int last = persistentProjectiles.Count - 1;
             Projectile p = persistentProjectiles[last];
@@ -843,7 +891,7 @@ public class Weapon
         b.SetInt(DATA_TYPE.hitCount, hitCount);
         b.SetInt(DATA_TYPE.chainCount, chainCount);
         b.SetFloat(DATA_TYPE.chainRange, chainRange);
-        b.SetFloat(DATA_TYPE.lifetime, lifetime);
+        b.SetFloat(DATA_TYPE.lifetime, FinalLifetime);
         b.SetFloat(DATA_TYPE.areaRadius, areaRadius);
     }
 

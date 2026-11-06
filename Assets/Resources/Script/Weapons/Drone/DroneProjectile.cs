@@ -67,7 +67,7 @@ public class DroneProjectile
     /// - owner : 드론 자신 (탐색 시 제외 대상 / 기본 이동 대상. 자식 탄은 AimAtNearest 로 이동 대상을 덮어쓴다)
     /// - targetLayer : 부모 무기의 타겟 레이어
     /// - ownerStats : 부모 무기의 주인 스텟 (플레이어 Damage / AttackSpeed / Range 가 자식 무기에 더해진다)
-    /// - statTags : 부모 무기의 태그 (Drone 프리팹 한 곳에서 태그를 관리한다)
+    /// - statTags : 부모 무기의 태그 (Drone 프리팹 한 곳에서 태그를 관리한다). ProjectileCount 는 드론 수에만 쓰므로 뺀다
     /// </summary>
     private void SetupChildWeapon()
     {
@@ -79,7 +79,8 @@ public class DroneProjectile
         childWeapon.owner = transform;
         childWeapon.targetLayer = weapon.targetLayer;
         childWeapon.SetOwnerStats(weapon.OwnerStats);
-        childWeapon.statTags = weapon.statTags;
+        // 투사체 수는 드론 수(부모 무기)에만 적용한다. 드론 한 대가 쏘는 탄 수는 늘리지 않는다
+        childWeapon.statTags = weapon.statTags & ~WeaponStatTag.ProjectileCount;
 
         ApplyUpgrade();
     }

@@ -48,6 +48,8 @@ stat.move_speed,이동 속도,Move Speed
 stat.attack_speed,공격 속도,Attack Speed
 stat.range,범위,Range
 # 차원
+stat.duration,지속 시간,Duration
+stat.projectile_count,투사체 수,Projectile Count
 dimension.forest.name,숲,Forest
 dimension.factory.name,공장,Factory
 dimension.storm.name,폭풍,Storm

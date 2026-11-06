@@ -9,6 +9,10 @@ public enum ValueType
     MoveSpeed,
     AttackSpeed,
     Range,
+    // 아래 두 값은 무기 전용 (플레이어 자체 base 는 0, 태그가 있는 무기의 지속시간 / 발사체 수에 더해진다)
+    // 보상 에셋에 정수로 직렬화되므로 순서를 바꾸지 말고 끝에만 추가한다
+    Duration,
+    ProjectileCount,
 }
 
 /// <summary>
@@ -31,6 +35,10 @@ public static class ValueTypeExtensions
                 return "stat.attack_speed";
             case ValueType.Range:
                 return "stat.range";
+            case ValueType.Duration:
+                return "stat.duration";
+            case ValueType.ProjectileCount:
+                return "stat.projectile_count";
             default:
                 return null;
         }

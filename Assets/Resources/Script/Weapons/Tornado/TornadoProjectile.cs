@@ -10,7 +10,7 @@ using UnityEngine;
 ///   몬스터 이동(MonsterMoveState) / Knockback 과 같은 방식(transform 이동)이라 서로 덮어쓰지 않고 더해진다
 ///   Knockback.resistance 만큼 덜 끌려온다. MonsterBrain 이 없는 대상(플레이어 등)은 끌어당기지 않는다
 /// - 크기 : 반경과 표시 크기 = 기본값 * weapon.GetParam(ProjectileScale, 1)
-/// - 수명 : weapon.lifetime (0 이하면 defaultLifetime). 매 프레임 읽으므로 업그레이드가 살아 있는 회오리에도 적용된다
+/// - 수명 : weapon.FinalLifetime (0 이하면 defaultLifetime). 매 프레임 읽으므로 업그레이드가 살아 있는 회오리에도 적용된다
 /// - 끌어당기는 속도 : weapon.GetParam(PullForce, pullForce)
 /// - ★ FlagTornadoPermanent : 수명이 줄지 않는다. 주인과 leashDistance 보다 멀어지면 주인 쪽으로 돌아온다
 /// - 무기 knockbackForce 는 0 으로 둔다 (넉백은 바깥으로 밀어내 끌어당김과 반대)
@@ -135,7 +135,7 @@ public class TornadoProjectile
 
     private bool IsPermanent => null != weapon && true == weapon.HasFlag(WeaponParam.FlagTornadoPermanent);
 
-    private float FinalLifetime => null != weapon && weapon.lifetime > 0f ? weapon.lifetime : defaultLifetime;
+    private float FinalLifetime => null != weapon && weapon.FinalLifetime > 0f ? weapon.FinalLifetime : defaultLifetime;
 
     private Transform Owner
     {

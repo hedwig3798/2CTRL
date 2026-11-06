@@ -2,20 +2,20 @@ using System.Collections.Generic;
 using UnityEngine;
 
 /// <summary>
-/// 화염 방사(Flame) 발사체 (무기는 WEAPON_TYPE.Repeat, fireCount 1)
-/// 공격 간격마다 발사되어 분사 시간 동안 주인(무기 위치)을 따라다니며,
+/// 화염 방사(Flame) 발사체 (무기는 WEAPON_TYPE.Capped, fireCount 1)
+/// 분사가 끝나고 공격 간격이 지나면 발사되어 분사 시간 동안 주인(무기 위치)을 따라다니며,
 /// 주인의 마지막 이동 방향(ArrowMovemnt.LastMoveDirection) 으로 펼친 부채꼴(반지름 = 무기 최종 범위) 안의 모든 적을 tickInterval 마다 타격한다
 /// - 적이 없어도 분사한다 (주기적 분사). 분사가 끝나면 비활성화되어 풀로 돌아간다
 /// - 넉백은 주인 위치에서 바깥쪽으로 밀어낸다
-/// - 분사 시간이 공격 간격(FinalCoolTime) 보다 길면 공격 간격으로 자른다 (두 분사가 겹쳐 두 배로 타격하지 않도록)
-/// - 업그레이드 : 분사 시간 = weapon.GetParam(BurstDuration, burstDuration), 부채꼴 각도 = weapon.GetParam(FanAngle, fanAngle) (발사할 때마다 다시 읽는다)
+/// - 분사 중에는 무기 타이머가 멈추므로 분사끼리 겹치지 않는다 (쿨타임은 분사가 끝난 뒤부터)
+/// - 업그레이드 : 분사 시간 = weapon.ApplyDuration(weapon.GetParam(BurstDuration, burstDuration)), 부채꼴 각도 = weapon.GetParam(FanAngle, fanAngle) (발사할 때마다 다시 읽는다)
 /// - ★ FlagBurn : 맞은 적에 화상(FlameBurn). burnInterval 마다 타격 데미지 * burnDamageRate, burnDuration 초. 다시 맞으면 지속시간만 갱신
 /// </summary>
 public class FlameProjectile
     : Projectile
 {
     [Header("flame")]
-    [Tooltip("기본 분사 시간 (초). 실제 값 = weapon.GetParam(BurstDuration, burstDuration). 공격 간격보다 길면 공격 간격으로 자른다")]
+    [Tooltip("기본 분사 시간 (초). 실제 값 = weapon.GetParam(BurstDuration, burstDuration) 에 플레이어 지속 시간 적용. 분사가 끝난 뒤 공격 간격이 돈다")]
     [Min(0.05f)]
     [SerializeField]
     private float burstDuration = 0.8f;
@@ -120,12 +120,9 @@ public class FlameProjectile
     {
         FindOwnerMovement();
 
-        float duration = Mathf.Max(0.05f, weapon.GetParam(WeaponParam.BurstDuration, burstDuration));
-        float coolTime = weapon.FinalCoolTime;
-        if (coolTime > 0f)
-        {
-            duration = Mathf.Min(duration, coolTime);
-        }
+        // 분사 시간 = 업그레이드 BurstDuration 에 플레이어 Duration 을 적용 (태그 없으면 그대로)
+        // 무기가 Capped(fireCount 1) 라 분사가 끝난 뒤에 쿨타임이 돌므로 공격 간격으로 자르지 않는다
+        float duration = Mathf.Max(0.05f, weapon.ApplyDuration(weapon.GetParam(WeaponParam.BurstDuration, burstDuration)));
 
         currFanAngle = Mathf.Clamp(weapon.GetParam(WeaponParam.FanAngle, fanAngle), 0f, 360f);
 

@@ -8,29 +8,53 @@ namespace Builders
     /// <summary>
     /// 무기 프리팹에 태그(Weapon.statTags) 를 적용한다 (멱등)
     /// - 태그가 없는 수치는 플레이어 버프 / 디버프를 받지 않는다
-    /// - 표에 없는 무기는 All
+    /// - 기본 = Damage | AttackSpeed | Range. 사거리를 쓰지 않는 무기는 Range 를 빼고, 지속형 / 다발 무기에 Duration / ProjectileCount 를 더한다
     /// - 무기 프리팹을 새로 만드는 빌더(WeaponUpgradeBuilder, ExtraWeaponBuilder 등) 를 다시 돌린 뒤에는 이것도 다시 실행한다
     /// </summary>
     public static class WeaponTagBuilder
     {
         private const string WEAPON_DIR = "Assets/prefab/weapon";
 
-        private const WeaponStatTag NO_RANGE = WeaponStatTag.Damage | WeaponStatTag.AttackSpeed;
+        private const WeaponStatTag BASE = WeaponStatTag.Damage | WeaponStatTag.AttackSpeed | WeaponStatTag.Range;
 
-        // 무기 프리팹 경로 (WEAPON_DIR 기준) -> 태그. 드론 자식 무기는 실행 중 Drone 의 태그를 복사한다
-        private static readonly Dictionary<string, WeaponStatTag> Tags = new Dictionary<string, WeaponStatTag>
+        // 사거리 0, 사거리를 쓰지 않는 무기
+        private static readonly HashSet<string> NoRange = new HashSet<string> { "Saw", "Shockwave", "Tornado", "Vine" };
+
+        // 지속형 공격 (장판 수명, Flame 분사 시간, Tornado 수명 - Capped 라 수명이 늘면 재시전 간격도 늘어난다)
+        private static readonly HashSet<string> Duration = new HashSet<string> { "Vine", "PoisonZone", "Root", "Flame", "Tornado" };
+
+        // 한 번에 발사하는 발사체 수 (Drone 은 드론 수, Lightning 은 낙뢰 수)
+        private static readonly HashSet<string> ProjectileCount = new HashSet<string>
         {
-            // 사거리 0, 사거리를 쓰지 않는 무기
-            { "Saw/Saw.prefab", NO_RANGE },
-            { "Shockwave/Shockwave.prefab", NO_RANGE },
-            { "Tornado/Tornado.prefab", NO_RANGE },
-            { "Vine/Vine.prefab", NO_RANGE },
+            "Boomerang", "Drone", "Explosive", "Laser", "Lightning", "Spirit", "SplitShot", "Tornado", "Root",
         };
+
+        /// <summary>
+        /// 무기 이름(프리팹 이름) 의 태그
+        /// </summary>
+        public static WeaponStatTag GetTags(string _weaponName)
+        {
+            WeaponStatTag tags = BASE;
+            if (NoRange.Contains(_weaponName))
+            {
+                tags &= ~WeaponStatTag.Range;
+            }
+            if (Duration.Contains(_weaponName))
+            {
+                tags |= WeaponStatTag.Duration;
+            }
+            if (ProjectileCount.Contains(_weaponName))
+            {
+                tags |= WeaponStatTag.ProjectileCount;
+            }
+            return tags;
+        }
 
         [MenuItem("Tools/Builders/WeaponTag")]
         public static string Build()
         {
             StringBuilder log = new StringBuilder();
+            HashSet<string> found = new HashSet<string>();
             int changed = 0;
 
             foreach (string guid in AssetDatabase.FindAssets("t:Prefab", new[] { WEAPON_DIR }))
@@ -43,10 +67,9 @@ namespace Builders
                     continue;
                 }
 
-                string key = path.Substring(WEAPON_DIR.Length + 1);
-                WeaponStatTag tags = Tags.TryGetValue(key, out WeaponStatTag found) ? found : WeaponStatTag.All;
-
-                log.AppendLine($"{key} : {tags}");
+                found.Add(prefab.name);
+                WeaponStatTag tags = GetTags(prefab.name);
+                log.AppendLine($"{prefab.name} : {tags}");
                 if (tags == weapon.statTags)
                 {
                     continue;
@@ -59,11 +82,14 @@ namespace Builders
                 changed++;
             }
 
-            foreach (string key in Tags.Keys)
+            foreach (HashSet<string> set in new[] { NoRange, Duration, ProjectileCount })
             {
-                if (null == AssetDatabase.LoadAssetAtPath<Weapon>($"{WEAPON_DIR}/{key}"))
+                foreach (string name in set)
                 {
-                    log.AppendLine($"[경고] 무기 프리팹을 찾지 못했습니다: {key}");
+                    if (false == found.Contains(name))
+                    {
+                        log.AppendLine($"[경고] 무기 프리팹을 찾지 못했습니다: {name}");
+                    }
                 }
             }
 

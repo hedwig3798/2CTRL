@@ -54,6 +54,7 @@ MonoBehaviour:
   damage: 8
   attackSpeed: 0.5
   range: 4
+  statTags: 23
   fireCount: 3
   speedRate: 1
   hitCount: 6

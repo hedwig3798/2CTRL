@@ -64,9 +64,9 @@ UpgradeLevel/UpgradeVersion (UpgradeTable/WeaponPrefab은 Weapon에 없음 -> We
 - Root/RootProjectile(:PoisonZone) 사거리 내 랜덤 위치에 지역, 둔화 항상. ★FlagRootChase 가장 가까운 적 추적(ChaseSpeed).
 - Spirit/SpiritProjectile(Capped) 대기→추적(SPIRIT_STATE Idle/Chase), hitCount 타격 후 소멸, TickInterval/ChaseSpeed 업글.
 - Saw/SawProjectile(Wave) 카메라 시야 좌/우 끝에서 가로 관통 이동, ProjectileScale, ★FlagSawBounce 화면 경계 튕김.
-- Flame/FlameProjectile(Repeat, fireCount1) LastMoveDirection 방향 부채꼴 분사(BurstDuration, FanAngle), ★FlagBurn → Flame/FlameBurn(화상 DoT, static Apply).
+- Flame/FlameProjectile(Repeat, fireCount1) LastMoveDirection 방향 부채꼴 분사(WEAPON_TYPE Capped, 분사 끝난 뒤 쿨타임; 분사시간=ApplyDuration(BurstDuration), FanAngle), ★FlagBurn → Flame/FlameBurn(화상 DoT, static Apply).
 - Tornado/TornadoProjectile(Capped) 떠돌며 MonsterContext.root 위치를 직접 끌어당김(PullForce, Knockback.resistance 반영), ★FlagTornadoPermanent 수명 무한+leash 복귀. 무기 knockbackForce 0.
-- Lightning/LightningProjectile(Repeat, fireCount1) StrikeCount명 표식(markDelay) 후 낙뢰 범위 데미지, ★FlagStormLink 지점 간 전기선(볼록껍질/선) 데미지. Lightning/LightningLineUtil(static: AddLink/Apply/Clear, LineRenderer 보조).
+- Lightning/LightningProjectile(Repeat, fireCount1) StrikeCount명 표식(markDelay) 후 낙뢰 범위 데미지(낙뢰 수 StrikeCount+FinalFireCount-1), ★FlagStormLink 지점 간 전기선(볼록껍질/선) 데미지. Lightning/LightningLineUtil(static: AddLink/Apply/Clear, LineRenderer 보조).
 
 - 통합(2026-11-03): `Assets/Editor/Builders/ExtraWeaponBuilder.cs`(7종 프리팹 `prefab/weapon/<Name>/`, 업그레이드 테이블, 보상). `DimensionDataBuilder` 무기 목록 숲 7 / 공장 5 / 폭풍 5.
 - 아트: `tools/art/extra_weapons.py`(Ninja Adventure + `tools/art/gen` 생성 원본) → `Textuer/Art/Weapon/D?_Weapon_<Name>_*.png`, `Icon/Common_Icon_<Name>.png`.

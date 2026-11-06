@@ -15,6 +15,9 @@ namespace Builders
     public static class ExtraWeaponBuilder
     {
         private const string WEAPON_DIR = "Assets/prefab/weapon";
+
+        // Flame 공속 (쿨타임 1 / 2.22 ≈ 0.45s, 분사 0.8s 와 합쳐 주기 1.25s)
+        public const float FLAME_ATTACK_SPEED = 2.22f;
         private const string TABLE_DIR = "Assets/prefab/Upgrade/WeaponUpgrade";
         private const string EFFECT_DIR = "Assets/prefab/Upgrade/Effects";
         private const string REWARD_DIR = "Assets/prefab/Upgrade/Weapon";
@@ -171,7 +174,9 @@ namespace Builders
                         Set(w, WEAPON_TYPE.Wave, 15f, 1f, 0f, 2, 4);
                         break;
                     case "Flame":
-                        Set(w, WEAPON_TYPE.Repeat, 4f, 0.8f, 3f, 1, 2);
+                        // Capped: 분사가 끝난 뒤 쿨타임이 돈다 (FlameProjectile)
+                        // 공속 2.22 = 쿨타임 0.45s. 분사 0.8s + 0.45s = 주기 1.25s 로 Repeat(공속 0.8) 시절 DPS 유지
+                        Set(w, WEAPON_TYPE.Capped, 4f, FLAME_ATTACK_SPEED, 3f, 1, 2);
                         w.knockbackForce = 1f;
                         break;
                     case "Tornado":

@@ -34,8 +34,10 @@
 
 ## 무기 태그 (2026-11-06, [balance.md](balance.md))
 - `Weapon.statTags`(기본 All), `Weapon.IsAffectedBy(ValueType)`. ApplyOwnerStat 이 태그 없는 수치는 플레이어 보정 무시. FinalCoolTime/FinalFireDelay 도 따라감.
-- `DroneProjectile.SetupChildWeapon`: 자식 무기에 부모 statTags 복사(Drone 프리팹 한 곳 관리).
-- `PlayerStatDebugUI.FormatWeaponStat`: 태그 없으면 "태그 없음: 버프 무시" 표시.
+- 2차: Weapon.FinalFireCount(fireCount<=0→0, 아니면 최소1), LaunchCount(Projectile.HandlesFireCount(virtual)면 1개만), FinalLifetime(<=0→0=발사체 기본값, BlackBoard lifetime), ApplyDuration(초). 발사 루프는 LaunchCount 사용. Lightning HandlesFireCount=true(낙뢰 수=StrikeCount+FinalFireCount-1).
+- `DroneProjectile.SetupChildWeapon`: 자식 무기에 부모 statTags 복사, 단 ProjectileCount 제거(드론 수에만 적용) (Drone 프리팹 한 곳 관리).
+- `PlayerStatDebugUI.FormatWeaponStat`: 태그 없으면 "태그 없음: 버프 무시" 표시. 발사 수(FinalFireCount)/지속 시간(FinalLifetime) 줄도 표시.
+- Tornado 수명은 weapon.FinalLifetime (Duration 태그 있음). Flame 은 Capped(ExtraWeaponBuilder 도 Capped), 분사 시간을 공격 간격으로 자르지 않음(분사 끝난 뒤 쿨타임). Flame 공속 2.22(`ExtraWeaponBuilder.FLAME_ATTACK_SPEED`, 분사 0.8s+쿨 0.45s=주기 1.25s 로 이전 DPS 유지).
 - `Editor/Builders/WeaponTagBuilder.cs` (Tools/Builders/WeaponTag, 멱등): 무기 프리팹 재생성 빌더 뒤에 다시 실행 필요.
 
 ## 추가 무기 후속 (2026-11-03)

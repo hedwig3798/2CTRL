@@ -45,15 +45,16 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Game.Runtime::Weapon
   owner: {fileID: 0}
-  weaponType: 0
+  weaponType: 2
   preLoadCount: 2
   projectile: {fileID: 3223511086403143741, guid: c4d555bfede845941aeb91039f2142ac, type: 3}
   targetLayer:
     serializedVersion: 2
     m_Bits: 0
   damage: 4
-  attackSpeed: 0.8
+  attackSpeed: 2.22
   range: 3
+  statTags: 15
   fireCount: 1
   speedRate: 1
   hitCount: 1

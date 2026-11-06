@@ -17,7 +17,7 @@ SO/프리팹 필드는 "키 필드"가 되고, 표시 시점에 StringTable 로 
 - CurrentLanguage(=GameSettings.Language), 이벤트 OnLanguageChanged(Language)(=GameSettings 이벤트), Count, Reload(), LoadFromText(csv)(테스트), Parse, ParseCsv.
 
 ## 키 네이밍 (영역.항목)
-ui.* (공통/타이틀/설정/일시정지/레벨업, 23), gameover.* (12), hud.*, dimension.*(3), stat.* (스탯 이름, ValueType), reward.*(44; reward.weapon.<snake_id>.name/.explain, reward.hp.explain1 등),
+ui.* (공통/타이틀/설정/일시정지/레벨업, 23), gameover.* (12), hud.*, dimension.*(3), stat.* (스탯 이름, ValueType; stat.duration/stat.projectile_count 추가), reward.*(44; reward.weapon.<snake_id>.name/.explain, reward.hp.explain1 등),
 upgrade.* (113; 무기 업그레이드 단계 문구. 빌더가 한국어 원문으로 키 역조회).
 
 ## 키 필드로 바뀐 것

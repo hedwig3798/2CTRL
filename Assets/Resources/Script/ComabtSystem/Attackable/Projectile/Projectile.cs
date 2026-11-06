@@ -194,6 +194,11 @@ public abstract class Projectile
     protected abstract bool OnLaunch();
 
     /// <summary>
+    /// true 면 Weapon 이 발사체를 1 개만 꺼내고, 발사체가 weapon.FinalFireCount 를 직접 쓴다 (Lightning: 낙뢰 수)
+    /// </summary>
+    public virtual bool HandlesFireCount => false;
+
+    /// <summary>
     /// LaunchAt 으로 발사될 때 호출된다. 타격 기록 초기화 등을 하고, false 면 발사하지 않는다
     /// 기본은 아무것도 하지 않고 발사한다
     /// </summary>

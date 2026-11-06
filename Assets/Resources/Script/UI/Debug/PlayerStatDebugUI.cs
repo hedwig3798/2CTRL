@@ -163,6 +163,11 @@ public class PlayerStatDebugUI
                 builder.Append($"데미지  <b>{weapon.FinalDamage:0.##}</b>  <color=#999999>({FormatWeaponStat(weapon, stats, ValueType.Damage, weapon.damage)})</color>\n");
                 builder.Append($"공격 속도  <b>{weapon.FinalAttackSpeed:0.##}</b>/s  <color=#999999>({FormatWeaponStat(weapon, stats, ValueType.AttackSpeed, weapon.attackSpeed)}, 간격 {weapon.FinalCoolTime:0.##}s)</color>\n");
                 builder.Append($"범위  <b>{weapon.FinalRange:0.##}</b>  <color=#999999>({FormatWeaponStat(weapon, stats, ValueType.Range, weapon.range)})</color>\n");
+                builder.Append($"발사 수  <b>{weapon.FinalFireCount}</b>  <color=#999999>({FormatWeaponStat(weapon, stats, ValueType.ProjectileCount, weapon.fireCount)})</color>\n");
+                if (weapon.lifetime > 0f)
+                {
+                    builder.Append($"지속 시간  <b>{weapon.FinalLifetime:0.##}</b>s  <color=#999999>({FormatWeaponStat(weapon, stats, ValueType.Duration, weapon.lifetime)})</color>\n");
+                }
                 if (weapon.fireDelay > 0f)
                 {
                     builder.Append($"발사 딜레이  <b>{weapon.FinalFireDelay:0.###}</b>s  <color=#999999>(기본 {weapon.fireDelay:0.###}s)</color>\n");
