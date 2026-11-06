@@ -22,3 +22,8 @@ Spawner, PlayerStats, PlayerSide, Weapon.UpgradeLevel, DimensionApplier, WeaponR
 - 시각 빌더 `Assets/Editor/Builders/Visual/InGameHudVisual.cs` (Tools/Builders/Visual/InGameHud): 슬롯 3단 프레임, LevelBadge, WaveTimerPlate, 머티리얼 `Assets/Resources/Textuer/Hud/HudLevelOutline.mat`, `HudTimerOutline.mat`.
 - 실행 순서: InGameHudBuilder -> InGameHudVisual -> ArtResourceBuilder. InGameHudBuilder 재실행 시 InGameHudVisual 도 재실행 필수.
 - 테스트: Assets/Tests/EditMode/HudEditTests.cs, Assets/Tests/PlayMode/HudPlayTests.cs (PlayMode asmdef 에 UnityEngine.UI 참조 추가).
+## 피격 비네트 (2026-11-06)
+- HitVignetteUI (`Assets/Resources/Script/UI/HitVignetteUI.cs`): Image 컴포넌트. 부모 PlayerStats 아래 HealthSystem.OnDamaged 구독. 시작 알파 0, 피격마다 1로 리셋, fadeDuration(0.4s) 동안 0으로 감소, 0이면 Image 비활성.
+- 빌더 `Assets/Editor/Builders/Visual/HitVignetteBuilder.cs` Build(): `Assets/Resources/Textuer/Hud/HitVignette.png`(붉은 가장자리 그라데이션, Bilinear) 생성 + Player.prefab 의 ScreenSpaceUI 아래 HitVignette 오브젝트(스트레치 Image + HitVignetteUI) 배치. 멱등.
+- 실행: `unity command script eval "return Builders.Visual.HitVignetteBuilder.Build();"`
+- 텍스처를 Textuer/Art 가 아닌 Textuer/Hud 에 둔 이유: ArtResourceBuilder 가 Art 폴더를 Point 필터로 덮어써 그라데이션이 깨짐.
