@@ -155,7 +155,7 @@ public class ExplosiveProjectile
         ApplyAreaDamage(_center, radius, excludeTargets);
         excludeTargets.Clear();
 
-        EffectPool.Spawn(explosionEffect, _center, radius);
+        EffectPool.Spawn(explosionEffect, _center, radius, gameObject.layer);
 
         TryStartSecondaryExplosion(_center);
 
@@ -236,7 +236,7 @@ public class ExplosiveProjectile
         }
         secondaryBuffer.Clear();
 
-        EffectPool.Spawn(_effect, _center, _radius);
+        EffectPool.Spawn(_effect, _center, _radius, _weapon.gameObject.layer);
     }
 
     private bool IsTargetLayer(int _layer)

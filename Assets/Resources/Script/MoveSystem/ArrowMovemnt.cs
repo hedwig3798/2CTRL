@@ -81,6 +81,12 @@ public class ArrowMovemnt
 
     void Update()
     {
+        // 일시정지(timeScale 0) 중에는 입력을 무시한다 (Update 는 계속 돌아서 방향·스프라이트가 바뀌면 Flame 등이 따라 돈다)
+        if (true == GamePause.IsPaused || Time.timeScale <= 0f)
+        {
+            return;
+        }
+
         Keyboard keyboard = Keyboard.current;
         if (null == keyboard)
         {

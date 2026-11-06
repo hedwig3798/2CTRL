@@ -157,7 +157,7 @@ public class SelfDestructRuntime
             , data.knockbackForce
             , _ctx.pipeline);
 
-        EffectPool.Spawn(data.explosionEffect, center, data.radius);
+        EffectPool.Spawn(data.explosionEffect, center, data.radius, null != _ctx.root ? _ctx.root.gameObject.layer : 0);
     }
 
     private void RestoreScale()

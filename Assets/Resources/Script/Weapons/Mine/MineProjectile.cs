@@ -227,7 +227,7 @@ public class MineProjectile
         float radius = weapon.areaRadius;
 
         ApplyAreaDamage(center, radius);
-        EffectPool.Spawn(explosionEffect, center, radius);
+        EffectPool.Spawn(explosionEffect, center, radius, gameObject.layer);
     }
 
     /// <summary>

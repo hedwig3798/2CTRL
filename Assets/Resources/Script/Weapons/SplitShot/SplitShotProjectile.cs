@@ -94,7 +94,7 @@ public class SplitShotProjectile
     {
         if (null != burstEffect)
         {
-            EffectPool.Spawn(burstEffect, _hitPoint, burstRadius);
+            EffectPool.Spawn(burstEffect, _hitPoint, burstRadius, gameObject.layer);
         }
 
         if (null == weapon || null == fragmentPrefab)

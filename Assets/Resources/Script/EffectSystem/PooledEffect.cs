@@ -63,9 +63,10 @@ public static class EffectPool
 
     /// <summary>
     /// _prefab 연출을 _position 에 꺼낸다. _radius 가 0 보다 크면 그 반지름에 맞춰 크기를 바꾼다
+    /// _layer 로 자식까지 레이어를 맞춘다. 분할 카메라는 Default 레이어를 그리지 않으므로 반드시 연출을 낸 쪽의 레이어를 넘긴다
     /// _prefab 이 없으면 null
     /// </summary>
-    public static PooledEffect Spawn(PooledEffect _prefab, Vector3 _position, float _radius = 0f)
+    public static PooledEffect Spawn(PooledEffect _prefab, Vector3 _position, float _radius, int _layer)
     {
         if (null == _prefab)
         {
@@ -87,6 +88,10 @@ public static class EffectPool
 
         effect.transform.position = _position;
         effect.SetRadius(_radius);
+        if (effect.gameObject.layer != _layer)
+        {
+            LayerUtils.SetLayer(effect.gameObject, _layer);
+        }
         effect.gameObject.SetActive(true);
         return effect;
     }
