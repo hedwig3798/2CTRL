@@ -37,6 +37,7 @@ gameover.kill,킬 : {0},Kills : {0}
 gameover.damage_taken,받은 데미지 : {0:0},Damage Taken : {0:0}
 gameover.weapon_header,무기별 데미지,Damage by Weapon
 gameover.weapon_line,"  {0} : {1:0}","  {0} : {1:0}"
+gameover.weapon_value,{0:0},{0:0}
 gameover.no_weapon,"  없음","  None"
 gameover.exp,획득 EXP : {0:0},EXP Gained : {0:0}
 gameover.restart,재시작,Restart
@@ -49,9 +50,9 @@ stat.attack_speed,공격 속도,Attack Speed
 stat.range,범위,Range
 stat.duration,지속 시간,Duration
 stat.projectile_count,투사체 수,Projectile Count
-dimension.forest.name,숲,Forest
 stat.hp_regen,체력 재생,HP Regen
 # 차원
+dimension.forest.name,숲,Forest
 dimension.factory.name,공장,Factory
 dimension.storm.name,폭풍,Storm
 "# 보상 : 패시브 ({0} = 스탯 이름, {1} = 값)"
@@ -60,7 +61,6 @@ reward.passive.attack_speed.name,공격속도,Attack Speed
 reward.passive.move_speed.name,이동속도,Move Speed
 reward.passive.range.name,범위,Range
 reward.passive.hp.name,체력,HP
-reward.passive.buff_ga,{0}가 {1:0.#%} 증가합니다.,{0} increases by {1:0.#%}.
 reward.passive.duration.name,지속 시간,Duration
 reward.passive.projectile_count.name,투사체 수,Projectile Count
 reward.passive.monster.name,몬스터 감소,Fewer Monsters
@@ -70,6 +70,7 @@ reward.passive.hp_regen.name,체력 재생,HP Regen
 reward.passive.regen_up,{0}이 초당 {1:0.#} 증가합니다.,{0} increases by {1:0.#}/s.
 reward.passive.regen_down,{0}이 초당 {1:0.#;0.#} 감소합니다.,{0} decreases by {1:0.#;0.#}/s.
 reward.passive.monster_up,몬스터 스폰율과 체력이 {1:0.#%} 증가합니다.,Monster spawn rate and HP increase by {1:0.#%}.
+reward.passive.buff_ga,{0}가 {1:0.#%} 증가합니다.,{0} increases by {1:0.#%}.
 reward.passive.buff_i,{0}이 {1:0.#%} 증가합니다.,{0} increases by {1:0.#%}.
 reward.passive.nerf_ga,{0}가 {1:0.#%;0.#%} 감소합니다.,{0} decreases by {1:0.#%;0.#%}.
 reward.passive.nerf_i,{0}이 {1:0.#%;0.#%} 감소합니다.,{0} decreases by {1:0.#%;0.#%}.

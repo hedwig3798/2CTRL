@@ -21,6 +21,12 @@ namespace Builders
         private const string SCENE_PATH = "Assets/Scenes/GameScene.unity";
         private const string FONT_PATH = "Assets/Fonts/NotoSansKR-Regular SDF.asset";
         private const int SORTING_ORDER = 100;
+        private const string WEAPON_REWARD_FOLDER = "Assets/prefab/Upgrade/Weapon";
+        // 카드 아래쪽 무기 아이콘 칸 영역 (2열, 무기 보유 상한 4 → 2줄)
+        private const float WEAPON_LIST_HEIGHT = 130f;
+        private const float WEAPON_LIST_BOTTOM = 26f;
+        private static readonly Vector2 WEAPON_CELL = new Vector2(340f, 56f);
+        private static readonly Vector2 WEAPON_SPACING = new Vector2(24f, 10f);
 
         [MenuItem("Tools/Builders/GameOver")]
         public static void BuildMenu()
@@ -88,6 +94,12 @@ namespace Builders
             LocalizationBuilderUtil.Unbind(left);
             LocalizationBuilderUtil.Unbind(right);
 
+            // 무기별 데미지 아이콘 칸 (카드 아래쪽). 통계 텍스트는 그 위로 줄인다
+            RectTransform leftList = MakeWeaponList(leftCard, left);
+            RectTransform rightList = MakeWeaponList(rightCard, right);
+            GameOverWeaponRow rowTemplate = MakeWeaponRowTemplate(panelGo.transform, font);
+            RewardData[] weaponRewards = LoadWeaponRewards();
+
             Button restart = MakeButton(panelGo.transform, "RestartButton", font, string.Empty, 0.30f, 0.48f);
             Button toTitle = MakeButton(panelGo.transform, "TitleButton", font, string.Empty, 0.52f, 0.70f);
             LocalizationBuilderUtil.BindChildLabel(restart, "gameover.restart");
@@ -103,6 +115,16 @@ namespace Builders
             uiSo.FindProperty("rightLabel").objectReferenceValue = right;
             uiSo.FindProperty("restartButton").objectReferenceValue = restart;
             uiSo.FindProperty("titleButton").objectReferenceValue = toTitle;
+            uiSo.FindProperty("leftWeaponList").objectReferenceValue = leftList;
+            uiSo.FindProperty("rightWeaponList").objectReferenceValue = rightList;
+            uiSo.FindProperty("weaponRowTemplate").objectReferenceValue = rowTemplate;
+            uiSo.FindProperty("weaponValueFormatKey").stringValue = "gameover.weapon_value";
+            SerializedProperty rewardsProp = uiSo.FindProperty("weaponRewards");
+            rewardsProp.arraySize = weaponRewards.Length;
+            for (int i = 0; i < weaponRewards.Length; i++)
+            {
+                rewardsProp.GetArrayElementAtIndex(i).objectReferenceValue = weaponRewards[i];
+            }
             // 싱글 게임: 좌우는 플레이어가 아니라 화면 구분 (StringTable 키)
             uiSo.FindProperty("leftHeaderKey").stringValue = "gameover.left_header";
             uiSo.FindProperty("rightHeaderKey").stringValue = "gameover.right_header";
@@ -120,7 +142,8 @@ namespace Builders
             EditorSceneManager.SaveScene(scene);
 
             sb.AppendLine("씬: " + SCENE_PATH);
-            sb.AppendLine("StatisticsManager / GameOverManager / GameOverCanvas(order " + SORTING_ORDER + ")/GameOverUI/Panel/{Title,LeftLabel,RightLabel,RestartButton,TitleButton}");
+            sb.AppendLine("StatisticsManager / GameOverManager / GameOverCanvas(order " + SORTING_ORDER + ")/GameOverUI/Panel/{Title,LeftLabel,RightLabel,WeaponList x2,WeaponRowTemplate,RestartButton,TitleButton}");
+            sb.AppendLine("무기 보상(아이콘) " + weaponRewards.Length + "개 연결");
             return sb.ToString();
         }
 
@@ -191,6 +214,106 @@ namespace Builders
             t.textWrappingMode = TextWrappingModes.Normal;
             t.overflowMode = TextOverflowModes.Truncate;
             return t;
+        }
+
+        /// <summary>
+        /// 카드 아래쪽에 무기 칸을 담을 2열 그리드. _label 은 그 위로 줄인다
+        /// </summary>
+        private static RectTransform MakeWeaponList(Transform _card, TMP_Text _label)
+        {
+            GameObject go = FindOrCreateChild(_card, "WeaponList");
+            RectTransform rt = go.GetComponent<RectTransform>();
+            rt.anchorMin = new Vector2(0f, 0f);
+            rt.anchorMax = new Vector2(1f, 0f);
+            rt.pivot = new Vector2(0.5f, 0f);
+            rt.offsetMin = new Vector2(40f, WEAPON_LIST_BOTTOM);
+            rt.offsetMax = new Vector2(-40f, WEAPON_LIST_BOTTOM + WEAPON_LIST_HEIGHT);
+            rt.localScale = Vector3.one;
+
+            GridLayoutGroup grid = GetOrAdd<GridLayoutGroup>(go);
+            grid.cellSize = WEAPON_CELL;
+            grid.spacing = WEAPON_SPACING;
+            grid.startCorner = GridLayoutGroup.Corner.UpperLeft;
+            grid.startAxis = GridLayoutGroup.Axis.Horizontal;
+            grid.childAlignment = TextAnchor.UpperLeft;
+            grid.constraint = GridLayoutGroup.Constraint.FixedColumnCount;
+            grid.constraintCount = 2;
+
+            // 빌더 재실행 시 런타임에 남은 칸이 있으면 지운다 (에디터에서는 비어 있어야 함)
+            for (int i = go.transform.childCount - 1; i >= 0; i--)
+            {
+                Object.DestroyImmediate(go.transform.GetChild(i).gameObject);
+            }
+
+            if (null != _label)
+            {
+                RectTransform lrt = _label.rectTransform;
+                lrt.offsetMin = new Vector2(lrt.offsetMin.x, WEAPON_LIST_BOTTOM + WEAPON_LIST_HEIGHT + 8f);
+            }
+            return rt;
+        }
+
+        /// <summary>
+        /// 꺼 둔 무기 칸 템플릿: Icon(왼쪽 정사각) + Value(아이콘 오른쪽 글자)
+        /// </summary>
+        private static GameOverWeaponRow MakeWeaponRowTemplate(Transform _panel, TMP_FontAsset _font)
+        {
+            GameObject go = FindOrCreateChild(_panel, "WeaponRowTemplate");
+            RectTransform rt = go.GetComponent<RectTransform>();
+            rt.anchorMin = new Vector2(0.5f, 0.5f);
+            rt.anchorMax = new Vector2(0.5f, 0.5f);
+            rt.sizeDelta = WEAPON_CELL;
+            rt.anchoredPosition = Vector2.zero;
+            rt.localScale = Vector3.one;
+
+            GameObject iconGo = FindOrCreateChild(go.transform, "Icon");
+            RectTransform irt = iconGo.GetComponent<RectTransform>();
+            irt.anchorMin = new Vector2(0f, 0.5f);
+            irt.anchorMax = new Vector2(0f, 0.5f);
+            irt.pivot = new Vector2(0f, 0.5f);
+            irt.sizeDelta = new Vector2(WEAPON_CELL.y, WEAPON_CELL.y);
+            irt.anchoredPosition = Vector2.zero;
+            irt.localScale = Vector3.one;
+            Image icon = GetOrAdd<Image>(iconGo);
+            icon.color = Color.white;
+            icon.preserveAspect = true;
+            icon.raycastTarget = false;
+
+            TMP_Text value = MakeLabel(go.transform, go.transform, "Value", _font, 36f, TextAlignmentOptions.MidlineLeft,
+                Vector2.zero, Vector2.one, "0");
+            value.rectTransform.offsetMin = new Vector2(WEAPON_CELL.y + 8f, 0f);
+            // 아이콘이 없어 "이름 : 수치" 로 대체될 때 긴 이름도 들어가도록 줄인다
+            value.enableAutoSizing = true;
+            value.fontSizeMin = 24f;
+            value.fontSizeMax = 36f;
+            value.textWrappingMode = TextWrappingModes.NoWrap;
+            value.overflowMode = TextOverflowModes.Ellipsis;
+            LocalizationBuilderUtil.Unbind(value);
+
+            GameOverWeaponRow row = GetOrAdd<GameOverWeaponRow>(go);
+            var so = new SerializedObject(row);
+            so.FindProperty("iconImage").objectReferenceValue = icon;
+            so.FindProperty("valueText").objectReferenceValue = value;
+            so.FindProperty("textLeftWithIcon").floatValue = WEAPON_CELL.y + 8f;
+            so.ApplyModifiedPropertiesWithoutUndo();
+
+            go.SetActive(false);
+            return row;
+        }
+
+        private static RewardData[] LoadWeaponRewards()
+        {
+            var list = new System.Collections.Generic.List<RewardData>();
+            foreach (string guid in AssetDatabase.FindAssets("t:RewardData", new[] { WEAPON_REWARD_FOLDER }))
+            {
+                RewardData reward = AssetDatabase.LoadAssetAtPath<RewardData>(AssetDatabase.GUIDToAssetPath(guid));
+                if (null != reward)
+                {
+                    list.Add(reward);
+                }
+            }
+            list.Sort((a, b) => string.CompareOrdinal(a.name, b.name));
+            return list.ToArray();
         }
 
         private static GameObject FindOrCreateChild(Transform _parent, string _name)
