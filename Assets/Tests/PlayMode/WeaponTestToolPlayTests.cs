@@ -213,6 +213,32 @@ public class WeaponTestToolPlayTests
     }
 
     [UnityTest]
+    public IEnumerator Dummy_IsInvincible_TakesDamageButNeverDies()
+    {
+        WeaponTestController c = NewController(Effects, -1, 0, out GameObject player);
+        yield return null;
+
+        List<GameObject> dummies = Dummies();
+        Assert.AreEqual(1, dummies.Count);
+        HealthSystem hs = dummies[0].GetComponentInChildren<HealthSystem>(true);
+        Assert.IsNotNull(hs);
+        Assert.IsTrue(hs.IsInvincible);
+
+        WeaponTestDamageMeter meter = c.Meters[0];
+        float lethal = hs.MaxHP * 10f;
+        Hit(hs, lethal);
+        Hit(hs, lethal);
+        yield return null;
+
+        Assert.IsFalse(hs.isDead);
+        Assert.AreEqual(hs.MaxHP, hs.CurrHP);
+        Assert.AreEqual(2, meter.HitCount);
+        Assert.AreEqual(lethal, meter.LastDamage);
+        Assert.IsNotNull(dummies[0]);
+        Assert.IsTrue(dummies[0].activeInHierarchy);
+    }
+
+    [UnityTest]
     public IEnumerator SelectLayout_InvalidIndex_ReturnsFalse_KeepsState()
     {
         WeaponTestController c = NewController(Effects, -1, 0, out GameObject player);

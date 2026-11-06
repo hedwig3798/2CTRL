@@ -41,6 +41,15 @@ public class HealthSystem
     [SerializeField]
     private bool isInvincibility = false;
 
+    /// <summary>
+    /// 무적 여부. 켜면 데미지 이벤트는 그대로 발생하지만 HP 가 다시 최대치로 채워져 죽지 않는다
+    /// </summary>
+    public bool IsInvincible
+    {
+        get => isInvincibility;
+        set => isInvincibility = value;
+    }
+
     private DropManager boundDropManager;
 
     // 죽을 때 드롭할 EXP 배율 (Initialize 에서 BlackBoard 의 expRate 를 저장, 0 이하면 DropManager 기본값)

@@ -69,6 +69,10 @@ public class WeaponTestController
     [SerializeField]
     private bool lockDummyPosition = true;
 
+    [Tooltip("더미를 무적으로 만든다 (데미지는 받고 미터에 기록되지만 죽지 않는다)")]
+    [SerializeField]
+    private bool invincibleDummies = true;
+
     [SerializeField]
     private WeaponTestDamageMeterSettings meterSettings = new WeaponTestDamageMeterSettings();
 
@@ -468,6 +472,10 @@ public class WeaponTestController
         if (null == health)
         {
             Debug.LogWarning($"[WeaponTestController] {go.name} 에 HealthSystem 이 없어 데미지를 잴 수 없습니다.", go);
+        }
+        else
+        {
+            health.IsInvincible = invincibleDummies;
         }
 
         WeaponTestDamageMeter meter = go.GetComponent<WeaponTestDamageMeter>();
