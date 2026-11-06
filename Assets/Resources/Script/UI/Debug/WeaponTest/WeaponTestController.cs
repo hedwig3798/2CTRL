@@ -10,8 +10,10 @@ using UnityEngine.UI;
 /// - 무기 교체 : WeaponRewardEffect 목록으로 버튼을 만들고, 고르면 현재 무기를 파괴한 뒤 새 무기를 만든다
 ///   (PlayerStats.AddWeapon 은 제거 기능이 없으므로 쓰지 않고, AddWeapon 과 같은 방식으로 직접 생성한다)
 /// - 강화 : +1 / 최대. "Lv n/max" 표시, 업그레이드 테이블이 없으면 버튼 비활성
-/// - 초기화 : 무기 재생성(업그레이드 0), 플레이어 원위치, 더미 재배치, 데미지 미터 리셋
-/// - 무기 교체 / 강화 / 초기화 시 모든 더미의 데미지 미터를 리셋해 현재 구성의 DPS 를 잰다
+/// - 초기화 : 무기 재생성(업그레이드 0), 패시브 스택 0, 플레이어 원위치, 더미 재배치, 데미지 미터 리셋
+/// - 패시브 : RewardData(StatRewardEffect) 별 스택. 스택이 바뀌면 플레이어 수정치를 지우고
+///   모든 패시브를 스택 수만큼 RewardData.Apply 로 다시 적용한다 (실게임 경로). 무기 교체 / 강화 시에는 유지
+/// - 무기 교체 / 강화 / 패시브 변경 / 초기화 시 모든 더미의 데미지 미터를 리셋해 현재 구성의 DPS 를 잰다
 ///
 /// UI 버튼 목록은 템플릿 버튼(비활성)을 복제해서 런타임에 만든다. 라벨은 버튼 자식의 TMP_Text
 /// </summary>
@@ -122,6 +124,56 @@ public class WeaponTestController
     [SerializeField]
     private string noWeaponText = "-";
 
+    [Header("패시브")]
+    [Tooltip("스택할 패시브 목록 (Assets/prefab/Upgrade/PassiveBuff, PassiveNuff 의 StatRewardEffect 보상). effect 가 StatRewardEffect 가 아니면 비활성")]
+    [SerializeField]
+    private RewardData[] passives;
+
+    [Tooltip("패시브 하나의 최대 스택")]
+    [Min(1)]
+    [SerializeField]
+    private int maxPassiveStack = 99;
+
+    [Tooltip("패시브가 바뀌면 현재 무기를 다시 만들고 강화 단계를 다시 적용한다 (발사 시점에 스탯을 읽어 둔 진행 중 발사체 정리)")]
+    [SerializeField]
+    private bool rebuildWeaponOnPassiveChange = true;
+
+    [Header("UI : 패시브")]
+    [Tooltip("패시브 행 템플릿 (비활성으로 두고 복제)")]
+    [SerializeField]
+    private WeaponTestPassiveRow passiveRowTemplate;
+
+    [Tooltip("패시브 행을 넣을 부모 (비어 있으면 템플릿의 부모)")]
+    [SerializeField]
+    private Transform passiveRowContainer;
+
+    [SerializeField]
+    private Button passiveResetButton;
+
+    [Tooltip("현재 스탯 요약 (선택)")]
+    [SerializeField]
+    private TMP_Text statSummaryText;
+
+    [Tooltip("패시브 라벨 포맷 ({0} = 이름, {1} = 1스택 변화량)")]
+    [SerializeField]
+    private string passiveLabelFormat = "{1}";
+
+    [Tooltip("스택 표시 포맷 ({0} = 스택)")]
+    [SerializeField]
+    private string passiveStackFormat = "×{0}";
+
+    [Tooltip("비활성 패시브 라벨 포맷 ({0} = 에셋 이름)")]
+    [SerializeField]
+    private string invalidPassiveFormat = "{0} (사용 불가)";
+
+    [Tooltip("스탯 요약 한 줄 포맷 ({0} = 이름, {1} = 부호 붙은 ΣAdd, {2} = 배율, {3} = 미적용 표시)")]
+    [SerializeField]
+    private string statSummaryLineFormat = "{0}  {1}  ×{2:0.00}{3}";
+
+    [Tooltip("현재 무기의 WeaponStatTag 에 없는 무기 수치 뒤에 붙는 표시")]
+    [SerializeField]
+    private string notAppliedText = " (미적용)";
+
     // 더미 하나의 런타임 정보
     private struct DummyEntry
     {
@@ -135,6 +187,25 @@ public class WeaponTestController
     private readonly List<WeaponTestDamageMeter> meters = new List<WeaponTestDamageMeter>();
     private readonly List<Button> weaponButtons = new List<Button>();
     private readonly List<Button> layoutButtons = new List<Button>();
+    private readonly List<WeaponTestPassiveRow> passiveRows = new List<WeaponTestPassiveRow>();
+
+    // 요약에 표시할 스탯 순서
+    private static readonly ValueType[] SummaryTypes =
+    {
+        ValueType.Damage,
+        ValueType.AttackSpeed,
+        ValueType.Range,
+        ValueType.Duration,
+        ValueType.ProjectileCount,
+        ValueType.MoveSpeed,
+        ValueType.HP,
+        ValueType.HPRegen,
+    };
+
+    // passives 와 같은 순서. 스택 / 사용 가능 여부 / 라벨용 1스택 변화량
+    private int[] passiveStacks = new int[0];
+    private bool[] passiveValid = new bool[0];
+    private string[] passiveDeltaLabels = new string[0];
 
     private Weapon currentWeapon;
     private int currentWeaponIndex = -1;
@@ -142,6 +213,10 @@ public class WeaponTestController
 
     private Vector3 playerHomePosition;
     private Rigidbody2D playerBody;
+    private HealthSystem playerHealth;
+
+    // 스탯 요약 문자열 재사용
+    private readonly System.Text.StringBuilder summaryBuilder = new System.Text.StringBuilder();
 
     private int attackLayer = -1;
     private int monsterLayer = -1;
@@ -150,6 +225,7 @@ public class WeaponTestController
     public int CurrentWeaponIndex => currentWeaponIndex;
     public int CurrentLayoutIndex => currentLayoutIndex;
     public IReadOnlyList<WeaponTestDamageMeter> Meters => meters;
+    public int PassiveCount => passiveStacks.Length;
 
     #region Unity
     private void Start()
@@ -167,6 +243,7 @@ public class WeaponTestController
 
         playerHomePosition = player.transform.position;
         playerBody = player.GetComponent<Rigidbody2D>();
+        playerHealth = player.GetComponentInChildren<HealthSystem>(true);
 
         ResolveWeaponHolder();
         ResolveLayers();
@@ -184,6 +261,9 @@ public class WeaponTestController
         BuildWeaponButtons();
         BuildLayoutButtons();
         BindControlButtons();
+
+        InitPassives();
+        BuildPassiveRows();
 
         if (0 <= initialLayoutIndex)
         {
@@ -525,10 +605,14 @@ public class WeaponTestController
 
     #region Reset
     /// <summary>
-    /// 무기 재생성(업그레이드 0), 플레이어 원위치, 더미 재배치, 데미지 미터 리셋
+    /// 무기 재생성(업그레이드 0), 패시브 스택 0, 플레이어 원위치, 더미 재배치, 데미지 미터 리셋
     /// </summary>
     public void ResetAll()
     {
+        // 무기는 아래 SelectWeapon 에서 다시 만들므로 여기서는 재생성하지 않는다
+        ClearPassiveStacks();
+        RefreshPassiveRows();
+
         ResetPlayerPosition();
 
         int weaponIndex = currentWeaponIndex;
@@ -554,6 +638,403 @@ public class WeaponTestController
             playerBody.linearVelocity = Vector2.zero;
         }
         player.transform.position = playerHomePosition;
+    }
+    #endregion
+
+    #region Passive
+    /// <summary>
+    /// passives[_index] 의 현재 스택 (범위 밖이면 0)
+    /// </summary>
+    public int GetPassiveStack(int _index)
+    {
+        if (_index < 0 || _index >= passiveStacks.Length)
+        {
+            return 0;
+        }
+        return passiveStacks[_index];
+    }
+
+    /// <summary>
+    /// passives[_index] 의 스택을 _stack 으로 바꾼다 (0 ~ maxPassiveStack 으로 자른다)
+    /// </summary>
+    /// <returns>범위 밖 / 사용 불가 패시브거나 스택이 그대로면 false</returns>
+    public bool SetPassiveStack(int _index, int _stack)
+    {
+        if (false == IsValidPassive(_index))
+        {
+            return false;
+        }
+
+        int stack = Mathf.Clamp(_stack, 0, maxPassiveStack);
+        if (stack == passiveStacks[_index])
+        {
+            return false;
+        }
+
+        passiveStacks[_index] = stack;
+        OnPassivesChanged();
+        return true;
+    }
+
+    /// <summary>
+    /// passives[_index] 의 스택에 _delta 를 더한다 (0 ~ maxPassiveStack 으로 자른다)
+    /// </summary>
+    /// <returns>범위 밖 / 사용 불가 패시브거나 스택이 그대로면 false</returns>
+    public bool AddPassiveStack(int _index, int _delta)
+    {
+        return SetPassiveStack(_index, GetPassiveStack(_index) + _delta);
+    }
+
+    /// <summary>
+    /// 모든 패시브 스택을 0 으로 하고 플레이어 수정치를 지운다 (무기 / 강화 단계는 유지)
+    /// </summary>
+    public void ResetPassives()
+    {
+        // 이미 모두 0 이면 무기 재생성 / 미터 리셋을 하지 않는다
+        if (false == HasAnyPassiveStack())
+        {
+            return;
+        }
+
+        ClearPassiveStacks();
+
+        if (true == rebuildWeaponOnPassiveChange)
+        {
+            RebuildCurrentWeapon();
+        }
+
+        ResetMeters();
+        RefreshPassiveRows();
+        RefreshWeaponUI();
+    }
+
+    private bool IsValidPassive(int _index)
+    {
+        return 0 <= _index && _index < passiveValid.Length && true == passiveValid[_index];
+    }
+
+    private bool HasAnyPassiveStack()
+    {
+        foreach (int stack in passiveStacks)
+        {
+            if (0 < stack)
+            {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    /// <summary>
+    /// 현재 HP 비율 (HealthSystem 이 없으면 -1)
+    /// - HealthSystem 은 최대 HP 가 늘면 늘어난 만큼 현재 HP 를 채우므로, 수정치를 지웠다 다시 붙이면 HP 가 가득 찬다.
+    ///   재적용 전 비율을 저장해 두고 재적용 후 같은 비율로 되돌린다
+    /// </summary>
+    private float CaptureHPRatio()
+    {
+        if (null == playerHealth || playerHealth.MaxHP <= 0f)
+        {
+            return -1f;
+        }
+        return Mathf.Clamp01(playerHealth.CurrHP / playerHealth.MaxHP);
+    }
+
+    private void RestoreHPRatio(float _ratio)
+    {
+        if (_ratio < 0f || null == playerHealth || true == playerHealth.isDead)
+        {
+            return;
+        }
+
+        // 살아 있으면 최소 1 (HealthSystem.HandlePlayerStatChanged 와 같은 규칙)
+        float maxHP = playerHealth.MaxHP;
+        playerHealth.CurrHP = Mathf.Min(maxHP, Mathf.Max(1f, maxHP * _ratio));
+    }
+
+    /// <summary>
+    /// 패시브 사용 가능 여부를 확인하고 1스택 변화량을 잰다 (끝나면 플레이어 수정치는 비어 있다)
+    /// - 1스택 변화량이 0 인 패시브는 경고 후 비활성
+    /// </summary>
+    private void InitPassives()
+    {
+        int count = (null != passives) ? passives.Length : 0;
+        passiveStacks = new int[count];
+        passiveValid = new bool[count];
+        passiveDeltaLabels = new string[count];
+
+        // 1) 측정 없이 형식만 확인한다
+        bool hasCandidate = false;
+        for (int i = 0; i < count; i++)
+        {
+            RewardData data = passives[i];
+            if (null == data)
+            {
+                Debug.LogWarning($"[WeaponTestController] {i} 번 패시브가 비어 있습니다.", this);
+                continue;
+            }
+            if (false == (data.GetEffect() is StatRewardEffect))
+            {
+                Debug.LogWarning($"[WeaponTestController] {data.name} 의 effect 가 StatRewardEffect 가 아니라 비활성 처리합니다.", data);
+                continue;
+            }
+            if (false == data.TryGetKey(out ValueType _) || false == data.TryGetValue(out float _))
+            {
+                Debug.LogWarning($"[WeaponTestController] {data.name} 에 key / value 가 없어 비활성 처리합니다.", data);
+                continue;
+            }
+
+            passiveValid[i] = true;
+            hasCandidate = true;
+        }
+
+        if (false == hasCandidate)
+        {
+            return;
+        }
+
+        // 2) 시작 전 수정치를 지운다 (측정은 빈 수정치에서 한 번씩 적용해 본다. 씬에서 미리 붙어 있던 수정치도 함께 사라진다)
+        float hpRatio = CaptureHPRatio();
+        for (int i = 0; i < count; i++)
+        {
+            if (false == passiveValid[i])
+            {
+                continue;
+            }
+
+            RewardData data = passives[i];
+            data.TryGetKey(out ValueType key);
+            if (false == TryMeasurePassiveDelta(data, key, out string label))
+            {
+                Debug.LogWarning($"[WeaponTestController] {data.name} 의 1스택 변화량이 0 이라 비활성 처리합니다.", data);
+                passiveValid[i] = false;
+                continue;
+            }
+            passiveDeltaLabels[i] = label;
+        }
+
+        player.ResetModifiers();
+        RestoreHPRatio(hpRatio);
+    }
+
+    /// <summary>
+    /// 빈 수정치에서 _data 를 한 번 적용해 ΣAdd / ΣMultiply 변화량을 문자열로 만든다
+    /// (StatRewardEffect 의 Add / Multiply 모드가 비공개라 실제 적용 결과로 판단한다)
+    /// </summary>
+    /// <returns>변화량이 0 이면 false</returns>
+    private bool TryMeasurePassiveDelta(RewardData _data, ValueType _key, out string _label)
+    {
+        player.ResetModifiers();
+        _data.Apply(CreateRewardContext());
+
+        float add = player.GetAdd(_key);
+        float multiply = player.GetMultiply(_key);
+
+        string result = string.Empty;
+        if (false == Mathf.Approximately(0f, multiply))
+        {
+            result = FormatSigned(multiply * 100f, "0.#") + "%";
+        }
+        if (false == Mathf.Approximately(0f, add))
+        {
+            string addText = FormatSigned(add, "0.##");
+            result = (true == string.IsNullOrEmpty(result)) ? addText : $"{result} {addText}";
+        }
+        if (true == string.IsNullOrEmpty(result))
+        {
+            _label = string.Empty;
+            return false;
+        }
+
+        _label = $"{_key.ToDisplayName()} {result}";
+        return true;
+    }
+
+    private static string FormatSigned(float _value, string _format)
+    {
+        string text = _value.ToString(_format, System.Globalization.CultureInfo.InvariantCulture);
+        return (0f <= _value) ? "+" + text : text;
+    }
+
+    private RewardContext CreateRewardContext()
+    {
+        return new RewardContext { Player = player, Side = player.Side };
+    }
+
+    /// <summary>
+    /// 스택을 모두 0 으로 하고 플레이어 수정치를 지운다 (무기 재생성 / UI 갱신은 하지 않는다)
+    /// </summary>
+    private void ClearPassiveStacks()
+    {
+        for (int i = 0; i < passiveStacks.Length; i++)
+        {
+            passiveStacks[i] = 0;
+        }
+
+        if (null != player)
+        {
+            float hpRatio = CaptureHPRatio();
+            player.ResetModifiers();
+            RestoreHPRatio(hpRatio);
+        }
+    }
+
+    private void OnPassivesChanged()
+    {
+        ApplyPassives();
+
+        if (true == rebuildWeaponOnPassiveChange)
+        {
+            RebuildCurrentWeapon();
+        }
+
+        ResetMeters();
+        RefreshPassiveRows();
+        RefreshWeaponUI();
+    }
+
+    /// <summary>
+    /// 플레이어 수정치를 지우고 모든 패시브를 스택 수만큼 실게임과 같은 RewardData.Apply 로 다시 적용한다
+    /// </summary>
+    private void ApplyPassives()
+    {
+        float hpRatio = CaptureHPRatio();
+        player.ResetModifiers();
+
+        RewardContext context = CreateRewardContext();
+        for (int i = 0; i < passiveStacks.Length; i++)
+        {
+            if (false == passiveValid[i])
+            {
+                continue;
+            }
+
+            for (int s = 0; s < passiveStacks[i]; s++)
+            {
+                passives[i].Apply(context);
+            }
+        }
+
+        RestoreHPRatio(hpRatio);
+    }
+
+    /// <summary>
+    /// 현재 무기를 다시 만들고 같은 강화 단계까지 다시 적용한다
+    /// - Final* 는 매번 플레이어 스탯을 읽지만, 이미 발사된 발사체(Laser 빔 길이, Flame 분사 시간 / 크기, Lightning 낙뢰 수)는
+    ///   발사 시점 값을 쓰므로 정리하고 새로 쏘게 한다
+    /// </summary>
+    private void RebuildCurrentWeapon()
+    {
+        if (null == currentWeapon || currentWeaponIndex < 0)
+        {
+            return;
+        }
+
+        int index = currentWeaponIndex;
+        int level = currentWeapon.UpgradeLevel;
+        Weapon prefab = GetWeaponPrefab(index);
+        if (null == prefab)
+        {
+            return;
+        }
+
+        DestroyCurrentWeapon();
+
+        currentWeapon = CreateWeapon(prefab);
+        currentWeaponIndex = index;
+
+        for (int i = 0; i < level; i++)
+        {
+            if (false == TryApplyNextUpgrade())
+            {
+                break;
+            }
+        }
+    }
+
+    private void BuildPassiveRows()
+    {
+        if (null == passiveRowTemplate)
+        {
+            if (0 < passiveStacks.Length)
+            {
+                Debug.LogWarning("[WeaponTestController] passiveRowTemplate 이 연결되지 않아 패시브 UI 를 만들지 않습니다.", this);
+            }
+            return;
+        }
+
+        passiveRowTemplate.gameObject.SetActive(false);
+        Transform parent = (null != passiveRowContainer) ? passiveRowContainer : passiveRowTemplate.transform.parent;
+
+        for (int i = 0; i < passiveStacks.Length; i++)
+        {
+            WeaponTestPassiveRow row = Instantiate(passiveRowTemplate, parent);
+            row.name = $"{passiveRowTemplate.name}_{i}";
+            row.gameObject.SetActive(true);
+            row.SetLabel(GetPassiveLabel(i));
+
+            int index = i;
+            if (null != row.MinusButton)
+            {
+                row.MinusButton.onClick.AddListener(() => AddPassiveStack(index, -1));
+            }
+            if (null != row.PlusButton)
+            {
+                row.PlusButton.onClick.AddListener(() => AddPassiveStack(index, 1));
+            }
+            passiveRows.Add(row);
+        }
+
+        RefreshPassiveRows();
+    }
+
+    private string GetPassiveLabel(int _index)
+    {
+        RewardData data = passives[_index];
+        if (false == passiveValid[_index])
+        {
+            return string.Format(invalidPassiveFormat, (null != data) ? data.name : _index.ToString());
+        }
+        return string.Format(passiveLabelFormat, data.GetName(), passiveDeltaLabels[_index]);
+    }
+
+    private void RefreshPassiveRows()
+    {
+        for (int i = 0; i < passiveRows.Count && i < passiveStacks.Length; i++)
+        {
+            bool valid = passiveValid[i];
+            int stack = passiveStacks[i];
+            passiveRows[i].SetStack(string.Format(passiveStackFormat, stack), true == valid && 0 < stack, true == valid && stack < maxPassiveStack);
+        }
+    }
+
+    /// <summary>
+    /// 스탯별 ΣAdd 와 배율. 현재 무기의 WeaponStatTag 에 없는 무기 수치는 미적용 표시
+    /// </summary>
+    private void RefreshStatSummary()
+    {
+        if (null == statSummaryText || null == player)
+        {
+            return;
+        }
+
+        System.Text.StringBuilder builder = summaryBuilder;
+        builder.Clear();
+        foreach (ValueType type in SummaryTypes)
+        {
+            bool isWeaponStat = WeaponStatTag.None != WeaponStatTagUtils.FromValueType(type);
+            bool notApplied = true == isWeaponStat && null != currentWeapon && false == currentWeapon.IsAffectedBy(type);
+
+            if (0 < builder.Length)
+            {
+                builder.Append('\n');
+            }
+            builder.AppendFormat(System.Globalization.CultureInfo.InvariantCulture, statSummaryLineFormat,
+                type.ToDisplayName(),
+                FormatSigned(player.GetAdd(type), "0.##"),
+                player.GetMultiplier(type),
+                (true == notApplied) ? notAppliedText : string.Empty);
+        }
+        statSummaryText.text = builder.ToString();
     }
     #endregion
 
@@ -672,6 +1153,10 @@ public class WeaponTestController
         {
             resetButton.onClick.AddListener(ResetAll);
         }
+        if (null != passiveResetButton)
+        {
+            passiveResetButton.onClick.AddListener(ResetPassives);
+        }
     }
 
     private void UnbindControlButtons()
@@ -687,6 +1172,10 @@ public class WeaponTestController
         if (null != resetButton)
         {
             resetButton.onClick.RemoveListener(ResetAll);
+        }
+        if (null != passiveResetButton)
+        {
+            passiveResetButton.onClick.RemoveListener(ResetPassives);
         }
     }
 
@@ -743,6 +1232,9 @@ public class WeaponTestController
         {
             weaponButtons[i].interactable = i != currentWeaponIndex && null != GetWeaponPrefab(i);
         }
+
+        // 무기마다 WeaponStatTag 가 달라 "(미적용)" 표시가 바뀐다
+        RefreshStatSummary();
     }
 
     private void RefreshLayoutButtons()

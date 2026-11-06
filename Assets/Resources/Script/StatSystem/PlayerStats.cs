@@ -127,6 +127,16 @@ public class PlayerStats
 
         OnStatChanged?.Invoke(this);
     }
+
+    /// <summary>
+    /// 보상으로 누적된 ΣAdd / ΣMultiply 를 모두 0 으로 되돌린다 (base 는 유지. 무기 테스트 씬 등 디버그용)
+    /// </summary>
+    public void ResetModifiers()
+    {
+        Array.Clear(addValues, 0, addValues.Length);
+        Array.Clear(mulValues, 0, mulValues.Length);
+        OnStatChanged?.Invoke(this);
+    }
     #endregion
 
     #region Weapon

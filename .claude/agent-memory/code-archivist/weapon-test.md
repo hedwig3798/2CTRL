@@ -13,3 +13,10 @@
   HealthSystem의 데미지 이벤트 구독(HandleDamaged), 월드 TextMeshPro 2개를 LateUpdate에서 갱신.
 - `WeaponTestDummyLayout.cs` : [Serializable] displayName, Vector2[] offsets, Count; static CreateDefaults(), Ring(center,radius,count), Cluster(center,spacing,count), Line(start,step,count).
 의존: WeaponRewardEffect, WeaponUpgradeTable, Weapon, Projectile, HealthSystem, TMPro, UnityEngine.UI.
+- `WeaponTestPassiveRow.cs` : [Serializable] WeaponTestPassiveRow, 패시브 한 줄 UI(라벨/스택 표시, +/- 버튼)를 담는 행 클래스.
+- 패시브 스택(WeaponTestController): 직렬화 필드 passives(RewardData[], StatRewardEffect만 유효), maxPassiveStack=99, rebuildWeaponOnPassiveChange=true(변경 시 무기 재생성),
+  passiveRowTemplate/passiveRowContainer/passiveResetButton, 포맷 passiveLabelFormat/passiveStackFormat/invalidPassiveFormat.
+  내부: passiveStacks/passiveValid/passiveDeltaLabels[] (passives와 동일 인덱스), InitPassives, BuildPassiveRows, ApplyPassives(PlayerStats.ResetModifiers 후 스택만큼 RewardData.Apply(RewardContext{Player,Side}) 재적용 → 무기 재생성), OnPassivesChanged.
+  public API: PassiveCount, GetPassiveStack(i), SetPassiveStack(i,stack)->bool (0~max clamp), AddPassiveStack(i,delta)->bool, ResetPassives(); ResetAll()도 패시브 스택 초기화+행 갱신.
+- 빌더(2026-11-06): WeaponTestSceneBuilder 가 오른쪽 위 PassivePanel(ScrollRect, PassiveRow 템플릿 비활성, PassiveResetButton, StatSummaryText) 생성, passives 15개(PassiveBuff 먼저 이름순, MonsterDecrease/MonsterIncreaseNuff 제외) 연결. 빌더 재실행 후 WeaponTestUiVisual 도 재실행. passiveLabelFormat 기본 "{1}"(변화량만, 예 "데미지 +5%").
+- 테스트: PlayMode WeaponTestPassivePlayTests(8), EditMode PlayerStatsResetModifiersTests(2).

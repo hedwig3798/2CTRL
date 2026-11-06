@@ -30,3 +30,4 @@
 - 빌더 Editor/Builders/PassiveRewardBuilder.cs (Tools/Builders/PassiveReward, 멱등): 에셋 생성 + RewardManager 프리팹·GameScene 풀 등록, TryGetWeight 제공.
 - 테스트 Tests/EditMode/PassiveRewardTests.cs.
 - 체력 재생 (2026-11-06): ValueType.HPRegen(끝에 추가, base 0, Get 이 0 미만을 0 으로). HealthSystem.ApplyRegen(rate, dt)(죽음/다운/최대치면 무시), Update 에서 playerStats 있을 때만 Get(HPRegen) 적용. 보상 PassiveBuff/HPRegenUpgrade(+0.5/s, StatAddEffect), PassiveNuff/HPRegenNuff(-0.3/s). StringTable stat.hp_regen, reward.passive.hp_regen.name/regen_up/regen_down. PassiveRewardBuilder 는 GameScene 열기 전 SaveCurrentModifiedScenesIfUserWantsTo.
+- PlayerStats.ResetModifiers(): ΣAdd/ΣMultiply 배열 0으로 초기화 후 OnStatChanged 발생 (무기 테스트 패시브 스택 재적용용). 참고 [weapon-test.md](weapon-test.md)

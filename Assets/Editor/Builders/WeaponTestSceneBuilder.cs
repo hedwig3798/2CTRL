@@ -26,6 +26,10 @@ namespace Builders
         private const string PLAYER_PREFAB = "Assets/prefab/Player/Player.prefab";
         private const string DUMMY_PREFAB = "Assets/prefab/Monster/Dummy/Dummy.prefab";
         private const string EFFECT_DIR = "Assets/prefab/Upgrade/Effects";
+        private const string PASSIVE_BUFF_DIR = "Assets/prefab/Upgrade/PassiveBuff";
+        private const string PASSIVE_NUFF_DIR = "Assets/prefab/Upgrade/PassiveNuff";
+        // 무기 테스트와 무관한 몬스터 수 증감 패시브는 제외
+        private static readonly string[] EXCLUDED_PASSIVES = { "MonsterDecrease", "MonsterIncreaseNuff" };
         private const string FONT_PATH = "Assets/Fonts/NotoSansKR-Regular SDF.asset";
         private const string CAPTURE_PATH = ".claude/tmp/weapontest_scene.png";
 
@@ -137,14 +141,33 @@ namespace Builders
             so.FindProperty("resetButton").objectReferenceValue = ui.reset;
             so.FindProperty("levelText").objectReferenceValue = ui.levelText;
             so.FindProperty("weaponNameText").objectReferenceValue = ui.weaponNameText;
+
+            List<RewardData> passives = LoadPassives();
+            SerializedProperty passiveArr = so.FindProperty("passives");
+            passiveArr.arraySize = passives.Count;
+            for (int i = 0; i < passives.Count; i++)
+            {
+                passiveArr.GetArrayElementAtIndex(i).objectReferenceValue = passives[i];
+            }
+            so.FindProperty("passiveRowTemplate").objectReferenceValue = ui.passiveRowTemplate;
+            so.FindProperty("passiveRowContainer").objectReferenceValue = ui.passiveRowContainer;
+            so.FindProperty("passiveResetButton").objectReferenceValue = ui.passiveReset;
+            so.FindProperty("statSummaryText").objectReferenceValue = ui.statSummaryText;
             so.ApplyModifiedPropertiesWithoutUndo();
+            sb.AppendLine($"passives {passives.Count}: " + string.Join(", ", passives.Select(p => p.name)));
             sb.AppendLine("meterSettings.font: " + (null != fontProp ? "연결" : "필드 없음"));
 
             // 참조 검증
             var check = new SerializedObject(controller);
             string[] refs = { "player", "dummyPrefab", "weaponButtonTemplate", "weaponButtonContainer", "layoutButtonTemplate",
-                "layoutButtonContainer", "upgradeOnceButton", "upgradeMaxButton", "resetButton", "levelText", "weaponNameText", "meterSettings.font" };
+                "layoutButtonContainer", "upgradeOnceButton", "upgradeMaxButton", "resetButton", "levelText", "weaponNameText", "meterSettings.font",
+                "passiveRowTemplate", "passiveRowContainer", "passiveResetButton", "statSummaryText" };
             var missing = refs.Where(r => null == check.FindProperty(r) || null == check.FindProperty(r).objectReferenceValue).ToList();
+            SerializedProperty checkPassives = check.FindProperty("passives");
+            if (null == checkPassives || 0 == checkPassives.arraySize)
+            {
+                missing.Add("passives");
+            }
             sb.AppendLine("누락 참조: " + (0 == missing.Count ? "없음" : string.Join(", ", missing)));
 
             EditorSceneManager.MarkSceneDirty(scene);
@@ -202,6 +225,10 @@ namespace Builders
             public Button reset;
             public TMP_Text levelText;
             public TMP_Text weaponNameText;
+            public WeaponTestPassiveRow passiveRowTemplate;
+            public Transform passiveRowContainer;
+            public Button passiveReset;
+            public TMP_Text statSummaryText;
         }
 
         private static UIRefs BuildCanvas(Scene _scene)
@@ -248,7 +275,165 @@ namespace Builders
             refs.upgradeMax = CreateButton("UpgradeMaxButton", controlPanel, "최대 강화", 280f, 56f);
             refs.reset = CreateButton("ResetButton", controlPanel, "초기화", 280f, 56f);
 
+            // 우측 상단 패시브 (LayoutPanel 오른쪽, ControlPanel 위)
+            BuildPassivePanel(canvasGo.transform, ref refs);
+
             return refs;
+        }
+
+        private const float PASSIVE_ROW_HEIGHT = 40f;
+        private const float PASSIVE_PANEL_WIDTH = 360f;
+
+        private static void BuildPassivePanel(Transform _canvas, ref UIRefs _refs)
+        {
+            RectTransform panel = CreatePanel("PassivePanel", _canvas,
+                new Vector2(1f, 1f), new Vector2(1f, 1f), new Vector2(1f, 1f), new Vector2(-20f, -20f), new Vector2(PASSIVE_PANEL_WIDTH, 640f));
+            var vlg = panel.gameObject.AddComponent<VerticalLayoutGroup>();
+            ConfigureLayout(vlg);
+            vlg.childForceExpandWidth = true;
+
+            // 스크롤 영역 (15행이 다 안 들어가므로 ScrollRect)
+            var scrollGo = new GameObject("PassiveScroll", typeof(RectTransform), typeof(Image), typeof(ScrollRect), typeof(LayoutElement));
+            scrollGo.layer = panel.gameObject.layer;
+            scrollGo.transform.SetParent(panel, false);
+            scrollGo.GetComponent<Image>().color = new Color(0f, 0f, 0f, 0.2f);
+            var scrollLe = scrollGo.GetComponent<LayoutElement>();
+            scrollLe.preferredHeight = 322f;
+            scrollLe.flexibleHeight = 1f;
+
+            const float SCROLLBAR_WIDTH = 14f;
+            var viewportGo = new GameObject("Viewport", typeof(RectTransform), typeof(RectMask2D), typeof(Image));
+            viewportGo.layer = scrollGo.layer;
+            viewportGo.GetComponent<Image>().color = new Color(0f, 0f, 0f, 0f); // 휠 스크롤 레이캐스트용
+            var viewport = viewportGo.GetComponent<RectTransform>();
+            viewport.SetParent(scrollGo.transform, false);
+            viewport.anchorMin = Vector2.zero;
+            viewport.anchorMax = Vector2.one;
+            viewport.pivot = new Vector2(0f, 1f);
+            viewport.offsetMin = Vector2.zero;
+            viewport.offsetMax = new Vector2(-SCROLLBAR_WIDTH - 2f, 0f);
+
+            var contentGo = new GameObject("Content", typeof(RectTransform), typeof(VerticalLayoutGroup), typeof(ContentSizeFitter));
+            contentGo.layer = scrollGo.layer;
+            var content = contentGo.GetComponent<RectTransform>();
+            content.SetParent(viewport, false);
+            content.anchorMin = new Vector2(0f, 1f);
+            content.anchorMax = new Vector2(1f, 1f);
+            content.pivot = new Vector2(0.5f, 1f);
+            content.anchoredPosition = Vector2.zero;
+            content.sizeDelta = Vector2.zero;
+            var cvlg = contentGo.GetComponent<VerticalLayoutGroup>();
+            ConfigureLayout(cvlg);
+            cvlg.padding = new RectOffset(4, 4, 4, 4);
+            cvlg.spacing = 4f;
+            cvlg.childForceExpandWidth = true;
+            var fitter = contentGo.GetComponent<ContentSizeFitter>();
+            fitter.verticalFit = ContentSizeFitter.FitMode.PreferredSize;
+            fitter.horizontalFit = ContentSizeFitter.FitMode.Unconstrained;
+
+            Scrollbar scrollbar = CreateVerticalScrollbar(scrollGo.transform, SCROLLBAR_WIDTH);
+
+            var scroll = scrollGo.GetComponent<ScrollRect>();
+            scroll.viewport = viewport;
+            scroll.content = content;
+            scroll.horizontal = false;
+            scroll.vertical = true;
+            scroll.movementType = ScrollRect.MovementType.Clamped;
+            scroll.scrollSensitivity = 30f;
+            scroll.verticalScrollbar = scrollbar;
+            scroll.verticalScrollbarVisibility = ScrollRect.ScrollbarVisibility.Permanent;
+
+            _refs.passiveRowContainer = content;
+            _refs.passiveRowTemplate = CreatePassiveRow(content);
+            _refs.passiveRowTemplate.gameObject.SetActive(false);
+
+            _refs.passiveReset = CreateButton("PassiveResetButton", panel, "패시브 초기화", PASSIVE_PANEL_WIDTH - 20f, 44f);
+
+            // 스탯 요약 8줄
+            TMP_Text summary = CreateText("StatSummaryText", panel, "", 18f, 230f);
+            summary.GetComponent<LayoutElement>().preferredWidth = PASSIVE_PANEL_WIDTH - 20f;
+            summary.alignment = TextAlignmentOptions.TopLeft;
+            summary.textWrappingMode = TextWrappingModes.NoWrap;
+            summary.overflowMode = TextOverflowModes.Truncate;
+            _refs.statSummaryText = summary;
+        }
+
+        private static WeaponTestPassiveRow CreatePassiveRow(Transform _parent)
+        {
+            var go = new GameObject("PassiveRow", typeof(RectTransform), typeof(HorizontalLayoutGroup), typeof(LayoutElement), typeof(WeaponTestPassiveRow));
+            go.layer = _parent.gameObject.layer;
+            go.transform.SetParent(_parent, false);
+            go.GetComponent<LayoutElement>().preferredHeight = PASSIVE_ROW_HEIGHT;
+            var hlg = go.GetComponent<HorizontalLayoutGroup>();
+            hlg.padding = new RectOffset(4, 4, 0, 0);
+            hlg.spacing = 4f;
+            hlg.childAlignment = TextAnchor.MiddleLeft;
+            hlg.childControlWidth = true;
+            hlg.childControlHeight = true;
+            hlg.childForceExpandWidth = false;
+            hlg.childForceExpandHeight = false;
+
+            TMP_Text nameText = CreateText("NameText", go.transform, "패시브", 18f, PASSIVE_ROW_HEIGHT);
+            var nameLe = nameText.GetComponent<LayoutElement>();
+            nameLe.preferredWidth = 160f;
+            nameLe.flexibleWidth = 1f;
+            nameText.alignment = TextAlignmentOptions.MidlineLeft;
+            nameText.enableAutoSizing = true;
+            nameText.fontSizeMin = 12f;
+            nameText.fontSizeMax = 18f;
+            nameText.textWrappingMode = TextWrappingModes.NoWrap;
+            nameText.overflowMode = TextOverflowModes.Ellipsis;
+
+            Button minus = CreateButton("MinusButton", go.transform, "-", PASSIVE_ROW_HEIGHT, PASSIVE_ROW_HEIGHT);
+            TMP_Text stackText = CreateText("StackText", go.transform, "x0", 18f, PASSIVE_ROW_HEIGHT);
+            stackText.GetComponent<LayoutElement>().preferredWidth = 50f;
+            Button plus = CreateButton("PlusButton", go.transform, "+", PASSIVE_ROW_HEIGHT, PASSIVE_ROW_HEIGHT);
+
+            var row = go.GetComponent<WeaponTestPassiveRow>();
+            var so = new SerializedObject(row);
+            so.FindProperty("nameText").objectReferenceValue = nameText;
+            so.FindProperty("stackText").objectReferenceValue = stackText;
+            so.FindProperty("minusButton").objectReferenceValue = minus;
+            so.FindProperty("plusButton").objectReferenceValue = plus;
+            so.ApplyModifiedPropertiesWithoutUndo();
+            return row;
+        }
+
+        private static Scrollbar CreateVerticalScrollbar(Transform _parent, float _width)
+        {
+            var go = new GameObject("Scrollbar", typeof(RectTransform), typeof(Image), typeof(Scrollbar));
+            go.layer = _parent.gameObject.layer;
+            var rt = go.GetComponent<RectTransform>();
+            rt.SetParent(_parent, false);
+            rt.anchorMin = new Vector2(1f, 0f);
+            rt.anchorMax = new Vector2(1f, 1f);
+            rt.pivot = new Vector2(1f, 1f);
+            rt.anchoredPosition = Vector2.zero;
+            rt.sizeDelta = new Vector2(_width, 0f);
+            go.GetComponent<Image>().color = new Color(0f, 0f, 0f, 0.3f);
+
+            var areaGo = new GameObject("SlidingArea", typeof(RectTransform));
+            areaGo.layer = go.layer;
+            var area = areaGo.GetComponent<RectTransform>();
+            area.SetParent(rt, false);
+            area.anchorMin = Vector2.zero;
+            area.anchorMax = Vector2.one;
+            area.offsetMin = Vector2.zero;
+            area.offsetMax = Vector2.zero;
+
+            var handleGo = new GameObject("Handle", typeof(RectTransform), typeof(Image));
+            handleGo.layer = go.layer;
+            var handle = handleGo.GetComponent<RectTransform>();
+            handle.SetParent(area, false);
+            handle.offsetMin = Vector2.zero;
+            handle.offsetMax = Vector2.zero;
+            handleGo.GetComponent<Image>().color = new Color(0.6f, 0.6f, 0.65f, 1f);
+
+            var bar = go.GetComponent<Scrollbar>();
+            bar.handleRect = handle;
+            bar.targetGraphic = handleGo.GetComponent<Image>();
+            bar.direction = Scrollbar.Direction.BottomToTop;
+            return bar;
         }
 
         private static void ConfigureLayout(HorizontalOrVerticalLayoutGroup _group)
@@ -337,6 +522,21 @@ namespace Builders
                 .OfType<WeaponRewardEffect>()
                 .OrderBy(e => e.name)
                 .ToList();
+        }
+
+        private static List<RewardData> LoadPassives()
+        {
+            var result = new List<RewardData>();
+            foreach (string dir in new[] { PASSIVE_BUFF_DIR, PASSIVE_NUFF_DIR })
+            {
+                result.AddRange(AssetDatabase.FindAssets("t:ScriptableObject", new[] { dir })
+                    .Select(AssetDatabase.GUIDToAssetPath)
+                    .Select(AssetDatabase.LoadAssetAtPath<ScriptableObject>)
+                    .OfType<RewardData>()
+                    .Where(r => false == EXCLUDED_PASSIVES.Contains(r.name))
+                    .OrderBy(r => r.name));
+            }
+            return result;
         }
 
         private static string Capture(Scene _scene, Camera _cam, GameObject _dummyPrefab)
