@@ -591,7 +591,6 @@ namespace Builders.Visual
             SetVisual(W + "Explosive/ExplosiveProjectile.prefab", "visual", "D3_Weapon_Explosive_Projectile", white);
             SetVisual(W + "Explosive/ExplosiveExplosionEffect.prefab", "visual", "Common_FX_Explosion", new Color(1f, 1f, 1f, 0.95f));
             SetVisual(W + "Shockwave/ShockwaveProjectile.prefab", "visual", "D3_Weapon_Shockwave_Ring", new Color(0.65f, 0.9f, 1f, 0.9f));
-            SetVisual(W + "Chain/ChainLightning.prefab", "visual", "D3_Weapon_Chain_Spark", white);
 
             // 체인 번개 라인: 텍스처 반복
             var lineTex = AssetDatabase.LoadAssetAtPath<Texture2D>(ART + "/Weapon/D3_Weapon_Chain_Line.png");

@@ -39,4 +39,4 @@ Unity 제어: Unity CLI(`unity`, Pipeline 패키지). 열린 에디터는 `unity
    - internal 헬퍼(예: `SettingsUIKit`)를 쓰는 빌더는 `script run` 이 CS0122 로 실패한다. `unity command script eval "return Builders.X.Build();"` 로 실행.
    - 무기 프리팹을 다시 만드는 빌더를 돌린 뒤에는 `Builders.WeaponTagBuilder.Build()` 도 다시 실행 (안 하면 무기 태그가 All 로 돌아감).
    - 런타임에 Instantiate 하는 연출·오브젝트는 낸 쪽의 레이어로 맞출 것 (분할 카메라 culling mask 에 Default 가 없어 안 보임). `EffectPool.Spawn` 은 레이어 인자 필수.
-   - `capture game_view --save_path` 상대 경로는 `Assets/` 아래에 저장된다. 캡처 후 `.claude/tmp/` 로 옮기고 지울 것. Game 뷰가 Free Aspect 면 캡처가 찌그러진다.
+   - `capture game_view --save_path` 는 절대 경로를 줘도 `Assets/` 아래에 저장된다. 캡처 후 `.claude/tmp/` 로 옮기고 지울 것. Game 뷰가 Free Aspect 면 캡처가 찌그러진다.

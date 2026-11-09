@@ -94,16 +94,6 @@ namespace Builders.Visual
                     sb.Append("line ok ");
                 }
                 else sb.Append("line missing ");
-                Transform vis = root.transform.Find("visual");
-                if (vis != null && vis.TryGetComponent(out SpriteRenderer sr))
-                {
-                    sr.color = new Color(0.7f, 0.92f, 1f, 1f);
-                    vis.localScale = new Vector3(0.3f, 0.3f, 1f);
-                    sr.sortingLayerName = "attack";
-                    sr.sortingOrder = 7;
-                    sb.Append("visual ok(sprite=" + (sr.sprite != null ? sr.sprite.name : "null") + ")");
-                }
-                else sb.Append("visual missing");
                 PrefabUtility.SaveAsPrefabAsset(root, CHAIN);
                 return sb.ToString();
             }

@@ -26,7 +26,9 @@ UpgradeLevel/UpgradeVersion (UpgradeTable/WeaponPrefab은 Weapon에 없음 -> We
 
 ## 무기별 (Weapons/*) ★ (5·10단계)
 - Boomerang/BoomerangUpgrade: IHitDamageModifier, FlagReturnDamage면 ReturnMovement.IsReturning 중 returnDamageRate배(빌더 1.5, 이전 2배).
-- Chain/ChainAmplifier(IHitDamageModifier, FlagChainAmplify: 전이마다 +15% 누적), Chain/ChainLightningLine(IProjectileHitListener, 번개 표시). 무기 기본: Repeat, dmg10, 공속0.8, 사거리7, chainCount3, chainRange3; ChainMovement+OneHitProjectile, 프리팹 prefab/weapon/Chain/.
+- Chain/ChainLightningProjectile (Projectile 직접 상속): OnLaunch 프레임에 FinalRange 내 최근접 적 -> chainRange 전이로 최대 min(1+chainCount, hitCount)명 즉시 타격(public StruckCount). 선(LineRenderer 자식 line)은 hold 0.1 + fade 0.3 뒤 풀 반환. ★FlagChainAmplify amplifyRate(전이마다 누적)를 내장. speedRate 효과 없음. (ChainAmplifier/ChainLightningLine 삭제됨)
+- ChainLightning.prefab = Transform + ChainLightningProjectile + 자식 line. 콜라이더/Lifetime/BlackBoardHandler/visual 없음. 무기 기본: Repeat, dmg10, 공속0.8, 사거리7, chainCount3, chainRange3. 프리팹 prefab/weapon/Chain/.
+- ChainMovement는 템플릿 prefab/weapon/bullet/ChainProjectile.prefab 전용(Chain 무기는 미사용). 빌더 WeaponUpgradeBuilder.BuildChainProjectile(RemoveIfExists 헬퍼). 테스트 PlayMode ChainLightningPlayTests(7). ArtResourceBuilder/WeaponChainSweepVisual은 Chain visual 처리 안 함.
 - Explosive: FlagSecondaryExplosion(0.3s 뒤 반경60%/데미지50%). Mine: FlagChainExplosion(범위 내 활성 지뢰 연쇄). PoisonZone: FlagSlowZone(틱마다 monster.Context.ApplySlow, 기본 -40%). Shockwave: FlagContractWave(소멸 후 수축 파동 50%). SplitShot: FlagResplit(SplitFragmentResplit.Arm/OnProjectileHit, 조각 첫 타격 위치에서 3개). Sweep: FlagSlashWave(formation 0이 조준 방향 관통 검기 60%). Drone/Laser: 파라미터 수정치 사용(드론 탄 Child*, 레이저 FanAngle/LaserWidth).
 
 ## 기타

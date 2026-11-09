@@ -81,9 +81,9 @@ public class Weapon
     public float knockbackForce;
 
     [Header("chain spec")]
-    [Tooltip("전이 횟수 (총 방문 수 = 1 + chainCount). ChainMovement 가 사용")]
+    [Tooltip("전이 횟수 (총 타격 수 = 1 + chainCount). ChainLightningProjectile, ChainMovement 가 사용")]
     public int chainCount;
-    [Tooltip("이전 타겟 기준 다음 타겟 탐색 범위. ChainMovement 가 사용")]
+    [Tooltip("이전 타겟 기준 다음 타겟 탐색 범위. ChainLightningProjectile, ChainMovement 가 사용")]
     public float chainRange;
 
     [Header("area spec")]

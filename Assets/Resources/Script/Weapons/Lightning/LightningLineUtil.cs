@@ -3,7 +3,7 @@ using UnityEngine;
 
 /// <summary>
 /// 번개 모양 지그재그 선을 만드는 공용 헬퍼 (LineRenderer, 월드 좌표)
-/// ChainLightningLine 의 마디 나누기와 같은 방식이다 (그쪽은 OneHitProjectile 전용이라 따로 둔다)
+/// LightningProjectile, ChainLightningProjectile 이 함께 쓴다
 /// </summary>
 public static class LightningLineUtil
 {

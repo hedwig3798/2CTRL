@@ -47,7 +47,7 @@ MonoBehaviour:
   owner: {fileID: 0}
   weaponType: 0
   preLoadCount: 5
-  projectile: {fileID: 4803801878435851661, guid: 45e1e155e0674bd4c9d8a24e9638715d, type: 3}
+  projectile: {fileID: 7390781382214347453, guid: 45e1e155e0674bd4c9d8a24e9638715d, type: 3}
   targetLayer:
     serializedVersion: 2
     m_Bits: 0
@@ -56,7 +56,7 @@ MonoBehaviour:
   range: 7
   statTags: 7
   fireCount: 1
-  speedRate: 1
+  speedRate: 5
   hitCount: 99
   fireDelay: 0.1
   spreadRange: 0

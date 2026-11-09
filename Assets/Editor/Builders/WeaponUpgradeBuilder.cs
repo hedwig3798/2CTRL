@@ -274,19 +274,18 @@ namespace Builders
             EditPrefab(CHAIN_PROJECTILE, root =>
             {
                 root.name = "ChainLightning";
-                var col = root.GetComponent<Collider2D>();
-                if (null != col)
+
+                // 즉시 타격 방식이라 CHAIN_SRC 의 이동 / 충돌 / 탄 표시를 쓰지 않는다
+                RemoveIfExists<ChainMovement>(root);
+                RemoveIfExists<OneHitProjectile>(root);
+                RemoveIfExists<BlackBoardHandler>(root);
+                RemoveIfExists<Collider2D>(root);
+                RemoveIfExists<Lifetime>(root);
+                Transform visual = root.transform.Find("visual");
+                if (null != visual)
                 {
-                    col.isTrigger = true;
+                    Object.DestroyImmediate(visual.gameObject);
                 }
-
-                var lifetime = GetOrAdd<Lifetime>(root);
-                lifetime.lifetime = 3f;
-
-                var amp = GetOrAdd<ChainAmplifier>(root);
-                var aso = new SerializedObject(amp);
-                SetFloat(aso, "amplifyRate", 0.15f);
-                aso.ApplyModifiedPropertiesWithoutUndo();
 
                 Transform lineT = root.transform.Find("line");
                 if (null == lineT)
@@ -310,10 +309,11 @@ namespace Builders
                 lr.useWorldSpace = true;
                 lr.positionCount = 0;
 
-                var line = GetOrAdd<ChainLightningLine>(root);
-                var lso = new SerializedObject(line);
-                lso.FindProperty("line").objectReferenceValue = lr;
-                lso.ApplyModifiedPropertiesWithoutUndo();
+                var projectile = GetOrAdd<ChainLightningProjectile>(root);
+                var pso = new SerializedObject(projectile);
+                SetFloat(pso, "amplifyRate", 0.15f);
+                pso.FindProperty("line").objectReferenceValue = lr;
+                pso.ApplyModifiedPropertiesWithoutUndo();
             });
             return AssetDatabase.LoadAssetAtPath<GameObject>(CHAIN_PROJECTILE);
         }
@@ -522,6 +522,15 @@ namespace Builders
         {
             var c = _go.GetComponent<T>();
             return null != c ? c : _go.AddComponent<T>();
+        }
+
+        private static void RemoveIfExists<T>(GameObject _go) where T : Component
+        {
+            var c = _go.GetComponent<T>();
+            if (null != c)
+            {
+                Object.DestroyImmediate(c, true);
+            }
         }
 
         private static void EditPrefab(string _path, System.Action<GameObject> _edit)

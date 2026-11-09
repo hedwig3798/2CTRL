@@ -35,11 +35,11 @@
 - 귀환 강타 배율(`BoomerangUpgrade.returnDamageRate` 1.5)과 둔화율(`PoisonZoneProjectile.slowRate` 0.3)은 발사체 프리팹 값이며 `WeaponUpgradeBuilder` 가 같이 맞춘다.
 
 ## Chain 무기 (신규)
-- 가장 가까운 적에게 번개를 쏘고, 그 적에서 chainRange 안의 다음 적으로 chainCount번 전이한다 (`ChainMovement`).
+- 가장 가까운 적을 타격하고, 그 적에서 chainRange 안의 다음 적으로 chainCount번 전이한다. 전이 대상 전부를 발사한 프레임에 타격하고, 타격 선만 잠깐 보였다가 서서히 사라진다 (`ChainLightningProjectile`).
 - 기본값
   - Repeat, 데미지 10, 공속 0.8, 사거리 7
   - fireCount 1, chainCount 3, chainRange 3
-- 발사체: 기존 `prefab/weapon/bullet/ChainProjectile.prefab` 구성(ChainMovement + OneHitProjectile)을 기반으로 `prefab/weapon/Chain/`에 새로 만든다.
+- 발사체: `prefab/weapon/Chain/ChainLightning.prefab` (`ChainLightningProjectile` + 자식 LineRenderer `line`). 이동·충돌 컴포넌트는 쓰지 않는다.
 
 ## 부메랑 이동 (ReturnMovement)
 - 되돌아서는 순간, 그때의 출발 지점 방향을 한 번만 정하고 끝까지 그 방향으로 날아간다.

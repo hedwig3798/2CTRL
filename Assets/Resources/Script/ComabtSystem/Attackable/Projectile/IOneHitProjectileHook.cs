@@ -1,5 +1,5 @@
 /// <summary>
-/// OneHitProjectile 과 같은 오브젝트에 붙어 타격마다 데미지 배율을 정한다 (부메랑 귀환 2배, 체인 증폭 등)
+/// OneHitProjectile 과 같은 오브젝트에 붙어 타격마다 데미지 배율을 정한다 (부메랑 귀환 2배 등)
 /// 여러 개가 붙어 있으면 배율을 모두 곱한다
 /// </summary>
 public interface IHitDamageModifier
@@ -11,7 +11,7 @@ public interface IHitDamageModifier
 }
 
 /// <summary>
-/// OneHitProjectile 과 같은 오브젝트에 붙어 타격 직후 알림을 받는다 (조각 재분열, 번개 표시 등)
+/// OneHitProjectile 과 같은 오브젝트에 붙어 타격 직후 알림을 받는다 (조각 재분열 등)
 /// 타격 수를 다 채워 발사체가 꺼지기 전에 호출된다
 /// </summary>
 public interface IProjectileHitListener
