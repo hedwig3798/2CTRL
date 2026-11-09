@@ -33,7 +33,7 @@ public class PlayerStats
 
     [Tooltip("보유할 수 있는 무기 수 (시작 무기 포함). 0 이하면 상한 없음")]
     [SerializeField]
-    private int maxWeaponCount = 4;
+    private int maxWeaponCount = 6;
 
     private static readonly int StatCount = Enum.GetValues(typeof(ValueType)).Length;
 

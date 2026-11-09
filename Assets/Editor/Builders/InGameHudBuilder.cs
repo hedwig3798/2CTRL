@@ -14,7 +14,7 @@ namespace Builders
     /// - 루트 HUDCanvas (Screen Space Overlay, sortingOrder 10 → EXPUI/LevelUpUI(0) 위, PauseCanvas(90) 아래)
     ///   LetterboxCanvas 를 붙여 16:9 영역 안 1920x1080 좌표계로 배치
     /// - WaveTimer: 중앙 위 TMP + WaveTimerUI (spawners = 씬의 스포너 전부 직접 연결)
-    /// - WeaponHUD_Left / WeaponHUD_Right: 좌상단 / 우상단, 슬롯 4개 (Slot0 = 첫 획득, 화면 가장자리부터)
+    /// - WeaponHUD_Left / WeaponHUD_Right: 좌상단 / 우상단, 슬롯 6개 (Slot0 = 첫 획득, 화면 가장자리부터)
     /// - 색 · 스프라이트는 플레이스홀더 (visual-designer 담당)
     /// </summary>
     public static class InGameHudBuilder
@@ -25,7 +25,7 @@ namespace Builders
         private const int SORTING_ORDER = 10;
         private const int UI_LAYER = 5;
 
-        private const int SLOT_COUNT = 4;
+        private const int SLOT_COUNT = 6;
         private const float SLOT_SIZE = 96f;
         private const float SLOT_SPACING = 12f;
         private const float EDGE_MARGIN = 24f;
@@ -113,7 +113,7 @@ namespace Builders
             EditorSceneManager.SaveScene(scene);
 
             sb.AppendLine("씬: " + SCENE_PATH);
-            sb.AppendLine(CANVAS_NAME + "(order " + SORTING_ORDER + ")/{WaveTimer, WeaponHUD_Left/Slot0..3, WeaponHUD_Right/Slot0..3}");
+            sb.AppendLine(CANVAS_NAME + "(order " + SORTING_ORDER + ")/{WaveTimer, WeaponHUD_Left/Slot0.." + (SLOT_COUNT - 1) + ", WeaponHUD_Right/Slot0.." + (SLOT_COUNT - 1) + "}");
             sb.AppendLine("Slot/{Background, Content/{Icon, NameText, LevelText}}");
             return sb.ToString();
         }

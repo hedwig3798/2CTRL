@@ -9,12 +9,12 @@ metadata:
 - Spawner: CurrentWaveIndex/CurrentWave/GetWaveRate(type). 최종 배율 = 웨이브배율 x (base+ΣAdd) x (1+ΣMul). Count는 웨이브 배율 없음. Wave 코루틴이 currentWaveIndex 갱신, 이후 스폰(소환/분열 포함)부터 적용.
 - Wave30Builder: 14웨이브(50x3, 150x11), 공통 DAMAGE_RATE/SPEED_RATE, 차원별 hpRate·spawnInterval(설계 7.2장), 스폰거리 11~13, 옛 에셋 안 지움. ValidateCommon/ValidateTable/LoadPrefabs/WavePath.
 ## 플레이어 스탯
-- PlayerStats: GetMultiplier = max(minMultiplier 0.5, 1+ΣMul). Get = (base+ΣAdd) x 배율. maxWeaponCount 4(시작 무기 포함), AddWeapon은 상한이면 false.
+- PlayerStats: GetMultiplier = max(minMultiplier 0.5, 1+ΣMul). Get = (base+ΣAdd) x 배율. maxWeaponCount 6(시작 무기 포함, 2026-11-09 상향. HUD 슬롯 InGameHudBuilder.SLOT_COUNT 6, 게임오버 무기 칸 3열), AddWeapon은 상한이면 false.
 - Weapon: Final* = (무기값 + 플레이어 GetAdd) x 플레이어 GetMultiplier (ApplyOwnerStat). Damage/AttackSpeed/Range 모두 곱연산.
 - 무기 태그 (2026-11-06): `StatSystem/WeaponStatTag.cs` [Flags] {None, Damage=1, AttackSpeed=2, Range=4, Duration=1<<3, ProjectileCount=1<<4, All=5개 전부}, `WeaponStatTagUtils.FromValueType`/`Has(tags, ValueType)` (HP·MoveSpeed 는 항상 false). 태그 없는 수치는 플레이어 ΣAdd/배율 무시(무기 값 그대로). Weapon.statTags 기본 All. 빌더 `WeaponTagBuilder`: 기본 Damage|AttackSpeed|Range; Range 제외 Saw/Shockwave/Tornado/Vine; Duration = Vine/PoisonZone/Root/Flame; ProjectileCount = Boomerang/Drone/Explosive/Laser/Lightning/Spirit/SplitShot/Tornado/Root. GetTags(name) 공개. ValueType 끝에 Duration/ProjectileCount(무기 전용, 플레이어 base 0; 보상 에셋 아직 없음). 테스트 `Tests/EditMode/WeaponStatTagTests.cs`.
 ## EXP / 레벨
 - MonsterData.expValue(기본 1) -> DropManager가 죽은 MonsterBrain.Data.expValue를 아이템 expRate로(없으면 defaultExpRate 1).
-- LevelTable: baseExp/coef/power/formulaLevelOffset(1). 필요 EXP = baseExp + coef x L^power, L=currLevel+offset. UseFormula/HasData/GetNeedExp(level). 둘 다 0이면 expTable 사용. ExpSystem은 GetNeedExp 위임.
+- LevelTable: baseExp/coef/power/formulaLevelOffset(1). 필요 EXP = baseExp + coef x L^power, L=currLevel+offset. UseFormula/HasData/GetNeedExp(level). 둘 다 0이면 expTable 사용. ExpSystem은 GetNeedExp 위임. 현재 값 9 / 17.5 / 1.2 (BalanceDataBuilder, 설계 11장).
 ## 선택지
 - 디버프는 패시브 버프 패널에만, 무기 상한 시 Weapon 풀 차단 (reward-ui.md 참고).
 ## 빌더

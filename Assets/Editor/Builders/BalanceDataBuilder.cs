@@ -151,13 +151,13 @@ namespace Builders
             if (null != table)
             {
                 var so = new SerializedObject(table);
-                so.FindProperty("baseExp").floatValue = 10f;
-                so.FindProperty("coef").floatValue = 20f;
+                so.FindProperty("baseExp").floatValue = 9f;
+                so.FindProperty("coef").floatValue = 17.5f;
                 so.FindProperty("power").floatValue = 1.2f;
                 so.FindProperty("maxLevel").intValue = 99;
                 so.ApplyModifiedPropertiesWithoutUndo();
                 EditorUtility.SetDirty(table);
-                sb.AppendLine("LevelTable 10/20/1.2 max99");
+                sb.AppendLine("LevelTable 9/17.5/1.2 max99");
             }
 
             // 5. 무기 데미지

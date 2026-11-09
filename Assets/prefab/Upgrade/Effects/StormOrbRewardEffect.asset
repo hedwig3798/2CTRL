@@ -1,0 +1,16 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d44659d547e349079d987e65f6e61f4a, type: 3}
+  m_Name: StormOrbRewardEffect
+  m_EditorClassIdentifier: Game.Runtime::WeaponRewardEffect
+  weaponPrefab: {fileID: 3390484466684792378, guid: 11b1cd3a737c7b643bf10b2db5969f86, type: 3}
+  upgradeTable: {fileID: 11400000, guid: 17ab780b73e74bb4694b3a381f176ce3, type: 2}

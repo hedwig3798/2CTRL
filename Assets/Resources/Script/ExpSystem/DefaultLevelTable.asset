@@ -24,7 +24,7 @@ MonoBehaviour:
   - 90
   - 100
   maxLevel: 99
-  baseExp: 10
-  coef: 20
+  baseExp: 9
+  coef: 17.5
   power: 1.2
   formulaLevelOffset: 1

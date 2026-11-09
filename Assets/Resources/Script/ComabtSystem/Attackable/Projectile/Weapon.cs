@@ -121,6 +121,7 @@ public class Weapon
     /// <summary>
     /// (무기 attackSpeed + 플레이어 AttackSpeed Add) × 플레이어 AttackSpeed 배율
     /// 무기 attackSpeed 가 0 이하면 공격하지 않는 무기로 보고 0, 아니면 최소 MinAttackSpeed
+    /// AttackSpeed 태그가 없는 무기는 플레이어 스텟을 받지 않으므로 하한 없이 무기 값 그대로 (쿨타임이 아주 긴 무기용)
     /// </summary>
     public float FinalAttackSpeed
     {
@@ -130,7 +131,26 @@ public class Weapon
             {
                 return 0f;
             }
+            if (false == statTags.Has(ValueType.AttackSpeed))
+            {
+                return attackSpeed;
+            }
             return Mathf.Max(MinAttackSpeed, ApplyOwnerStat(attackSpeed, ValueType.AttackSpeed));
+        }
+    }
+
+    /// <summary>
+    /// Repeat 무기의 다음 발사까지 남은 시간 (초). Repeat 가 아니거나 공격하지 않으면 0
+    /// </summary>
+    public float RemainingCoolTime
+    {
+        get
+        {
+            if (WEAPON_TYPE.Repeat != weaponType)
+            {
+                return 0f;
+            }
+            return Mathf.Max(0f, FinalCoolTime - timer);
         }
     }
 

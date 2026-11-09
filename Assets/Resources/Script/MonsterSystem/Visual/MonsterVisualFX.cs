@@ -97,6 +97,12 @@ public class MonsterVisualFX
 
     private void HandleState(MonsterStateId _id)
     {
+        // 다운 상태에서 바로 사망하면 디졸브가 끝날 때까지 다운 색을 유지한다
+        if (MonsterStateId.Downed == state && MonsterStateId.Dead == _id)
+        {
+            return;
+        }
+
         state = _id;
         stateTime = 0f;
     }

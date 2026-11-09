@@ -18,7 +18,10 @@ namespace Builders
         private const WeaponStatTag BASE = WeaponStatTag.Damage | WeaponStatTag.AttackSpeed | WeaponStatTag.Range;
 
         // 사거리 0, 사거리를 쓰지 않는 무기
-        private static readonly HashSet<string> NoRange = new HashSet<string> { "Saw", "Shockwave", "Tornado", "Vine" };
+        private static readonly HashSet<string> NoRange = new HashSet<string> { "Saw", "Shockwave", "SpinBlade", "Tornado", "Vine" };
+
+        // 공속 패시브를 받지 않는 무기 (SpinBlade 는 쿨타임 60초 고정, StormOrb 는 타격 간격이 발사체 고정값)
+        private static readonly HashSet<string> NoAttackSpeed = new HashSet<string> { "SpinBlade", "StormOrb" };
 
         // 지속형 공격 (장판 수명, Flame 분사 시간, Tornado 수명 - Capped 라 수명이 늘면 재시전 간격도 늘어난다)
         private static readonly HashSet<string> Duration = new HashSet<string> { "Vine", "PoisonZone", "Root", "Flame", "Tornado" };
@@ -26,7 +29,7 @@ namespace Builders
         // 한 번에 발사하는 발사체 수 (Drone 은 드론 수, Lightning 은 낙뢰 수)
         private static readonly HashSet<string> ProjectileCount = new HashSet<string>
         {
-            "Boomerang", "Drone", "Explosive", "Laser", "Lightning", "Spirit", "SplitShot", "Tornado", "Root",
+            "Boomerang", "Drone", "Explosive", "Laser", "Lightning", "Spirit", "SplitShot", "Tornado", "Root", "StormOrb",
         };
 
         /// <summary>
@@ -38,6 +41,10 @@ namespace Builders
             if (NoRange.Contains(_weaponName))
             {
                 tags &= ~WeaponStatTag.Range;
+            }
+            if (NoAttackSpeed.Contains(_weaponName))
+            {
+                tags &= ~WeaponStatTag.AttackSpeed;
             }
             if (Duration.Contains(_weaponName))
             {
@@ -82,7 +89,7 @@ namespace Builders
                 changed++;
             }
 
-            foreach (HashSet<string> set in new[] { NoRange, Duration, ProjectileCount })
+            foreach (HashSet<string> set in new[] { NoRange, NoAttackSpeed, Duration, ProjectileCount })
             {
                 foreach (string name in set)
                 {

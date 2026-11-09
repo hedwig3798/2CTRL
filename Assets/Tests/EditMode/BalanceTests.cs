@@ -194,24 +194,25 @@ public class BalanceTests
     }
 
     [Test]
-    public void AddWeapon_RefusesFifth()
+    public void AddWeapon_RefusesSeventh()
     {
         PlayerStats p = MakePlayer(PlayerSide.Left);
-        Weapon[] prefabs = new Weapon[5];
-        for (int i = 0; i < 5; ++i)
+        Assert.AreEqual(6, p.MaxWeaponCount);
+        Weapon[] prefabs = new Weapon[7];
+        for (int i = 0; i < 7; ++i)
         {
             prefabs[i] = MakeWeaponPrefab("W" + i);
         }
-        for (int i = 0; i < 4; ++i)
+        for (int i = 0; i < 6; ++i)
         {
             Assert.IsFalse(p.IsWeaponFull);
             Assert.IsTrue(p.AddWeapon(prefabs[i]));
         }
         Assert.IsTrue(p.IsWeaponFull);
         LogAssert.Expect(LogType.Warning, new System.Text.RegularExpressions.Regex(".*"));
-        Assert.IsFalse(p.AddWeapon(prefabs[4]));
-        Assert.AreEqual(4, p.WeaponCount);
-        Assert.IsFalse(p.HasWeapon(prefabs[4]));
+        Assert.IsFalse(p.AddWeapon(prefabs[6]));
+        Assert.AreEqual(6, p.WeaponCount);
+        Assert.IsFalse(p.HasWeapon(prefabs[6]));
     }
 
     [Test]
@@ -221,8 +222,8 @@ public class BalanceTests
         PlayerStats left = MakePlayer(PlayerSide.Left);
         MakePlayer(PlayerSide.Right);
 
-        RewardData[] rewards = new RewardData[5];
-        for (int i = 0; i < 5; ++i)
+        RewardData[] rewards = new RewardData[7];
+        for (int i = 0; i < 7; ++i)
         {
             WeaponRewardEffect e = Track(ScriptableObject.CreateInstance<WeaponRewardEffect>());
             SetField(e, "weaponPrefab", MakeWeaponPrefab("W" + i));
@@ -233,7 +234,7 @@ public class BalanceTests
         }
 
         RewardContext ctx = new RewardContext { Player = left, Side = PlayerSide.Left, Manager = manager };
-        for (int i = 0; i < 4; ++i)
+        for (int i = 0; i < 6; ++i)
         {
             rewards[i].Apply(ctx);
         }
@@ -248,7 +249,7 @@ public class BalanceTests
         Assert.AreEqual(0, result.Count);
 
         n = manager.GetRandomUnique(10, new[] { RewardPoolType.Weapon }, PlayerSide.Right, result);
-        Assert.AreEqual(5, n);
+        Assert.AreEqual(7, n);
 
         manager.SetPoolBlockedFor(PlayerSide.Left, RewardPoolType.Weapon, false);
         Assert.IsFalse(manager.IsPoolBlockedFor(PlayerSide.Left, RewardPoolType.Weapon));

@@ -44,3 +44,11 @@
 - `Projectile.RefreshDamage()`(protected): weapon.FinalDamage × 발사 배율(LaunchAt damageRate)과 knockback 재기록. 오래 사는 발사체(Saw 튕김, Tornado 영구, Spirit)가 타격 직전 호출.
 - `PoisonZoneProjectile.SlowRate`(protected virtual) 훅. Root 는 `rootSlowRate` 0.4 로 override.
 - Saw: 카메라 탐색 실패 캐시(cameraRetryInterval 1초). Tornado: brainCacheLimit 256. Spirit: UpgradeVersion 변경 시 hitCount 증가분을 remainingHits 에 더함.
+
+## SpinBlade/StormOrb 추가 (2026-11-09)
+- HealthSystem: 정적 `ActiveEnemies`, `CollectAlive(mask, list, includeDowned)` (플레이어 제외, MonsterBrain 없는 bat 포함), `Execute(ref msg)` / `IsExecuted` (부활·분열·자폭 무시, MonsterDeadState 가 체크).
+- Weapon: `RemainingCoolTime` 추가. AttackSpeed 태그가 없으면 FinalAttackSpeed 하한 0.1 미적용.
+- SpinBlade (`Weapons/SpinBlade`): 공장 전용, Repeat 60초, 태그 Damage 만, 자식 SpinBladeTelegraph, ★10 FlagSpinBladeExecute 즉사.
+- StormOrb (`Weapons/StormOrb`): 폭풍 전용, Persistent, OrbitSpeedRate, FlagStormOrbLink.
+- 빌더: ExtraWeaponBuilder 9종, WeaponTagBuilder NoAttackSpeed, `ArtResourceBuilder.BuildSpinBladeStormOrb`(tools/art/spin_storm.py).
+- 차원 무기 수: 숲 7 / 공장 6 / 폭풍 6 ([dimension.md](dimension.md)).

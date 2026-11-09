@@ -25,7 +25,7 @@ public class ExtraWeaponEditTests
     [Test]
     public void 신규_파라미터는_고유값_플래그는_플래그로_분류된다()
     {
-        WeaponParam[] unique = { WeaponParam.ChaseSpeed, WeaponParam.BurstDuration, WeaponParam.PullForce, WeaponParam.StrikeCount };
+        WeaponParam[] unique = { WeaponParam.ChaseSpeed, WeaponParam.BurstDuration, WeaponParam.PullForce, WeaponParam.StrikeCount, WeaponParam.OrbitSpeedRate };
         foreach (WeaponParam p in unique)
         {
             Assert.IsFalse(p.IsCommon(), p.ToString());
@@ -44,6 +44,64 @@ public class ExtraWeaponEditTests
             Assert.IsFalse(p.IsCommon(), p.ToString());
             Assert.Less((int)p, WeaponParamUtils.SlotCount, p.ToString());
         }
+    }
+
+    [Test]
+    public void 회전칼날_전격구체_플래그와_OrbitSpeedRate_값은_고정이다()
+    {
+        Assert.AreEqual(119, (int)WeaponParam.OrbitSpeedRate);
+        Assert.AreEqual(214, (int)WeaponParam.FlagSpinBladeExecute);
+        Assert.AreEqual(215, (int)WeaponParam.FlagStormOrbLink);
+        Assert.IsTrue(WeaponParam.FlagSpinBladeExecute.IsFlag());
+        Assert.IsTrue(WeaponParam.FlagStormOrbLink.IsFlag());
+        Assert.Less((int)WeaponParam.FlagStormOrbLink, WeaponParamUtils.SlotCount);
+    }
+
+    private PlayerStats MakeOwner(float _attackSpeedMultiply)
+    {
+        GameObject pgo = new GameObject("EditOwner");
+        pgo.SetActive(false);
+        extra.Add(pgo);
+        PlayerStats p = pgo.AddComponent<PlayerStats>();
+        p.AddModifier(ValueType.AttackSpeed, StatModifierMode.Multiply, _attackSpeedMultiply);
+        return p;
+    }
+
+    private readonly System.Collections.Generic.List<GameObject> extra = new System.Collections.Generic.List<GameObject>();
+
+    [Test]
+    public void AttackSpeed_태그가_없고_attackSpeed_1_60이면_쿨타임_60초이고_플레이어_공속_영향이_없다()
+    {
+        weapon.attackSpeed = 1f / 60f;
+        weapon.statTags = WeaponStatTag.Damage;
+        weapon.SetOwnerStats(MakeOwner(2f));
+
+        Assert.AreEqual(1f / 60f, weapon.FinalAttackSpeed, 1e-6f);
+        Assert.AreEqual(60f, weapon.FinalCoolTime, 0.001f);
+        foreach (GameObject g in extra) Object.DestroyImmediate(g);
+        extra.Clear();
+    }
+
+    [Test]
+    public void AttackSpeed_태그가_있는_무기는_하한_0_1이_유지된다()
+    {
+        weapon.attackSpeed = 1f / 60f;
+        weapon.statTags = WeaponStatTag.All;
+        weapon.SetOwnerStats(MakeOwner(0f));
+
+        Assert.AreEqual(0.1f, weapon.FinalAttackSpeed, 1e-6f);
+        Assert.AreEqual(10f, weapon.FinalCoolTime, 0.001f);
+        foreach (GameObject g in extra) Object.DestroyImmediate(g);
+        extra.Clear();
+    }
+
+    [Test]
+    public void attackSpeed_0이하면_쿨타임_0이다()
+    {
+        weapon.attackSpeed = 0f;
+        weapon.statTags = WeaponStatTag.Damage;
+        Assert.AreEqual(0f, weapon.FinalAttackSpeed);
+        Assert.AreEqual(0f, weapon.FinalCoolTime);
     }
 
     [Test]

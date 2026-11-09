@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Runtime.CompilerServices;
 using UnityEngine;
 
@@ -34,9 +35,47 @@ public class HealthSystem
     /// </summary>
     public Func<bool> DeathInterceptor;
 
+    // 활성화된 적 전체 (전 맵 공격용. TargetFinder 는 버퍼 제한이 있고, 박쥐처럼 MonsterBrain 이 없는 적도 있다)
+    private static readonly HashSet<HealthSystem> ActiveEnemies = new HashSet<HealthSystem>();
+
+    [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
+    private static void ResetActiveEnemies()
+    {
+        ActiveEnemies.Clear();
+    }
+
+    /// <summary>
+    /// _mask 레이어의 살아 있는 적을 _result 에 담는다 (_result 는 먼저 비운다, 플레이어 제외)
+    /// _includeDowned 면 부활 대기 중인 적도 포함한다
+    /// </summary>
+    public static void CollectAlive(LayerMask _mask, List<HealthSystem> _result, bool _includeDowned = false)
+    {
+        _result.Clear();
+        foreach (HealthSystem health in ActiveEnemies)
+        {
+            if (null == health || 0 == (_mask.value & (1 << health.gameObject.layer)))
+            {
+                continue;
+            }
+
+            if (false == health.isDead || (true == _includeDowned && true == health.IsDowned))
+            {
+                _result.Add(health);
+            }
+        }
+    }
+
     private bool isDowned;
 
     public bool IsDowned => isDowned;
+
+    // Execute 로 죽는 중이면 부활 가로채기를 건너뛴다 (Initialize 에서 초기화)
+    private bool isExecuted;
+
+    /// <summary>
+    /// Execute 로 죽었는지. 몬스터의 부활·분열 등 사망 키워드를 건너뛰는 데 쓴다
+    /// </summary>
+    public bool IsExecuted => isExecuted;
 
     [SerializeField]
     private bool isInvincibility = false;
@@ -194,6 +233,35 @@ public class HealthSystem
     }
 
     /// <summary>
+    /// 즉사. 남은 HP 전부를 _msg 의 무기 데미지로 처리하고 부활 가로채기 없이 최종 사망한다
+    /// 부활 대기(다운) 중이면 바로 최종 사망으로 넘긴다. 무적이면 ProcessDamage 처럼 죽지 않는다
+    /// </summary>
+    public void Execute(ref DamageMassage _msg)
+    {
+        if (true == isDowned)
+        {
+            isExecuted = true;
+            isDowned = false;
+            OnDeath?.Invoke(gameObject);
+            return;
+        }
+
+        if (true == isDead)
+        {
+            return;
+        }
+
+        isExecuted = true;
+        _msg.damage = Mathf.Max(CurrHP, 1f);
+        ProcessDamage(ref _msg);
+
+        if (false == isDead)
+        {
+            isExecuted = false;
+        }
+    }
+
+    /// <summary>
     /// 다운 상태에서 되살린다. 최대 HP 의 _hpRatio 만큼 채운다
     /// </summary>
     public void Revive(float _hpRatio)
@@ -217,7 +285,7 @@ public class HealthSystem
         // 가로챘으면 OnDeath(드롭/디졸브) 없이 다운 상태로 남는다
         // 인터셉터 안에서 상태가 바뀔 때 IsDowned 가 맞게 보이도록 먼저 세운다
         isDowned = true;
-        if (null != DeathInterceptor && true == DeathInterceptor())
+        if (false == isExecuted && null != DeathInterceptor && true == DeathInterceptor())
         {
             return;
         }
@@ -273,6 +341,7 @@ public class HealthSystem
     {
         isDead = false;
         isDowned = false;
+        isExecuted = false;
         SetCollidersEnabled(true);
 
         float rate = 1f;
@@ -324,6 +393,10 @@ public class HealthSystem
             playerStats.OnStatChanged -= HandlePlayerStatChanged;
             playerStats.OnStatChanged += HandlePlayerStatChanged;
         }
+        else
+        {
+            ActiveEnemies.Add(this);
+        }
     }
 
     /// <summary>
@@ -347,6 +420,8 @@ public class HealthSystem
 
     private void OnDisable()
     {
+        ActiveEnemies.Remove(this);
+
         if (null != playerStats)
         {
             playerStats.OnStatChanged -= HandlePlayerStatChanged;

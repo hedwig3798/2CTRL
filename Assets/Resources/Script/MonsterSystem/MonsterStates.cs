@@ -218,6 +218,13 @@ public sealed class MonsterDeadState
         brain.EndActiveAction();
 
         MonsterContext ctx = brain.Context;
+
+        // 즉사면 분열·자폭 등 사망 키워드를 발동하지 않는다
+        if (null != ctx.health && true == ctx.health.IsExecuted)
+        {
+            return;
+        }
+
         KeywordRuntime[] runtimes = brain.Runtimes;
         for (int i = 0; i < runtimes.Length; ++i)
         {

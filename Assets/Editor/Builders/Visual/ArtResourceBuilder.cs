@@ -110,7 +110,7 @@ namespace Builders.Visual
                 ti.mipmapEnabled = false;
                 ti.alphaIsTransparency = true;
                 ti.spritePixelsPerUnit = PPU;
-                ti.wrapMode = path.EndsWith("_Chain_Line.png") ? TextureWrapMode.Repeat : TextureWrapMode.Clamp;
+                ti.wrapMode = path.EndsWith("_Chain_Line.png") || path.EndsWith("_StormOrb_Link.png") ? TextureWrapMode.Repeat : TextureWrapMode.Clamp;
 
                 string file = System.IO.Path.GetFileNameWithoutExtension(path);
                 bool strip = path.Contains("/Player/") || path.Contains("/Monster/");
@@ -764,7 +764,96 @@ namespace Builders.Visual
                     lr.sortingOrder = 2;
                 }
             });
+            BuildSpinBladeStormOrb(W, mat);
             log.AppendLine("extra weapons ok");
+        }
+
+        // 회전 칼날: 칼날 224px = 7 유닛. 끝이 분할 화면 가장자리(카메라 orthographic 8)에 닿도록 bladeRadius 4 (끝 = 4 + 3.5)
+        // 전격 구체: 작은 구체 + 폭풍 차원 색(푸른 계열) 전기선
+        private static void BuildSpinBladeStormOrb(string W, Material _chainMat)
+        {
+            const float BLADE_RADIUS = 4f;
+            foreach (bool isTelegraph in new[] { true, false })
+            {
+                string path = W + (isTelegraph ? "SpinBlade/SpinBlade.prefab" : "SpinBlade/SpinBladeProjectile.prefab");
+                EditPrefab(path, root =>
+                {
+                    foreach (Transform t in root.GetComponentsInChildren<Transform>(true))
+                    {
+                        if ("blade0" != t.name && "blade1" != t.name)
+                        {
+                            continue;
+                        }
+                        var sr = t.GetComponent<SpriteRenderer>();
+                        StyleSprite(sr, "D2_Weapon_SpinBlade_Blade", 1);
+                        if (true == isTelegraph)
+                        {
+                            sr.color = new Color(1f, 1f, 1f, 0.85f);
+                        }
+                        t.localScale = Vector3.one;
+
+                        // 회전 잔상: 칼날 뒤쪽(-Y) 부채꼴. 텍스처 좌측 중앙 = 플레이어 중심
+                        Transform trail = t.Find("trail");
+                        if (true == isTelegraph)
+                        {
+                            if (null != trail)
+                            {
+                                Object.DestroyImmediate(trail.gameObject);
+                            }
+                            continue;
+                        }
+                        if (null == trail)
+                        {
+                            trail = new GameObject("trail").transform;
+                            trail.SetParent(t, false);
+                            trail.gameObject.AddComponent<SpriteRenderer>();
+                        }
+                        StyleSprite(trail.GetComponent<SpriteRenderer>(), "D2_Weapon_SpinBlade_Trail", 0);
+                        trail.localPosition = new Vector3(-BLADE_RADIUS + 4f, 0f, 0f);
+                        trail.localRotation = Quaternion.identity;
+                        trail.localScale = Vector3.one;
+                    }
+                    if (false == isTelegraph)
+                    {
+                        var proj = root.GetComponent<SpinBladeProjectile>();
+                        var so = new SerializedObject(proj);
+                        so.FindProperty("bladeRadius").floatValue = BLADE_RADIUS;
+                        so.FindProperty("renderers").arraySize = 0;
+                        so.ApplyModifiedPropertiesWithoutUndo();
+                    }
+                });
+            }
+
+            // 전기선 머티리얼: 체인 번개와 같은 셰이더, 폭풍 색 텍스처 (밝은 파랑 + 흰 심)
+            string linkMatPath = MAT + "/M_StormOrbLink.mat";
+            var linkMat = AssetDatabase.LoadAssetAtPath<Material>(linkMatPath);
+            if (null == linkMat)
+            {
+                linkMat = new Material(_chainMat);
+                AssetDatabase.CreateAsset(linkMat, linkMatPath);
+            }
+            Sprite linkSprite = Single("Weapon/D3_Weapon_StormOrb_Link");
+            if (null != linkSprite)
+            {
+                linkMat.mainTexture = linkSprite.texture;
+                EditorUtility.SetDirty(linkMat);
+            }
+            EditPrefab(W + "StormOrb/StormOrbProjectile.prefab", root =>
+            {
+                StyleSprite(root.GetComponent<SpriteRenderer>(), "D3_Weapon_StormOrb_Body", 1);
+                root.transform.localScale = new Vector3(0.9f, 0.9f, 1f);
+                Transform link = root.transform.Find("Link");
+                var lr = link.GetComponent<LineRenderer>();
+                lr.sharedMaterial = linkMat;
+                lr.textureMode = LineTextureMode.Tile;
+                lr.startWidth = 0.2f;
+                lr.endWidth = 0.2f;
+                lr.startColor = Color.white;
+                lr.endColor = Color.white;
+                lr.sortingLayerName = "attack";
+                lr.sortingOrder = 0;
+            });
+            log.AppendLine("spinblade/stormorb ok");
         }
 
         private static void BuildItems()
@@ -789,6 +878,7 @@ namespace Builders.Visual
             ("Explosive", "Explosive"),
             ("Vine", "Vine"), ("Spirit", "Spirit"), ("Root", "Root"), ("Saw", "Saw"),
             ("Flame", "Flame"), ("Tornado", "Tornado"), ("Lightning", "Lightning"),
+            ("SpinBlade", "SpinBlade"), ("StormOrb", "StormOrb"),
             ("ASUpgrade", "AttackSpeedUp"), ("DamageUpgrade", "DamageUp"), ("HPUpgrade", "HPUp"),
             ("RangeUpgrade", "RangeUp"), ("SpeedUpgrade", "SpeedUp"),
             ("AttackNuff", "AttackSpeedDown"), ("DamageNuff", "DamageDown"), ("HPNuff", "HPDown"),

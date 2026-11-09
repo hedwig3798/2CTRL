@@ -60,6 +60,8 @@ public enum WeaponParam
     PullForce = 117,
     /// <summary>한 번에 낙뢰를 맞히는 대상 수. Lightning</summary>
     StrikeCount = 118,
+    /// <summary>1바퀴 도는 속도 배율 (기본 1). StormOrb</summary>
+    OrbitSpeedRate = 119,
 
     // ★ 플래그
     /// <summary>돌아올 때 데미지 배율 적용. Boomerang</summary>
@@ -90,6 +92,10 @@ public enum WeaponParam
     FlagTornadoPermanent = 212,
     /// <summary>낙뢰 대상 연결 데미지. Lightning</summary>
     FlagStormLink = 213,
+    /// <summary>대상 전부 즉사. SpinBlade</summary>
+    FlagSpinBladeExecute = 214,
+    /// <summary>이웃한 구체를 전기선으로 연결. StormOrb</summary>
+    FlagStormOrbLink = 215,
 }
 
 public static class WeaponParamUtils

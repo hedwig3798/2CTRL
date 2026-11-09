@@ -100,10 +100,14 @@ reward.weapon.saw.name,톱날,Saw Blade
 reward.weapon.saw.explain,화면 끝에서 톱날을 날려 가로로 지나가며 닿는 모든 적을 벱니다.,"Launches saw blades from the edge of the screen that sweep across, cutting every enemy they touch."
 reward.weapon.shockwave.name,충격파,Shockwave
 reward.weapon.shockwave.explain,주기적으로 주변에 충격파를 퍼뜨려 닿은 적에게 피해를 주고 멀리 밀쳐냅니다.,Periodically releases a shockwave that damages enemies it touches and pushes them far away.
+reward.weapon.spin_blade.name,회전 칼날,Spin Blade
+reward.weapon.spin_blade.explain,긴 쿨타임마다 전장의 모든 적을 벤다.,"Every long cooldown, slashes every enemy on the battlefield."
 reward.weapon.spirit.name,정령,Spirit
 reward.weapon.spirit.explain,주변을 떠다니는 정령을 소환합니다. 정령은 가까운 적을 쫓아가 여러 번 공격합니다.,Summons spirits that float around you. They chase nearby enemies and attack several times.
 reward.weapon.split_shot.name,분열탄,Split Shot
 reward.weapon.split_shot.explain,"가장 가까운 적에게 탄을 쏘고, 맞은 자리에서 작은 조각 6개가 사방으로 퍼져 주변 적을 타격합니다.","Fires a shot at the nearest enemy that bursts into 6 fragments on impact, hitting enemies all around."
+reward.weapon.storm_orb.name,전격 구체,Storm Orb
+reward.weapon.storm_orb.explain,주위를 공전하며 닿은 적을 타격하는 전기 구체 2개를 얻습니다.,Gain 2 electric orbs that circle you and strike any enemy they touch.
 reward.weapon.sweep.name,휘두르기,Sweep
 reward.weapon.sweep.explain,가까운 적을 향해 칼날을 크게 휘둘러 닿은 모든 적을 타격하고 밀쳐내는 근접 무기를 얻습니다.,"Gain a melee weapon that swings a wide blade toward nearby enemies, hitting and knocking back all it touches."
 reward.weapon.tornado.name,회오리,Tornado
@@ -224,3 +228,12 @@ upgrade.star_targets_plus_2_max_3,★ 대상 +2 (최대 3),★ Targets +2 (max 3
 upgrade.targets_plus_2_max_3,대상 +2 (최대 3),Targets +2 (max 3)
 upgrade.star_linked_storm,★ 연결,★ Linked Storm
 upgrade.linked_storm,연결,Linked Storm
+upgrade.damage_plus_60pct,데미지 +60%,Damage +60%
+upgrade.star_execute_all_monsters,★ 모든 몬스터 즉사,★ Execute All Monsters
+upgrade.execute_all_monsters,모든 몬스터 즉사,Execute All Monsters
+upgrade.orbit_radius_plus_20pct,공전 반경 +20%,Orbit Radius +20%
+upgrade.orbit_speed_plus_20pct,공전 속도 +20%,Orbit Speed +20%
+upgrade.star_orbs_plus_2_4_total,★ 구체 +2 (4개),★ Orbs +2 (4 total)
+upgrade.orbs_plus_2_4_total,구체 +2 (4개),Orbs +2 (4 total)
+upgrade.star_electric_link,★ 전기선 연결,★ Electric Link
+upgrade.electric_link,전기선 연결,Electric Link

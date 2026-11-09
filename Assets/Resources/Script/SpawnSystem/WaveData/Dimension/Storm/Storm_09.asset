@@ -27,6 +27,6 @@ MonoBehaviour:
     spawnRange: {x: 11, y: 13}
     spawnInterval: 0.77
   time: 150
-  hpRate: 3.97
+  hpRate: 4.8
   damageRate: 1.9
   speedRate: 1.15

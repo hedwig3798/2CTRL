@@ -26,6 +26,7 @@ P=[w['S_start']/(w['rate']*B.margin(w['start']))/c for w in W]
 H=[]; 
 for i in range(14):
     h=P[i]/hp[i]
+    if i==1: h=1.90              # 55초 체크포인트가 2레벨 직후라 튀는 값을 완화 (S 60 -> 80 구간의 중간)
     if i==B.RUSH: h=H[-1]*1.03   # 러시: 추세만 유지 (숨 고르기 웨이브)
     if i and h<H[-1]*1.03: h=H[-1]*1.03
     H.append(h)
@@ -55,7 +56,7 @@ def sim_levels(f):
         e+=income(t)*dt; t+=dt
         while e>=f(lv): e-=f(lv); times.append((lv,t)); lv+=1
     return times
-for A2,b2,o in ((A,b,0),(20,1.2,10),(18,1.22,12)):
+for A2,b2,o in ((A,b,0),(20,1.2,10),(17.5,1.2,9)):
     tl=sim_levels(lambda l:o+A2*l**b2); print(A2,b2,o)
     print([(l,round(t)) for l,t in tl if l in (1,2,3,5,10,15,20,25,30,35,40,45,50)], 'levels at 1800:',len(tl))
 json.dump(dict(rows=rows,need=need,fit=[A,b]),open('final2.json','w'),indent=1)

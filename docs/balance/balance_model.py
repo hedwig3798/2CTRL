@@ -20,7 +20,7 @@ W = {
 TARGET_BASE = {k: 26.0 for k in W}; TARGET_BASE["Sweep"] = 32.0; TARGET_BASE["Shockwave"] = 22.0
 TARGET_L10 = 9.0
 R_REF = 2.0      # 기본 유효 DPS 를 잰 표준 스폰 속도(마리/초)
-MAX_W = 4        # 플레이어 무기 보유 상한
+MAX_W = 6        # 플레이어 무기 보유 상한
 PANELS = 3
 import os
 POOL_W = dict(up=float(os.environ.get("WU","1.5")), weapon=float(os.environ.get("WW","1.5")), buff=1.0)   # 보상 풀 항목 가중치
@@ -38,7 +38,7 @@ MIN_MUL = 0.5
 SURV_VALUE = 0.35   # 생존 스텟 1% = DPS 0.35% 로 환산 (AI 선택용)
 
 # ===== 3. 레벨 =====
-LV_A, LV_P, LV_N = 26.3, 1.08, 60
+LV_A, LV_P, LV_N = 23.0, 1.08, 60   # 6슬롯: 26.3 -> 23.0 (레벨업 약 12% 가속)
 LEVEL_TIMES = [LV_A * k ** LV_P for k in range(1, LV_N + 1)]
 
 # ===== 4. 웨이브 =====

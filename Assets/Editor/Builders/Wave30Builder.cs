@@ -130,7 +130,7 @@ namespace Builders
                     return new DimensionTable
                     {
                         monsters = new[] { "bat", "MiniSlime", "Slime", "Golem" },
-                        hpRate = new[] { 1.00f, 1.56f, 2.28f, 2.37f, 2.61f, 3.04f, 3.18f, 3.27f, 3.37f, 3.47f, 3.58f, 3.68f, 3.79f, 3.91f },
+                        hpRate = new[] { 1.00f, 1.90f, 2.81f, 3.09f, 3.39f, 3.73f, 3.85f, 3.97f, 4.08f, 4.21f, 4.33f, 4.46f, 4.60f, 4.73f },
                         intervals = new[]
                         {
                             new[] { 1.11f, 3.33f, NO,    NO    }, // 1  00:00
@@ -154,7 +154,7 @@ namespace Builders
                     return new DimensionTable
                     {
                         monsters = new[] { "MiniSlime", "Slime", "Bomber", "Golem" },
-                        hpRate = new[] { 1.00f, 1.56f, 2.28f, 2.37f, 2.61f, 3.04f, 3.18f, 3.27f, 3.37f, 3.47f, 3.58f, 3.68f, 3.79f, 3.91f },
+                        hpRate = new[] { 1.00f, 1.90f, 2.81f, 3.09f, 3.39f, 3.73f, 3.85f, 3.97f, 4.08f, 4.21f, 4.33f, 4.46f, 4.60f, 4.73f },
                         intervals = new[]
                         {
                             new[] { 0.93f, 8.33f, NO,    NO    }, // 1  00:00
@@ -178,7 +178,7 @@ namespace Builders
                     return new DimensionTable
                     {
                         monsters = new[] { "bat", "Wraith", "Shaman" },
-                        hpRate = new[] { 0.90f, 1.56f, 2.28f, 2.37f, 2.61f, 3.04f, 3.34f, 3.64f, 3.97f, 4.34f, 4.77f, 5.26f, 5.84f, 6.51f },
+                        hpRate = new[] { 0.90f, 1.90f, 2.81f, 3.09f, 3.39f, 3.73f, 4.05f, 4.41f, 4.80f, 5.26f, 5.78f, 6.38f, 7.07f, 7.89f },
                         intervals = new[]
                         {
                             new[] { 0.83f, NO,    NO    }, // 1  00:00

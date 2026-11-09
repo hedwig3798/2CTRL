@@ -6,7 +6,7 @@ using UnityEngine;
 namespace Builders
 {
     /// <summary>
-    /// 차원별 추가 무기 7종(Vine, Spirit, Root, Saw, Flame, Tornado, Lightning)의
+    /// 차원별 추가 무기 9종(Vine, Spirit, Root, Saw, Flame, Tornado, Lightning, SpinBlade, StormOrb)의
     /// 무기 / 발사체 프리팹, 업그레이드 테이블, 보상 효과, 보상 에셋을 생성·갱신한다 (멱등)
     /// - 사양: docs/weapon-dimension-extra-design.md "통합 정보" + 차원별 10단계 표
     /// - 프리팹이 이미 있으면 내용을 열어 갱신한다 (GUID / fileID 유지, 다른 에셋의 참조가 끊기지 않게)
@@ -24,6 +24,9 @@ namespace Builders
         private const string ART = "Assets/Resources/Textuer/Art/Weapon/";
         private const string LINE_MAT = "Packages/com.unity.render-pipelines.universal/Runtime/Materials/Sprite-Unlit-Default.mat";
         private const string SORTING = "attack";
+
+        // StormOrb 구체 지름 (스프라이트 / 판정 공통, 임시 값)
+        private const float ORB_DIAMETER = 0.8f;
 
         private const StatModifierMode ADD = StatModifierMode.Add;
         private const StatModifierMode MUL = StatModifierMode.Multiply;
@@ -47,6 +50,8 @@ namespace Builders
             new RewardDef { name = "Flame", iconFrom = "Laser" },
             new RewardDef { name = "Tornado", iconFrom = "Shockwave" },
             new RewardDef { name = "Lightning", iconFrom = "Chain" },
+            new RewardDef { name = "SpinBlade", iconFrom = "Saw" },
+            new RewardDef { name = "StormOrb", iconFrom = "Chain" },
         };
 
         [MenuItem("Tools/Builders/ExtraWeapon")]
@@ -77,6 +82,8 @@ namespace Builders
                 { "Flame", BuildFlame() },
                 { "Tornado", BuildTornado() },
                 { "Lightning", BuildLightning() },
+                { "SpinBlade", BuildSpinBlade() },
+                { "StormOrb", BuildStormOrb() },
             };
 
             var weapons = new Dictionary<string, Weapon>();
@@ -186,6 +193,15 @@ namespace Builders
                     case "Lightning":
                         Set(w, WEAPON_TYPE.Repeat, 25f, 0.7f, 8f, 1, 3);
                         w.areaRadius = 0.8f;
+                        break;
+                    case "SpinBlade":
+                        // 쿨타임 60초 고정 (태그는 Damage 만이라 공속 패시브를 받지 않는다)
+                        Set(w, WEAPON_TYPE.Repeat, 100f, 1f / 60f, 0f, 1, 1);
+                        BuildSpinBladeTelegraph(root, w);
+                        break;
+                    case "StormOrb":
+                        // range = 공전 반경. 타격 간격은 발사체의 hitInterval 이라 공속은 쓰지 않는다. ★ 구체 +2 까지 미리 만든다
+                        Set(w, WEAPON_TYPE.Persistent, 9f, 1f, 2f, 2, 4);
                         break;
                 }
             });
@@ -380,6 +396,93 @@ namespace Builders
             return AssetDatabase.LoadAssetAtPath<GameObject>(path);
         }
 
+        private static GameObject BuildSpinBlade()
+        {
+            string dir = WEAPON_DIR + "/SpinBlade";
+            EnsureFolder(dir);
+            string path = dir + "/SpinBladeProjectile.prefab";
+            EditOrCreatePrefab(path, "SpinBladeProjectile", root =>
+            {
+                var p = GetOrAdd<SpinBladeProjectile>(root);
+                var so = new SerializedObject(p);
+                SetFloat(so, "spinDuration", 0.4f);
+                SetFloat(so, "bladeRadius", 1.5f);
+                SetRefArray(so, "blades", BladeTransforms(root.transform));
+                SetString(so, "sortingLayerName", SORTING);
+                so.ApplyModifiedPropertiesWithoutUndo();
+            });
+            return AssetDatabase.LoadAssetAtPath<GameObject>(path);
+        }
+
+        // 예고 칼날은 무기 쪽에 둔다 (발사체는 발동 순간에야 생긴다)
+        private static void BuildSpinBladeTelegraph(GameObject _weaponRoot, Weapon _weapon)
+        {
+            Transform t = GetOrCreateChild(_weaponRoot.transform, "Telegraph");
+            t.localPosition = Vector3.zero;
+            var telegraph = GetOrAdd<SpinBladeTelegraph>(t.gameObject);
+
+            var so = new SerializedObject(telegraph);
+            SetRef(so, "weapon", _weapon);
+            SetRefArray(so, "blades", BladeTransforms(t));
+            SetFloat(so, "telegraphDuration", 1.5f);
+            SetFloat(so, "startRadius", 0f);
+            SetString(so, "sortingLayerName", SORTING);
+            so.ApplyModifiedPropertiesWithoutUndo();
+        }
+
+        // 칼날 2개 (임시 스프라이트, +X 가 바깥쪽. 톱날은 원형이라 방향 무관 - 아트 단계에서 교체)
+        private static Object[] BladeTransforms(Transform _parent)
+        {
+            return new Object[]
+            {
+                Visual(_parent.gameObject, "blade0", ART + "D2_Weapon_Saw_Blade.png", 1f).transform,
+                Visual(_parent.gameObject, "blade1", ART + "D2_Weapon_Saw_Blade.png", 1f).transform,
+            };
+        }
+
+        private static GameObject BuildStormOrb()
+        {
+            string dir = WEAPON_DIR + "/StormOrb";
+            EnsureFolder(dir);
+            string path = dir + "/StormOrbProjectile.prefab";
+            var lineMat = AssetDatabase.LoadAssetAtPath<Material>(LINE_MAT);
+            EditOrCreatePrefab(path, "StormOrbProjectile", root =>
+            {
+                var p = GetOrAdd<StormOrbProjectile>(root);
+                var orbit = GetOrAdd<OrbitMovement>(root);
+                p.blackBoardHandler = GetOrAdd<BlackBoardHandler>(root);
+
+                var sr = GetOrAdd<SpriteRenderer>(root);
+                sr.sprite = LoadSprite(ART + "D3_Weapon_Chain_Spark.png");
+                sr.sortingLayerName = SORTING;
+                NormalizeScale(root.transform, sr.sprite, ORB_DIAMETER);
+
+                // 공전은 OrbitMovement 가 transform 으로 옮기므로 Kinematic. 몬스터(Dynamic) 의 판정 트리거와 이벤트가 난다
+                var rb = GetOrAdd<Rigidbody2D>(root);
+                rb.bodyType = RigidbodyType2D.Kinematic;
+                rb.gravityScale = 0f;
+                rb.simulated = true;
+
+                // 콜라이더 반지름에는 루트 스케일이 곱해지므로 월드 기준 ORB_DIAMETER 가 되게 나눈다
+                var col = GetOrAdd<CircleCollider2D>(root);
+                col.isTrigger = true;
+                col.radius = 0.5f * ORB_DIAMETER / Mathf.Max(0.0001f, root.transform.localScale.x);
+
+                LineRenderer link = Line(root.transform, "Link", 0.12f, lineMat);
+
+                var so = new SerializedObject(p);
+                SetRef(so, "orbitMovement", orbit);
+                SetRef(so, "linkLine", link);
+                SetFloat(so, "orbitPeriod", 1.8f);
+                SetFloat(so, "hitInterval", 0.5f);
+                SetFloat(so, "linkDamageRate", 0.6f);
+                SetFloat(so, "linkTickInterval", 0.3f);
+                SetString(so, "sortingLayerName", SORTING);
+                so.ApplyModifiedPropertiesWithoutUndo();
+            });
+            return AssetDatabase.LoadAssetAtPath<GameObject>(path);
+        }
+
         // ---------------- visual helpers (플레이스홀더) ----------------
 
         // 독 장판 조각과 같은 구성 (visual 자식, 크기 1) - ScaleOverLifetime 이 루트 크기를 areaRadius 로 맞춘다
@@ -474,6 +577,8 @@ namespace Builders
 
         private static WeaponUpgradeStep Dmg() => S("데미지 +20%", M(WeaponParam.Damage, MUL, 0.2f));
 
+        private static WeaponUpgradeStep Dmg60() => S("데미지 +60%", M(WeaponParam.Damage, MUL, 0.6f));
+
         private static WeaponUpgradeStep As() => S("공속 +15%", M(WeaponParam.AttackSpeed, MUL, 0.15f));
 
         private static WeaponUpgradeStep Flag(WeaponParam _p, string _text) => Star(_text, M(_p, ADD, 1f));
@@ -566,6 +671,26 @@ namespace Builders
                 Flag(WeaponParam.FlagStormLink, "연결"),
             };
 
+            // 5단계도 ★ 표시 없음
+            t["SpinBlade"] = new[]
+            {
+                Dmg60(), Dmg60(), Dmg60(), Dmg60(), Dmg60(), Dmg60(), Dmg60(), Dmg60(), Dmg60(),
+                Flag(WeaponParam.FlagSpinBladeExecute, "모든 몬스터 즉사"),
+            };
+
+            t["StormOrb"] = new[]
+            {
+                Dmg(),
+                S("공전 반경 +20%", M(WeaponParam.Range, MUL, 0.2f)),
+                S("공전 속도 +20%", M(WeaponParam.OrbitSpeedRate, MUL, 0.2f)),
+                Dmg(),
+                Star("구체 +2 (4개)", M(WeaponParam.FireCount, ADD, 2f)),
+                Dmg(),
+                S("공전 속도 +20%", M(WeaponParam.OrbitSpeedRate, MUL, 0.2f)),
+                Dmg(), Dmg(),
+                Flag(WeaponParam.FlagStormOrbLink, "전기선 연결"),
+            };
+
             return t;
         }
 
@@ -599,6 +724,21 @@ namespace Builders
             else
             {
                 Debug.LogWarning("[ExtraWeaponBuilder] 필드 없음 " + _so.targetObject.GetType().Name + "." + _name);
+            }
+        }
+
+        private static void SetRefArray(SerializedObject _so, string _name, Object[] _v)
+        {
+            var p = _so.FindProperty(_name);
+            if (null == p)
+            {
+                Debug.LogWarning("[ExtraWeaponBuilder] 필드 없음 " + _so.targetObject.GetType().Name + "." + _name);
+                return;
+            }
+            p.arraySize = _v.Length;
+            for (int i = 0; i < _v.Length; ++i)
+            {
+                p.GetArrayElementAtIndex(i).objectReferenceValue = _v[i];
             }
         }
 

@@ -22,10 +22,11 @@ namespace Builders
         private const string FONT_PATH = "Assets/Fonts/NotoSansKR-Regular SDF.asset";
         private const int SORTING_ORDER = 100;
         private const string WEAPON_REWARD_FOLDER = "Assets/prefab/Upgrade/Weapon";
-        // 카드 아래쪽 무기 아이콘 칸 영역 (2열, 무기 보유 상한 4 → 2줄)
+        // 카드 아래쪽 무기 아이콘 칸 영역 (3열, 무기 보유 상한 6 → 2줄)
+        private const int WEAPON_LIST_COLUMNS = 3;
         private const float WEAPON_LIST_HEIGHT = 130f;
         private const float WEAPON_LIST_BOTTOM = 26f;
-        private static readonly Vector2 WEAPON_CELL = new Vector2(340f, 56f);
+        private static readonly Vector2 WEAPON_CELL = new Vector2(219f, 56f);
         private static readonly Vector2 WEAPON_SPACING = new Vector2(24f, 10f);
 
         [MenuItem("Tools/Builders/GameOver")]
@@ -217,7 +218,7 @@ namespace Builders
         }
 
         /// <summary>
-        /// 카드 아래쪽에 무기 칸을 담을 2열 그리드. _label 은 그 위로 줄인다
+        /// 카드 아래쪽에 무기 칸을 담을 3열 그리드. _label 은 그 위로 줄인다
         /// </summary>
         private static RectTransform MakeWeaponList(Transform _card, TMP_Text _label)
         {
@@ -237,7 +238,7 @@ namespace Builders
             grid.startAxis = GridLayoutGroup.Axis.Horizontal;
             grid.childAlignment = TextAnchor.UpperLeft;
             grid.constraint = GridLayoutGroup.Constraint.FixedColumnCount;
-            grid.constraintCount = 2;
+            grid.constraintCount = WEAPON_LIST_COLUMNS;
 
             // 빌더 재실행 시 런타임에 남은 칸이 있으면 지운다 (에디터에서는 비어 있어야 함)
             for (int i = go.transform.childCount - 1; i >= 0; i--)

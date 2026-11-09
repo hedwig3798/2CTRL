@@ -940,7 +940,7 @@ MonoBehaviour:
   side: 0
   weaponHolder: {fileID: 1049810268336096917}
   minMultiplier: 0.5
-  maxWeaponCount: 4
+  maxWeaponCount: 6
 --- !u!1 &8949733347197857447
 GameObject:
   m_ObjectHideFlags: 0
