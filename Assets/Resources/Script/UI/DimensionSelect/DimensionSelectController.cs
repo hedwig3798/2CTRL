@@ -7,13 +7,15 @@ using UnityEngine.SceneManagement;
 
 /// <summary>
 /// 차원 선택 씬 로직
-/// - 진영마다 커서로 차원을 넘기고 확정한다. 확정 키를 다시 누르면 확정을 취소한다
-///   - 왼쪽 : A / D 로 넘기고 Space 로 확정
-///   - 오른쪽 : ← / → 로 넘기고 Enter 로 확정
-/// - 확정한 동안은 커서를 넘길 수 없다
-/// - 상대가 확정한 차원은 확정할 수 없고, 넘길 때 건너뛴다
+/// - 차원을 columns 열 격자에 왼쪽 위부터 순서대로 놓고, 진영마다 커서를 4방향으로 옮겨 확정한다. 확정 키를 다시 누르면 확정을 취소한다
+///   - 왼쪽 : W / S / A / D 로 이동하고 Space 로 확정
+///   - 오른쪽 : ↑ / ↓ / ← / → 로 이동하고 Enter 로 확정
+/// - 가로는 현재 줄 안에서, 세로는 줄 수 안에서 순환한다. 세로로 옮긴 곳이 빈칸이면 그 줄의 마지막 칸으로 간다
+/// - 확정한 동안은 커서를 옮길 수 없다
+/// - 커서는 상대가 확정한 칸을 포함해 어느 칸이든 이동·겹침 가능하다
+/// - 상대가 확정한 차원은 확정할 수 없다. 커서가 겹치면 먼저 확정 키를 누른 쪽이 차지한다 (같은 프레임이면 왼쪽이 먼저)
 /// - 둘 다 확정하면 loadDelay 뒤 DimensionSelection 을 세팅하고 gameSceneName 을 로드한다 (대기 중 취소하면 로드하지 않음)
-/// - 표시는 DimensionSelectView 또는 이벤트로 한다
+/// - 표시는 DimensionGridCell(격자), DimensionSelectView(좌우 큰 카드) 또는 이벤트로 한다
 /// </summary>
 public class DimensionSelectController
     : MonoBehaviour
@@ -21,6 +23,10 @@ public class DimensionSelectController
     [Tooltip("고를 수 있는 차원 (2개 이상)")]
     [SerializeField]
     private DimensionData[] dimensions;
+
+    [Tooltip("격자의 열 수 (1 ~ 차원 수로 보정, 차원은 왼쪽 위부터 채운다)")]
+    [SerializeField]
+    private int columns = 3;
 
     [Tooltip("둘 다 확정하면 로드할 씬 (Build Settings 에 등록되어 있어야 함)")]
     [SerializeField]
@@ -39,20 +45,32 @@ public class DimensionSelectController
 
     [Header("Left Keys")]
     [SerializeField]
-    private Key leftPrevKey = Key.A;
+    private Key leftUpKey = Key.W;
 
     [SerializeField]
-    private Key leftNextKey = Key.D;
+    private Key leftDownKey = Key.S;
+
+    [SerializeField]
+    private Key leftLeftKey = Key.A;
+
+    [SerializeField]
+    private Key leftRightKey = Key.D;
 
     [SerializeField]
     private Key leftConfirmKey = Key.Space;
 
     [Header("Right Keys")]
     [SerializeField]
-    private Key rightPrevKey = Key.LeftArrow;
+    private Key rightUpKey = Key.UpArrow;
 
     [SerializeField]
-    private Key rightNextKey = Key.RightArrow;
+    private Key rightDownKey = Key.DownArrow;
+
+    [SerializeField]
+    private Key rightLeftKey = Key.LeftArrow;
+
+    [SerializeField]
+    private Key rightRightKey = Key.RightArrow;
 
     [SerializeField]
     private Key rightConfirmKey = Key.Enter;
@@ -67,6 +85,10 @@ public class DimensionSelectController
 
     [SerializeField]
     private DimensionSelectView rightView;
+
+    [Tooltip("격자 칸 (dimensions 와 같은 순서, 칸 수가 달라도 안전)")]
+    [SerializeField]
+    private DimensionGridCell[] gridCells;
 
     /// <summary>
     /// 커서가 바뀌었을 때 (진영, 새 인덱스)
@@ -116,8 +138,8 @@ public class DimensionSelectController
             return;
         }
 
-        HandleInput(keyboard, PlayerSide.Left, leftPrevKey, leftNextKey, leftConfirmKey, Key.None);
-        HandleInput(keyboard, PlayerSide.Right, rightPrevKey, rightNextKey, rightConfirmKey, rightConfirmAltKey);
+        HandleInput(keyboard, PlayerSide.Left, leftUpKey, leftDownKey, leftLeftKey, leftRightKey, leftConfirmKey, Key.None);
+        HandleInput(keyboard, PlayerSide.Right, rightUpKey, rightDownKey, rightLeftKey, rightRightKey, rightConfirmKey, rightConfirmAltKey);
     }
 
     private static bool WasPressed(Keyboard _keyboard, Key _key)
@@ -125,16 +147,26 @@ public class DimensionSelectController
         return Key.None != _key && _keyboard[_key].wasPressedThisFrame;
     }
 
-    private void HandleInput(Keyboard _keyboard, PlayerSide _side, Key _prev, Key _next, Key _confirm, Key _confirmAlt)
+    private void HandleInput(Keyboard _keyboard, PlayerSide _side, Key _up, Key _down, Key _left, Key _right, Key _confirm, Key _confirmAlt)
     {
-        if (true == WasPressed(_keyboard, _prev))
+        if (true == WasPressed(_keyboard, _up))
         {
-            MoveCursor(_side, -1);
+            MoveCursor(_side, 0, -1);
         }
 
-        if (true == WasPressed(_keyboard, _next))
+        if (true == WasPressed(_keyboard, _down))
         {
-            MoveCursor(_side, 1);
+            MoveCursor(_side, 0, 1);
+        }
+
+        if (true == WasPressed(_keyboard, _left))
+        {
+            MoveCursor(_side, -1, 0);
+        }
+
+        if (true == WasPressed(_keyboard, _right))
+        {
+            MoveCursor(_side, 1, 0);
         }
 
         if (true == WasPressed(_keyboard, _confirm) || true == WasPressed(_keyboard, _confirmAlt))
@@ -180,33 +212,53 @@ public class DimensionSelectController
     }
 
     /// <summary>
-    /// _side 커서를 _direction(-1 / +1) 방향으로 넘긴다. 상대가 확정한 차원은 건너뛴다
-    /// 확정한 동안은 넘기지 않는다
+    /// _side 커서를 격자에서 (_dx, _dy) 만큼 옮긴다. _dy 는 아래쪽이 + 이다
+    /// - 가로는 현재 줄의 실제 길이 안에서, 세로는 줄 수 안에서 순환한다
+    /// - 세로로 옮긴 곳이 빈칸이면 그 줄의 마지막 칸으로 간다
+    /// - 상대가 확정한 칸도 건너뛰지 않는다. 확정한 동안은 옮기지 않는다
     /// </summary>
     /// <returns>커서가 바뀌었으면 true</returns>
-    public bool MoveCursor(PlayerSide _side, int _direction)
+    public bool MoveCursor(PlayerSide _side, int _dx, int _dy)
     {
         int i = (int)_side;
-        if (true == confirmed[i] || 0 == _direction || null == dimensions || 0 == dimensions.Length)
+        if (true == confirmed[i] || (0 == _dx && 0 == _dy) || null == dimensions || 0 == dimensions.Length)
         {
             return false;
         }
 
         int count = dimensions.Length;
-        int step = 0 < _direction ? 1 : -1;
-        int index = cursors[i];
-        for (int n = 0; n < count - 1; ++n)
+        int gridColumns = Mathf.Clamp(columns, 1, count);
+        int rowCount = (count + gridColumns - 1) / gridColumns;
+
+        int row = cursors[i] / gridColumns;
+        int column = Wrap(cursors[i] % gridColumns + _dx, GetRowLength(row, rowCount, gridColumns, count));
+
+        row = Wrap(row + _dy, rowCount);
+        column = Mathf.Min(column, GetRowLength(row, rowCount, gridColumns, count) - 1);
+
+        int index = row * gridColumns + column;
+        if (index == cursors[i])
         {
-            index = (index + step + count) % count;
-            if (true == CanConfirm(_side, index))
-            {
-                cursors[i] = index;
-                OnCursorChanged?.Invoke(_side, index);
-                RefreshViews();
-                return true;
-            }
+            return false;
         }
-        return false;
+
+        cursors[i] = index;
+        OnCursorChanged?.Invoke(_side, index);
+        RefreshViews();
+        return true;
+    }
+
+    private static int Wrap(int _value, int _length)
+    {
+        return (_value % _length + _length) % _length;
+    }
+
+    /// <summary>
+    /// _row 줄의 실제 칸 수 (마지막 줄만 짧을 수 있다)
+    /// </summary>
+    private static int GetRowLength(int _row, int _rowCount, int _columns, int _count)
+    {
+        return _row < _rowCount - 1 ? _columns : _count - _columns * (_rowCount - 1);
     }
 
     /// <summary>
@@ -280,6 +332,36 @@ public class DimensionSelectController
     {
         RefreshView(leftView, PlayerSide.Left);
         RefreshView(rightView, PlayerSide.Right);
+        RefreshGridCells();
+    }
+
+    private void RefreshGridCells()
+    {
+        if (null == gridCells)
+        {
+            return;
+        }
+
+        int count = null != dimensions ? dimensions.Length : 0;
+        int left = (int)PlayerSide.Left;
+        int right = (int)PlayerSide.Right;
+
+        for (int i = 0; i < gridCells.Length; ++i)
+        {
+            DimensionGridCell cell = gridCells[i];
+            if (null == cell)
+            {
+                continue;
+            }
+
+            bool hasDimension = i < count;
+            cell.Show(
+                true == hasDimension ? dimensions[i] : null,
+                true == hasDimension && cursors[left] == i,
+                confirmed[left],
+                true == hasDimension && cursors[right] == i,
+                confirmed[right]);
+        }
     }
 
     private void RefreshView(DimensionSelectView _view, PlayerSide _side)

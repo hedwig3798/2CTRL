@@ -3,8 +3,9 @@
 ## 결정 사항
 - 차원 3개(숲·공장·폭풍), 좌우 중복 금지.
 - 선택은 별도 씬 `DimensionSelectScene`에서 한다. 씬 순서: Title(0) → DimensionSelect(1) → GameScene(2).
-- 조작: 왼쪽은 A/D로 넘기고 Space로 확정, 오른쪽은 ←/→로 넘기고 Enter로 확정. 다시 누르면 확정 취소. 둘 다 확정하면 GameScene을 로드한다. 입력은 new Input System(`Keyboard.current`).
-- 상대 진영이 이미 확정한 차원은 고를 수 없다(카드를 건너뛰거나 확정이 막힘).
+- 화면: 중앙에 차원 바둑판(열 수는 `columns`, 현재 3열 1줄), 양옆에 각 진영이 보고 있는 차원의 큰 카드.
+- 조작: 왼쪽은 WASD로 칸을 옮기고 Space로 확정, 오른쪽은 방향키로 옮기고 Enter로 확정. 다시 누르면 확정 취소. 둘 다 확정하면 GameScene을 로드한다. 입력은 new Input System(`Keyboard.current`).
+- 커서는 어느 칸이든 이동·겹침이 가능하다. 겹친 차원은 먼저 확정한 쪽이 차지하고, 상대가 확정한 차원은 확정이 막힌다.
 - 시작 무기: 차원마다 고정 1개. **게임 시작 시 무기 고르기(LevelUpUI grantStartReward / SelectPanelGroup.RefreshStartRewards)는 제거한다.**
 - 무기 보상 풀: 차원 전용. 패시브 버프·너프 풀은 공유한다.
 - 플레이어 외형: 차원별 AnimatorOverrideController.

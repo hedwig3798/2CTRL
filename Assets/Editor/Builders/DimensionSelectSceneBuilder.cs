@@ -15,7 +15,10 @@ namespace Builders
     /// <summary>
     /// Assets/Scenes/DimensionSelectScene.unity 를 새로 만든다 (멱등, 매번 빈 씬으로 재생성)
     /// - Main Camera, EventSystem(InputSystemUIInputModule), Canvas
-    ///   [좌·우 카드(DimensionSelectView: 테마 배경 / 미리보기 / 이름 / 확정 표시 / 잠금 표시), 하단 키 안내] + DimensionSelectController
+    ///   [좌·우 큰 카드(LeftCard / RightCard, DimensionSelectView: 테마 배경 / 미리보기 / 이름 / 확정 표시 / 잠금 표시),
+    ///    중앙 격자(DimensionGrid, GridLayoutGroup 고정 열: 차원 수만큼 Cell_0… DimensionSelectView + DimensionGridCell),
+    ///    하단 키 안내] + DimensionSelectController (dimensions / columns / gridCells 연결)
+    /// - 칸 자식: LeftCursorFrame / RightCursorFrame (시작 비활성) / CellCard[Preview, Name] / LockedMark (시작 비활성)
     /// - 레이아웃은 기능 확인 수준 (연출은 visual-designer)
     /// - TitleScene 의 TitleMenu.gameSceneName 을 이 씬으로, Build Settings 를 Title(0) / DimensionSelect(1) / Game(2) 로 맞춘다
     /// - 확인용으로 .claude/tmp/dimensionselect.png 캡처
@@ -28,6 +31,24 @@ namespace Builders
         private const string FONT_PATH = "Assets/Fonts/NotoSansKR-Regular SDF.asset";
         private const string CAPTURE_PATH = ".claude/tmp/dimensionselect.png";
         private static readonly string[] DIMENSIONS = { "Forest", "Factory", "Storm" };
+
+        private const int COLUMNS = 3;
+        private const float LEFT_ANCHOR_X = 0.14f;
+        private const float RIGHT_ANCHOR_X = 0.86f;
+        private const float CENTER_ANCHOR_Y = 0.55f;
+        private static readonly Vector2 CARD_SIZE = new Vector2(400f, 600f);
+        private static readonly Vector2 CARD_PREVIEW_SIZE = new Vector2(320f, 320f);
+        private const float CARD_NAME_FONT = 56f;
+        private const float CARD_NAME_WIDTH = 370f;
+        private static readonly Vector2 GRID_SIZE = new Vector2(920f, 700f);
+        private static readonly Vector2 CELL_SIZE = new Vector2(260f, 300f);
+        private static readonly Vector2 CELL_SPACING = new Vector2(40f, 60f);
+        private static readonly Vector2 CELL_PREVIEW_SIZE = new Vector2(200f, 200f);
+        private const float CELL_NAME_FONT = 40f;
+        private const float LEFT_FRAME_GROW = 40f;
+        private const float RIGHT_FRAME_GROW = 20f;
+        private static readonly Color LEFT_FRAME_COLOR = new Color(0.3f, 0.85f, 1f, 1f);
+        private static readonly Color RIGHT_FRAME_COLOR = new Color(1f, 0.35f, 0.55f, 1f);
 
         private static TMP_FontAsset font;
 
@@ -89,12 +110,18 @@ namespace Builders
             scaler.referenceResolution = new Vector2(1920f, 1080f);
             scaler.matchWidthOrHeight = 0.5f;
 
-            DimensionSelectView leftView = CreateCard("LeftCard", canvasGo.transform, 0.25f);
-            DimensionSelectView rightView = CreateCard("RightCard", canvasGo.transform, 0.75f);
+            DimensionSelectView leftView = CreateCard("LeftCard", canvasGo.transform, LEFT_ANCHOR_X, CARD_SIZE, CARD_PREVIEW_SIZE, CARD_NAME_FONT, CARD_NAME_WIDTH);
+            DimensionSelectView rightView = CreateCard("RightCard", canvasGo.transform, RIGHT_ANCHOR_X, CARD_SIZE, CARD_PREVIEW_SIZE, CARD_NAME_FONT, CARD_NAME_WIDTH);
+            RectTransform gridRt = CreateGrid(canvasGo.transform);
+            var cells = new DimensionGridCell[dims.Length];
+            for (int i = 0; i < dims.Length; i++)
+            {
+                cells[i] = CreateCell(i, gridRt);
+            }
 
             // 하단 키 안내 (조작 키만)
-            CreateKeyHint("LeftKeyHint", canvasGo.transform, 0.25f, "A / D   ·   Space");
-            CreateKeyHint("RightKeyHint", canvasGo.transform, 0.75f, "← / →   ·   Enter");
+            CreateKeyHint("LeftKeyHint", canvasGo.transform, LEFT_ANCHOR_X, "W A S D   ·   Space");
+            CreateKeyHint("RightKeyHint", canvasGo.transform, RIGHT_ANCHOR_X, "↑ ← ↓ →   ·   Enter");
 
             // 4. Controller
             var controller = canvasGo.AddComponent<DimensionSelectController>();
@@ -105,6 +132,13 @@ namespace Builders
             {
                 arr.GetArrayElementAtIndex(i).objectReferenceValue = dims[i];
             }
+            var cellArr = so.FindProperty("gridCells");
+            cellArr.arraySize = cells.Length;
+            for (int i = 0; i < cells.Length; i++)
+            {
+                cellArr.GetArrayElementAtIndex(i).objectReferenceValue = cells[i];
+            }
+            so.FindProperty("columns").intValue = COLUMNS;
             so.FindProperty("gameSceneName").stringValue = "GameScene";
             so.FindProperty("leftView").objectReferenceValue = leftView;
             so.FindProperty("rightView").objectReferenceValue = rightView;
@@ -113,9 +147,22 @@ namespace Builders
             // 캡처용 미리 표시 (실행 중에는 Controller 가 다시 그림)
             leftView.Show(dims[0], false, false);
             rightView.Show(dims[1], false, false);
+            for (int i = 0; i < cells.Length; i++)
+            {
+                cells[i].GetComponent<DimensionSelectView>().Show(dims[i], false, false);
+            }
 
             EditorSceneManager.SaveScene(scene, SCENE_PATH);
-            sb.AppendLine("저장: " + SCENE_PATH + " 차원=" + string.Join(",", dims.Select(d => d.name)));
+            sb.AppendLine("저장: " + SCENE_PATH + " 차원=" + string.Join(",", dims.Select(d => d.name)) + " 칸=" + cells.Length);
+
+            // 커서 프레임은 시작 비활성·불투명으로 저장해야 하므로 저장 뒤에 켠다 (캡처 전용, 아래 씬 재로드로 사라짐)
+            for (int i = 0; i < cells.Length; i++)
+            {
+                cells[i].Show(dims[i], 0 == i, false, 1 == i, false);
+            }
+
+            // 칸의 위치·크기는 GridLayoutGroup 이 구동하는 값이라 씬에 저장되지 않으므로 캡처 전에 배치한다
+            LayoutRebuilder.ForceRebuildLayoutImmediate(gridRt);
 
             sb.AppendLine(Capture(cam, canvasGo.GetComponent<Canvas>()));
             sb.AppendLine(RegisterBuildScenes());
@@ -129,14 +176,14 @@ namespace Builders
         /// <summary>
         /// 카드 하나: 테마 배경(themeGraphic) / 미리보기 / 이름 / 확정 표시 / 잠금 표시
         /// </summary>
-        private static DimensionSelectView CreateCard(string _name, Transform _parent, float _anchorX)
+        private static DimensionSelectView CreateCard(string _name, Transform _parent, float _anchorX, Vector2 _size, Vector2 _previewSize, float _nameFontSize, float _nameWidth)
         {
             var cardGo = new GameObject(_name, typeof(RectTransform), typeof(Image));
             cardGo.layer = _parent.gameObject.layer;
             var rt = cardGo.GetComponent<RectTransform>();
             rt.SetParent(_parent, false);
-            rt.anchorMin = rt.anchorMax = new Vector2(_anchorX, 0.55f);
-            rt.sizeDelta = new Vector2(560f, 720f);
+            rt.anchorMin = rt.anchorMax = new Vector2(_anchorX, CENTER_ANCHOR_Y);
+            rt.sizeDelta = _size;
             var theme = cardGo.GetComponent<Image>();
             theme.color = Color.gray;
             theme.raycastTarget = false;
@@ -144,7 +191,7 @@ namespace Builders
             var previewGo = new GameObject("Preview", typeof(RectTransform), typeof(Image));
             var prt = Child(previewGo, cardGo.transform);
             prt.anchorMin = prt.anchorMax = new Vector2(0.5f, 0.6f);
-            prt.sizeDelta = new Vector2(420f, 420f);
+            prt.sizeDelta = _previewSize;
             var preview = previewGo.GetComponent<Image>();
             preview.preserveAspect = true;
             preview.raycastTarget = false;
@@ -152,9 +199,9 @@ namespace Builders
             var nameGo = new GameObject("Name", typeof(RectTransform), typeof(TextMeshProUGUI));
             var nrt = Child(nameGo, cardGo.transform);
             nrt.anchorMin = nrt.anchorMax = new Vector2(0.5f, 0.12f);
-            nrt.sizeDelta = new Vector2(520f, 120f);
+            nrt.sizeDelta = new Vector2(_nameWidth, 120f);
             var nameText = nameGo.GetComponent<TextMeshProUGUI>();
-            SetupText(nameText, "", 72f);
+            SetupText(nameText, "", _nameFontSize);
 
             // 확정 표시: 카드 뒤의 노란 테두리 (플레이스홀더). 카드보다 먼저 그려야 하므로 카드의 형제로 둔다
             var confirmGo = new GameObject(_name + "_ConfirmedMark", typeof(RectTransform), typeof(Image));
@@ -188,6 +235,92 @@ namespace Builders
             so.FindProperty("lockedMark").objectReferenceValue = lockGo;
             so.ApplyModifiedPropertiesWithoutUndo();
             return view;
+        }
+
+        /// <summary>
+        /// 중앙 격자. 열 수를 고정해 차원이 늘면 줄이 자동으로 늘어난다
+        /// </summary>
+        private static RectTransform CreateGrid(Transform _parent)
+        {
+            var go = new GameObject("DimensionGrid", typeof(RectTransform), typeof(GridLayoutGroup));
+            var rt = Child(go, _parent);
+            rt.anchorMin = rt.anchorMax = new Vector2(0.5f, CENTER_ANCHOR_Y);
+            rt.sizeDelta = GRID_SIZE;
+            var grid = go.GetComponent<GridLayoutGroup>();
+            grid.constraint = GridLayoutGroup.Constraint.FixedColumnCount;
+            grid.constraintCount = COLUMNS;
+            grid.cellSize = CELL_SIZE;
+            grid.spacing = CELL_SPACING;
+            grid.childAlignment = TextAnchor.MiddleCenter;
+            return rt;
+        }
+
+        /// <summary>
+        /// 격자 한 칸: 왼쪽·오른쪽 커서 프레임 / 카드(테마 배경, 미리보기, 이름) / 잠금 표시. 자식 순서가 곧 그리는 순서
+        /// </summary>
+        private static DimensionGridCell CreateCell(int _index, Transform _parent)
+        {
+            var cellGo = new GameObject("Cell_" + _index, typeof(RectTransform));
+            Child(cellGo, _parent);
+
+            Image leftFrame = CreateStretchImage("LeftCursorFrame", cellGo.transform, LEFT_FRAME_GROW, LEFT_FRAME_COLOR);
+            leftFrame.gameObject.SetActive(false);
+            Image rightFrame = CreateStretchImage("RightCursorFrame", cellGo.transform, RIGHT_FRAME_GROW, RIGHT_FRAME_COLOR);
+            rightFrame.gameObject.SetActive(false);
+
+            Image theme = CreateStretchImage("CellCard", cellGo.transform, 0f, Color.gray);
+
+            var previewGo = new GameObject("Preview", typeof(RectTransform), typeof(Image));
+            var prt = Child(previewGo, theme.transform);
+            prt.anchorMin = prt.anchorMax = new Vector2(0.5f, 0.6f);
+            prt.sizeDelta = CELL_PREVIEW_SIZE;
+            var preview = previewGo.GetComponent<Image>();
+            preview.preserveAspect = true;
+            preview.raycastTarget = false;
+
+            var nameGo = new GameObject("Name", typeof(RectTransform), typeof(TextMeshProUGUI));
+            var nrt = Child(nameGo, theme.transform);
+            nrt.anchorMin = nrt.anchorMax = new Vector2(0.5f, 0.13f);
+            nrt.sizeDelta = new Vector2(CELL_SIZE.x - 20f, 70f);
+            var nameText = nameGo.GetComponent<TextMeshProUGUI>();
+            SetupText(nameText, "", CELL_NAME_FONT);
+
+            Image locked = CreateStretchImage("LockedMark", cellGo.transform, 0f, new Color(0f, 0f, 0f, 0.7f));
+            locked.gameObject.SetActive(false);
+
+            var view = cellGo.AddComponent<DimensionSelectView>();
+            var viewSo = new SerializedObject(view);
+            viewSo.FindProperty("nameText").objectReferenceValue = nameText;
+            viewSo.FindProperty("previewImage").objectReferenceValue = preview;
+            viewSo.FindProperty("themeGraphic").objectReferenceValue = theme;
+            viewSo.FindProperty("lockedMark").objectReferenceValue = locked.gameObject;
+            viewSo.ApplyModifiedPropertiesWithoutUndo();
+
+            var cell = cellGo.AddComponent<DimensionGridCell>();
+            var cellSo = new SerializedObject(cell);
+            cellSo.FindProperty("view").objectReferenceValue = view;
+            cellSo.FindProperty("leftFrame").objectReferenceValue = leftFrame;
+            cellSo.FindProperty("rightFrame").objectReferenceValue = rightFrame;
+            cellSo.ApplyModifiedPropertiesWithoutUndo();
+            return cell;
+        }
+
+        /// <summary>
+        /// 부모에 맞춰 늘어나는 Image. _grow 는 부모보다 커지는 전체 크기 (사방으로 절반씩)
+        /// </summary>
+        private static Image CreateStretchImage(string _name, Transform _parent, float _grow, Color _color)
+        {
+            var go = new GameObject(_name, typeof(RectTransform), typeof(Image));
+            var rt = Child(go, _parent);
+            rt.anchorMin = Vector2.zero;
+            rt.anchorMax = Vector2.one;
+            float half = _grow * 0.5f;
+            rt.offsetMin = new Vector2(-half, -half);
+            rt.offsetMax = new Vector2(half, half);
+            var img = go.GetComponent<Image>();
+            img.color = _color;
+            img.raycastTarget = false;
+            return img;
         }
 
         private static void CreateKeyHint(string _name, Transform _parent, float _anchorX, string _text)

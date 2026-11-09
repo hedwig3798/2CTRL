@@ -1116,6 +1116,9 @@ namespace Builders.Visual
                         image.preserveAspect = true;
                         EditorUtility.SetDirty(image);
                     }
+                    // LeftCursorFrame/RightCursorFrame: 진영 색(Image.color)이 그대로 보여야 하므로
+                    // 컬러 패널 스프라이트(PanelFocus 등)를 입히지 않고 흰 Simple 사각형을 유지한다.
+                    // CellCard 뒤에서 사방으로 튀어나온 부분만 테두리로 보인다.
                 }
                 foreach (Transform r in roots)
                 {

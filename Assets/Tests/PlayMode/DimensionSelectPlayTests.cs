@@ -103,16 +103,13 @@ public class DimensionSelectPlayTests
     [Test]
     public void Controller_MoveCursor_WrapsBothDirections()
     {
-        // 오른쪽 커서(1)가 확정 전이라 건너뛰기 없음. 왼쪽만 이동
+        // 3칸 한 줄. 가로 순환
         DimensionSelectController c = NewController(3);
-        // Left 0 -> prev -> 2 (wrap)
-        Assert.IsTrue(c.MoveCursor(PlayerSide.Left, -1));
+        Assert.IsTrue(c.MoveCursor(PlayerSide.Left, -1, 0));
         Assert.AreEqual(2, c.GetCursor(PlayerSide.Left));
-        // 2 -> next -> 0 (wrap)
-        Assert.IsTrue(c.MoveCursor(PlayerSide.Left, 1));
+        Assert.IsTrue(c.MoveCursor(PlayerSide.Left, 1, 0));
         Assert.AreEqual(0, c.GetCursor(PlayerSide.Left));
-        // 0 -> next -> 1 (오른쪽이 아직 확정 안 했으므로 겹쳐도 이동)
-        Assert.IsTrue(c.MoveCursor(PlayerSide.Left, 1));
+        Assert.IsTrue(c.MoveCursor(PlayerSide.Left, 1, 0));
         Assert.AreEqual(1, c.GetCursor(PlayerSide.Left));
     }
 
@@ -125,26 +122,26 @@ public class DimensionSelectPlayTests
         int lastIndex = -1;
         c.OnCursorChanged += (s, i) => { ++calls; lastSide = s; lastIndex = i; };
 
-        Assert.IsFalse(c.MoveCursor(PlayerSide.Left, 0));
+        Assert.IsFalse(c.MoveCursor(PlayerSide.Left, 0, 0));
         Assert.AreEqual(0, calls);
 
-        c.MoveCursor(PlayerSide.Left, 1);
+        c.MoveCursor(PlayerSide.Left, 1, 0);
         Assert.AreEqual(1, calls);
         Assert.AreEqual(PlayerSide.Left, lastSide);
         Assert.AreEqual(1, lastIndex);
     }
 
     [Test]
-    public void Controller_MoveCursor_SkipsDimensionConfirmedByOpponent()
+    public void Controller_MoveCursor_DoesNotSkipDimensionConfirmedByOpponent()
     {
         DimensionSelectController c = NewController(3);
         // 오른쪽이 1번 확정
         Assert.IsTrue(c.ToggleConfirm(PlayerSide.Right));
-        // 왼쪽 0 -> next: 1 은 건너뛰고 2
-        Assert.IsTrue(c.MoveCursor(PlayerSide.Left, 1));
-        Assert.AreEqual(2, c.GetCursor(PlayerSide.Left));
-        // 2 -> prev : 1 건너뛰고 0
-        Assert.IsTrue(c.MoveCursor(PlayerSide.Left, -1));
+        // 왼쪽 0 -> next: 1 (확정된 칸으로도 이동)
+        Assert.IsTrue(c.MoveCursor(PlayerSide.Left, 1, 0));
+        Assert.AreEqual(1, c.GetCursor(PlayerSide.Left));
+        // 1 -> prev : 0
+        Assert.IsTrue(c.MoveCursor(PlayerSide.Left, -1, 0));
         Assert.AreEqual(0, c.GetCursor(PlayerSide.Left));
     }
 
@@ -153,17 +150,261 @@ public class DimensionSelectPlayTests
     {
         DimensionSelectController c = NewController(3);
         c.ToggleConfirm(PlayerSide.Left);
-        Assert.IsFalse(c.MoveCursor(PlayerSide.Left, 1));
+        Assert.IsFalse(c.MoveCursor(PlayerSide.Left, 1, 0));
+        Assert.IsFalse(c.MoveCursor(PlayerSide.Left, 0, 1));
         Assert.AreEqual(0, c.GetCursor(PlayerSide.Left));
     }
 
     [Test]
-    public void Controller_TwoDimensions_OpponentConfirmed_NoMovePossible()
+    public void Controller_TwoDimensions_OpponentConfirmed_CursorCanStillMove()
     {
         DimensionSelectController c = NewController(2);
         c.ToggleConfirm(PlayerSide.Right); // 1 확정
-        Assert.IsFalse(c.MoveCursor(PlayerSide.Left, 1), "갈 수 있는 차원이 없다");
+        Assert.IsTrue(c.MoveCursor(PlayerSide.Left, 1, 0), "확정된 칸으로도 이동 가능");
+        Assert.AreEqual(1, c.GetCursor(PlayerSide.Left));
+        Assert.IsFalse(c.ToggleConfirm(PlayerSide.Left), "겹쳐도 고정은 불가");
+    }
+
+    [Test]
+    public void Controller_Vertical_SingleRow_ReturnsFalse()
+    {
+        DimensionSelectController c = NewController(3); // columns 3 -> 한 줄
+        Assert.IsFalse(c.MoveCursor(PlayerSide.Left, 0, 1));
+        Assert.IsFalse(c.MoveCursor(PlayerSide.Left, 0, -1));
         Assert.AreEqual(0, c.GetCursor(PlayerSide.Left));
+    }
+
+    [Test]
+    public void Controller_TwoColumnsThreeCells_VerticalWrapAndClamp()
+    {
+        // 격자: [0 1] / [2 .]
+        DimensionSelectController c = NewController(3);
+        SetField(c, "columns", 2);
+
+        // Right 시작 1 : 아래 -> 2번째 줄은 1칸뿐이라 2 로 clamp
+        Assert.IsTrue(c.MoveCursor(PlayerSide.Right, 0, 1));
+        Assert.AreEqual(2, c.GetCursor(PlayerSide.Right));
+        // 아래 -> 순환해 위 줄의 같은 열(0)
+        Assert.IsTrue(c.MoveCursor(PlayerSide.Right, 0, 1));
+        Assert.AreEqual(0, c.GetCursor(PlayerSide.Right));
+        // 위 -> 순환해 아래 줄 2
+        Assert.IsTrue(c.MoveCursor(PlayerSide.Right, 0, -1));
+        Assert.AreEqual(2, c.GetCursor(PlayerSide.Right));
+    }
+
+    [Test]
+    public void Controller_TwoColumnsThreeCells_HorizontalWrapsWithinActualRowLength()
+    {
+        DimensionSelectController c = NewController(3);
+        SetField(c, "columns", 2);
+        c.MoveCursor(PlayerSide.Left, 0, 1); // 0 -> 2 (마지막 줄)
+        Assert.AreEqual(2, c.GetCursor(PlayerSide.Left));
+        // 마지막 줄은 1칸 : 가로 이동은 자기 자신 -> false
+        Assert.IsFalse(c.MoveCursor(PlayerSide.Left, 1, 0));
+        Assert.IsFalse(c.MoveCursor(PlayerSide.Left, -1, 0));
+        Assert.AreEqual(2, c.GetCursor(PlayerSide.Left));
+
+        // 첫 줄은 2칸 순환
+        DimensionSelectController c2 = NewController(3);
+        SetField(c2, "columns", 2);
+        Assert.IsTrue(c2.MoveCursor(PlayerSide.Left, -1, 0));
+        Assert.AreEqual(1, c2.GetCursor(PlayerSide.Left));
+        Assert.IsTrue(c2.MoveCursor(PlayerSide.Left, 1, 0));
+        Assert.AreEqual(0, c2.GetCursor(PlayerSide.Left));
+    }
+
+    [Test]
+    public void Controller_OneColumn_VerticalOnly()
+    {
+        DimensionSelectController c = NewController(3);
+        SetField(c, "columns", 1);
+        Assert.IsFalse(c.MoveCursor(PlayerSide.Left, 1, 0), "1열은 가로 이동 없음");
+        Assert.IsTrue(c.MoveCursor(PlayerSide.Left, 0, 1));
+        Assert.AreEqual(1, c.GetCursor(PlayerSide.Left));
+        Assert.IsTrue(c.MoveCursor(PlayerSide.Left, 0, -1));
+        Assert.IsTrue(c.MoveCursor(PlayerSide.Left, 0, -1));
+        Assert.AreEqual(2, c.GetCursor(PlayerSide.Left), "위로 순환");
+    }
+
+    [Test]
+    public void Controller_ColumnsLargerThanCount_ClampedToCount()
+    {
+        DimensionSelectController c = NewController(3);
+        SetField(c, "columns", 10);
+        Assert.IsFalse(c.MoveCursor(PlayerSide.Left, 0, 1), "한 줄로 보정되어 세로 이동 없음");
+        Assert.IsTrue(c.MoveCursor(PlayerSide.Left, -1, 0));
+        Assert.AreEqual(2, c.GetCursor(PlayerSide.Left));
+    }
+
+    [Test]
+    public void Controller_ColumnsZeroOrNegative_TreatedAsOne()
+    {
+        DimensionSelectController c = NewController(3);
+        SetField(c, "columns", 0);
+        Assert.IsTrue(c.MoveCursor(PlayerSide.Left, 0, 1));
+        Assert.AreEqual(1, c.GetCursor(PlayerSide.Left));
+    }
+
+    [Test]
+    public void Controller_Cursors_CanOverlap_AndFirstConfirmerOwns()
+    {
+        DimensionSelectController c = NewController(3);
+        c.MoveCursor(PlayerSide.Left, 1, 0); // 둘 다 1
+        Assert.IsTrue(c.ToggleConfirm(PlayerSide.Left));
+        Assert.IsFalse(c.ToggleConfirm(PlayerSide.Right));
+        Assert.IsFalse(c.IsConfirmed(PlayerSide.Right));
+        // 해제하면 다시 가능
+        Assert.IsTrue(c.ToggleConfirm(PlayerSide.Left));
+        Assert.IsTrue(c.ToggleConfirm(PlayerSide.Right));
+    }
+    #endregion
+
+    #region Grid cells
+    private class CellRig
+    {
+        public DimensionGridCell cell;
+        public GameObject lockedMark;
+        public GameObject leftFrame;
+        public GameObject rightFrame;
+        public UnityEngine.UI.Image leftImage;
+    }
+
+    private CellRig NewCell()
+    {
+        CellRig r = new CellRig();
+        GameObject go = Track(new GameObject("Cell"));
+        r.cell = go.AddComponent<DimensionGridCell>();
+
+        GameObject viewGo = new GameObject("View");
+        viewGo.transform.SetParent(go.transform, false);
+        DimensionSelectView view = viewGo.AddComponent<DimensionSelectView>();
+        r.lockedMark = new GameObject("Locked");
+        r.lockedMark.transform.SetParent(viewGo.transform, false);
+        SetField(view, "lockedMark", r.lockedMark);
+        SetField(r.cell, "view", view);
+
+        r.leftFrame = new GameObject("LF");
+        r.leftFrame.transform.SetParent(go.transform, false);
+        r.leftImage = r.leftFrame.AddComponent<UnityEngine.UI.Image>();
+        SetField(r.cell, "leftFrame", r.leftImage);
+
+        r.rightFrame = new GameObject("RF");
+        r.rightFrame.transform.SetParent(go.transform, false);
+        SetField(r.cell, "rightFrame", r.rightFrame.AddComponent<UnityEngine.UI.Image>());
+        return r;
+    }
+
+    private DimensionSelectController NewControllerWithCells(int _count, int _cellCount, out CellRig[] _rigs)
+    {
+        _rigs = new CellRig[_cellCount];
+        DimensionGridCell[] cells = new DimensionGridCell[_cellCount];
+        for (int i = 0; i < _cellCount; ++i)
+        {
+            _rigs[i] = NewCell();
+            cells[i] = _rigs[i].cell;
+        }
+
+        GameObject go = Track(new GameObject("Controller"));
+        go.SetActive(false);
+        DimensionSelectController c = go.AddComponent<DimensionSelectController>();
+        DimensionData[] dims = new DimensionData[_count];
+        for (int i = 0; i < _count; ++i)
+        {
+            dims[i] = NewDim("Dim" + i);
+        }
+        SetField(c, "dimensions", dims);
+        SetField(c, "gridCells", cells);
+        SetField(c, "loadDelay", 1000f);
+        SetField(c, "gameSceneName", "");
+        go.SetActive(true);
+        return c;
+    }
+
+    [Test]
+    public void GridCells_CursorFrames_FollowCursors()
+    {
+        CellRig[] rigs;
+        DimensionSelectController c = NewControllerWithCells(3, 3, out rigs);
+        // 초기 Left 0 / Right 1 (Start 에서 갱신은 EditMode 호출 시점에 안 될 수 있어 이동으로 갱신)
+        c.MoveCursor(PlayerSide.Left, 1, 0); // Left 1
+        c.MoveCursor(PlayerSide.Left, 1, 0); // Left 2
+
+        Assert.IsFalse(rigs[0].leftFrame.activeSelf);
+        Assert.IsFalse(rigs[1].leftFrame.activeSelf);
+        Assert.IsTrue(rigs[2].leftFrame.activeSelf);
+        Assert.IsTrue(rigs[1].rightFrame.activeSelf);
+        Assert.IsFalse(rigs[0].rightFrame.activeSelf);
+        Assert.IsFalse(rigs[2].rightFrame.activeSelf);
+        Assert.AreEqual(rigs[2].cell.GetType(), typeof(DimensionGridCell));
+        Assert.AreEqual((float)GetField(rigs[2].cell, "idleFrameAlpha"), rigs[2].leftImage.color.a, 1e-4f, "미고정은 idle alpha");
+    }
+
+    [Test]
+    public void GridCells_Confirm_SetsAlphaOne_AndOnlyConfirmedCellLocked()
+    {
+        CellRig[] rigs;
+        DimensionSelectController c = NewControllerWithCells(3, 3, out rigs);
+        Assert.IsTrue(c.ToggleConfirm(PlayerSide.Left)); // Left 0 확정
+
+        Assert.AreEqual(1f, rigs[0].leftImage.color.a, 1e-4f);
+        Assert.IsTrue(rigs[0].lockedMark.activeSelf);
+        Assert.IsFalse(rigs[1].lockedMark.activeSelf, "Right 커서 칸은 잠김 표시 없음");
+        Assert.IsFalse(rigs[2].lockedMark.activeSelf);
+
+        // 취소하면 모두 꺼진다
+        c.ToggleConfirm(PlayerSide.Left);
+        Assert.IsFalse(rigs[0].lockedMark.activeSelf);
+        Assert.Less(rigs[0].leftImage.color.a, 1f);
+    }
+
+    [Test]
+    public void GridCells_OpponentCursorElsewhere_DoesNotLockOtherCells()
+    {
+        CellRig[] rigs;
+        DimensionSelectController c = NewControllerWithCells(3, 3, out rigs);
+        c.ToggleConfirm(PlayerSide.Right); // Right 1 확정
+        c.MoveCursor(PlayerSide.Left, 1, 0); // Left 가 1 로 (겹침)
+        c.MoveCursor(PlayerSide.Left, 1, 0); // Left 2
+
+        Assert.IsTrue(rigs[1].lockedMark.activeSelf);
+        Assert.IsFalse(rigs[0].lockedMark.activeSelf);
+        Assert.IsFalse(rigs[2].lockedMark.activeSelf);
+    }
+
+    [Test]
+    public void GridCells_CountMismatch_NoException()
+    {
+        CellRig[] rigsMore;
+        Assert.DoesNotThrow(() =>
+        {
+            DimensionSelectController c = NewControllerWithCells(3, 5, out rigsMore);
+            c.MoveCursor(PlayerSide.Left, 1, 0);
+            c.ToggleConfirm(PlayerSide.Left);
+        }, "칸이 차원보다 많음");
+
+        CellRig[] rigsFewer;
+        Assert.DoesNotThrow(() =>
+        {
+            DimensionSelectController c = NewControllerWithCells(3, 1, out rigsFewer);
+            c.MoveCursor(PlayerSide.Left, 1, 0);
+            c.ToggleConfirm(PlayerSide.Left);
+        }, "칸이 차원보다 적음");
+    }
+
+    [Test]
+    public void GridCells_NullEntries_Safe()
+    {
+        DimensionSelectController c = NewController(3);
+        SetField(c, "gridCells", new DimensionGridCell[] { null, null });
+        Assert.DoesNotThrow(() => c.MoveCursor(PlayerSide.Left, 1, 0));
+    }
+
+    [Test]
+    public void GridCell_Show_NullReferences_Safe()
+    {
+        GameObject go = Track(new GameObject("EmptyCell"));
+        DimensionGridCell cell = go.AddComponent<DimensionGridCell>();
+        Assert.DoesNotThrow(() => cell.Show(null, true, true, true, true));
     }
     #endregion
 
@@ -186,7 +427,7 @@ public class DimensionSelectPlayTests
     public void Controller_CannotConfirmDimensionConfirmedByOpponent()
     {
         DimensionSelectController c = NewController(3);
-        c.MoveCursor(PlayerSide.Left, 1); // 겹치게 (Left=1, Right=1)
+        c.MoveCursor(PlayerSide.Left, 1, 0); // 겹치게 (Left=1, Right=1)
         Assert.AreEqual(1, c.GetCursor(PlayerSide.Left));
         Assert.IsTrue(c.ToggleConfirm(PlayerSide.Right)); // 오른쪽 먼저 확정
 
@@ -209,7 +450,7 @@ public class DimensionSelectPlayTests
     public void Controller_CancelAfterOpponentConfirmed_ReleasesDimension()
     {
         DimensionSelectController c = NewController(3);
-        c.MoveCursor(PlayerSide.Left, 1);
+        c.MoveCursor(PlayerSide.Left, 1, 0);
         c.ToggleConfirm(PlayerSide.Right);
         Assert.IsFalse(c.CanConfirm(PlayerSide.Left, 1));
 
@@ -256,7 +497,7 @@ public class DimensionSelectPlayTests
         // 존재하지 않는 씬 이름 : 로드는 실패(로그)하지만 그 전에 DimensionSelection 이 세팅된다
         LogAssert.ignoreFailingMessages = true;
         DimensionSelectController c = NewController(3, 0.1f, "NoSuchScene_ForTest");
-        c.MoveCursor(PlayerSide.Left, -1); // Left = 2, Right = 1
+        c.MoveCursor(PlayerSide.Left, -1, 0); // Left = 2, Right = 1
         c.ToggleConfirm(PlayerSide.Left);
         c.ToggleConfirm(PlayerSide.Right);
 
