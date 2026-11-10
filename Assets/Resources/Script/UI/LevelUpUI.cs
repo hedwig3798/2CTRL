@@ -1,5 +1,6 @@
 using TMPro;
 using UnityEngine;
+using UnityEngine.InputSystem;
 using UnityEngine.UI;
 
 /// <summary>
@@ -7,6 +8,7 @@ using UnityEngine.UI;
 /// - EventManager.OnLevelUp 을 구독하므로, 항상 활성 상태인 Canvas 루트에 붙이고 자식 전체를 On/Off 한다.
 /// - 한 번에 여러 레벨이 오르면 오른 레벨 수만큼 버튼을 눌러야 재개된다.
 /// - 자식 SelectPanelGroup 에서 선택지를 고르기 전에는 재개 버튼이 비활성화된다.
+/// - 스페이스바로도 재개 버튼을 누를 수 있다.
 /// - 재개 버튼 글자는 resumeLabelKey 로 채운다 (프리팹에 박힌 글자 대신. 언어가 바뀌면 다시 채움)
 /// </summary>
 public class LevelUpUI
@@ -177,6 +179,30 @@ public class LevelUpUI
         if (false == IsOpen)
         {
             Open();
+        }
+    }
+
+    private void Update()
+    {
+        if (false == isOpen)
+        {
+            return;
+        }
+
+        Keyboard keyboard = Keyboard.current;
+        if (null == keyboard || false == keyboard.spaceKey.wasPressedThisFrame)
+        {
+            return;
+        }
+
+        // 버튼 클릭과 똑같이 처리 (클릭음 포함). 버튼이 비활성이면 무시
+        if (null == resumeButton)
+        {
+            HandleResume();
+        }
+        else if (true == resumeButton.interactable)
+        {
+            resumeButton.onClick.Invoke();
         }
     }
 

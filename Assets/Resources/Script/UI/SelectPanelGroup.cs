@@ -1,11 +1,14 @@
 using System;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.InputSystem;
+using UnityEngine.InputSystem.Controls;
 
 /// <summary>
 /// Select Panel 묶음. 그룹 안에서는 하나만 선택된다.
 /// - 클릭된 패널만 선택하고 나머지는 해제하며, 같은 패널을 다시 눌러도 해제되지 않는다.
-/// - 활성화될 때마다 선택을 초기화하므로 UI 를 열 때마다 선택 없는 상태로 시작한다.
+/// - 활성화되거나 보상을 새로 뽑을 때마다 보이는 첫 번째 패널(1번 선택지)이 선택된 상태로 시작한다.
+/// - 키보드로도 고를 수 있다: Left 쪽은 W / S, Right 쪽은 ↑ / ↓ (보이는 패널만, 끝에서 멈춤)
 /// - 레벨업 시 RewardManager 에서 패널마다 보상을 중복 없이 랜덤으로 뽑아 채운다.
 ///   - 첫 번째 데이터 : Weapon / PassiveBuff / WeaponUpgrade 풀 중 하나
 ///   - 두 번째 데이터 : 첫 번째 데이터가 PassiveBuff 풀에서 뽑혔을 때만 PassiveNerf(디버프) 풀 중 하나
@@ -208,7 +211,7 @@ public class SelectPanelGroup
 
         mainBuffer.Clear();
         debuffBuffer.Clear();
-        ClearSelection();
+        SelectFirst();
     }
 
     /// <summary>
@@ -256,7 +259,82 @@ public class SelectPanelGroup
             }
         }
 
-        ClearSelection();
+        SelectFirst();
+    }
+
+    private void Update()
+    {
+        Keyboard keyboard = Keyboard.current;
+        if (null == keyboard)
+        {
+            return;
+        }
+
+        bool isLeft = PlayerSide.Left == side;
+        KeyControl upKey = isLeft ? keyboard.wKey : keyboard.upArrowKey;
+        KeyControl downKey = isLeft ? keyboard.sKey : keyboard.downArrowKey;
+
+        if (true == upKey.wasPressedThisFrame)
+        {
+            MoveSelection(-1);
+        }
+        else if (true == downKey.wasPressedThisFrame)
+        {
+            MoveSelection(1);
+        }
+    }
+
+    /// <summary>
+    /// 보이는 패널 중에서 _step 방향의 다음 패널을 클릭한 것처럼 선택한다 (끝이면 그대로)
+    /// </summary>
+    private void MoveSelection(int _step)
+    {
+        int current = null != SelectedPanel ? selectPanels.IndexOf(SelectedPanel) : -1;
+        if (current < 0)
+        {
+            SelectPanel first = FindFirstVisible();
+            if (null != first)
+            {
+                first.Click();
+            }
+            return;
+        }
+
+        for (int i = current + _step; i >= 0 && i < selectPanels.Count; i += _step)
+        {
+            SelectPanel candidate = selectPanels[i];
+            if (null != candidate && true == candidate.gameObject.activeSelf)
+            {
+                candidate.Click();
+                return;
+            }
+        }
+    }
+
+    private SelectPanel FindFirstVisible()
+    {
+        foreach (SelectPanel selectPanel in selectPanels)
+        {
+            if (null != selectPanel && true == selectPanel.gameObject.activeSelf)
+            {
+                return selectPanel;
+            }
+        }
+        return null;
+    }
+
+    /// <summary>
+    /// 보이는 첫 번째 패널을 선택한다 (클릭음 없이). 보이는 패널이 없으면 선택 해제
+    /// </summary>
+    public void SelectFirst()
+    {
+        SelectPanel first = FindFirstVisible();
+        if (null == first)
+        {
+            ClearSelection();
+            return;
+        }
+        HandlePanelClicked(first);
     }
 
     private void OnDisable()

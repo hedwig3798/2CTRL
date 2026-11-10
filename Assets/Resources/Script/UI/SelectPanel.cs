@@ -122,6 +122,14 @@ public class SelectPanel
 
     public void OnPointerClick(PointerEventData _eventData)
     {
+        Click();
+    }
+
+    /// <summary>
+    /// 클릭과 똑같이 OnClicked 를 알린다 (키보드 선택용. 클릭음도 함께 난다)
+    /// </summary>
+    public void Click()
+    {
         OnClicked?.Invoke(this);
     }
 
