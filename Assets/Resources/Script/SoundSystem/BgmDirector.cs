@@ -143,6 +143,18 @@ public class BgmDirector
     private GameOverManager gameOver;
 
     public static BgmMode CurrentMode => null != instance ? instance.mode : BgmMode.None;
+
+    /// <summary>
+    /// 재생 중인 BGM 을 페이드 없이 즉시 멈춘다 (게임 오버 연출 시작 등)
+    /// </summary>
+    public static void StopImmediately()
+    {
+        if (null == instance)
+        {
+            return;
+        }
+        instance.StopAll(0f);
+    }
     public static SoundId CurrentIntensity =>
         null != instance && BgmMode.Combat == instance.mode ? BASE_IDS[instance.intensityIndex] : SoundId.None;
 

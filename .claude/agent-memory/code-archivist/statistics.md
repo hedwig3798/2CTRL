@@ -15,6 +15,8 @@
 - 무기 데미지: Projectile.SetupDamage 에서 damageMassage.weapon=_weapon -> HealthSystem(적).PublishDamage -> OnWeaponDamage(weapon.OwnerStats.Side, weapon, applied) -> EnqueueWeaponDamage. 무기 없는 데미지(접촉/장판)는 미발행.
 - 피격: HealthSystem(playerStats 있음).PublishDamage -> OnPlayerDamaged(side, applied). applied>0 일 때만(무적 무관 실제 감소량).
 - EXP: ItemCollector(Awake 에서 ownerStats 탐색) -> OnExpGained(side, exp).
+- 패배 연출(2026-11-10): TriggerGameOver = GamePause.Pause + SoundManager.StopAll() + BgmDirector.StopImmediately() + LockStatistics -> 코루틴(전부 unscaled): freezeSeconds 0.6 -> DimensionApplier.SideCamera(죽은 쪽).pixelRect 영역에 런타임 캔버스 GameOverDim(sortingOrder 95; HUD10<Pause90<Dim95<GameOverCanvas100)로 dimSeconds 0.5 동안 dimColor(검정 a0.55)까지 -> holdSeconds 0.8 -> 패배음 + GameOverUI.Show -> OnGameOver. 승리는 즉시 표시.
+- 신규 API: SoundManager.StopAll()(원샷·루프 즉시 정지, ignorePause 포함, BGM 제외), BgmDirector.StopImmediately()(StopAll(0)), DimensionApplier.SideCamera 게터.
 - 사망: HealthSystem.Die -> playerStats 있으면 OnPlayerDeath(side) -> GameOverManager.
 
 ## 씬 배치 (2026-11-02)

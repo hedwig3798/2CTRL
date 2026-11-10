@@ -193,6 +193,26 @@ public class SoundManager
     }
 
     /// <summary>
+    /// 재생 중인 효과음(원샷 · 루프, ignorePause 포함)을 모두 즉시 멈춘다 (BGM 은 BgmDirector 가 따로 맡는다)
+    /// </summary>
+    public static void StopAll()
+    {
+        if (null == instance)
+        {
+            return;
+        }
+        StopAllLoops();
+        Voice[] voices = instance.oneShots;
+        for (int i = 0; i < voices.Length; ++i)
+        {
+            if (true == voices[i].isActive)
+            {
+                instance.ReleaseVoice(voices[i]);
+            }
+        }
+    }
+
+    /// <summary>
     /// 이벤트 하나의 재생 기록 (없으면 0)
     /// </summary>
     public static SoundStats GetStats(SoundId _id)

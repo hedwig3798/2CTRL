@@ -65,6 +65,11 @@ public class DimensionApplier
     public PlayerSide Side => side;
 
     /// <summary>
+    /// 자기 진영 카메라 (연결되지 않았으면 null)
+    /// </summary>
+    public Camera SideCamera => sideCamera;
+
+    /// <summary>
     /// 적용한 차원 (적용 전이거나 없으면 null)
     /// </summary>
     public DimensionData Dimension => dimension;
