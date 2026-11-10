@@ -33,6 +33,10 @@ public class VolumeSettingRow
     [SerializeField] private Color unmutedColor = Color.white;
     [SerializeField] private Color mutedColor = new Color(1f, 0.45f, 0.45f, 1f);
 
+    [Header("sound")]
+    [Tooltip("이 채널 슬라이더를 움직이면 미리듣기 소리를 낸다 (Effect 채널만)")]
+    [SerializeField] private SoundId previewSound = SoundId.UI_SLIDER;
+
     public AudioChannel Channel => channel;
 
     private void OnEnable()
@@ -97,6 +101,12 @@ public class VolumeSettingRow
         GameSettings.SetVolume(channel, _value);
         // 같은 값이라 이벤트가 안 와도 라벨은 맞춘다
         Refresh();
+
+        // 바뀐 효과음 음량으로 미리듣기 (간격 제한은 SoundEvent 의 minInterval)
+        if (AudioChannel.Effect == channel)
+        {
+            SoundManager.Play(previewSound);
+        }
     }
 
     private void HandleMuteClicked()

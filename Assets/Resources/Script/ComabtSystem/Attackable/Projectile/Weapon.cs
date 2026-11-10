@@ -112,6 +112,26 @@ public class Weapon
     // 무기 스텟에 더할 주인 스텟 (없으면 무기 스텟만 사용)
     private PlayerStats ownerStats;
 
+    /// <summary>
+    /// 공격 1회를 시작했을 때 (발사한 무기). 발사음 재생용 (CombatSoundBinder 가 구독)
+    /// - 한 번의 공격(fireCount 발)에 1번. Repeat 의 fireDelay 분할 발사는 발마다, Capped 는 1발이 1회 공격이므로 발마다.
+    ///   Repeat 동시 발사 / Wave 는 첫 발에만.
+    /// - Persistent 의 발사체 보충, FireSub(보조 발사체) 에서는 발행하지 않는다.
+    /// - 구독자가 없으면 조건 계산도 하지 않는다.
+    /// </summary>
+    public static event System.Action<Weapon> Fired;
+
+    /// <summary>
+    /// 무기가 켜졌을 때 / 꺼졌을 때 (파괴 포함). 루프 소리 등록용 (CombatSoundBinder 가 구독)
+    /// </summary>
+    public static event System.Action<Weapon> Enabled;
+    public static event System.Action<Weapon> Disabled;
+
+    /// <summary>
+    /// 이 무기 풀에서 꺼내 살아 있는 발사체 수 (보조 발사체 FireSub 제외). GC 없이 풀의 CountActive 를 읽는다
+    /// </summary>
+    public int ActiveProjectileCount => projectilePool is ObjectPool<Projectile> pool ? pool.CountActive : 0;
+
     #region Final Stat
     /// <summary>
     /// (무기 damage + 플레이어 Damage Add) × 플레이어 Damage 배율 (0 미만은 0)
@@ -302,7 +322,7 @@ public class Weapon
         {
             for (int i = 0; i < count; ++i)
             {
-                if (false == FireOne(i, count))
+                if (false == FireOne(i, count, 0 == i))
                 {
                     // 타겟이 없으면 이번 발사는 전부 취소
                     return;
@@ -325,7 +345,7 @@ public class Weapon
                 yield return wait;
             }
 
-            if (false == FireOne(i, count))
+            if (false == FireOne(i, count, true))
             {
                 // 타겟이 없으면 남은 발사는 취소
                 break;
@@ -336,8 +356,9 @@ public class Weapon
 
     /// <summary>
     /// 발사체 하나를 발사한다. 타겟이 없어 발사하지 못하면 false
+    /// _notifyFired 가 true 면 발사에 성공했을 때 Fired 를 발행한다 (공격 1회의 시작인지는 호출하는 쪽이 정한다)
     /// </summary>
-    private bool FireOne(int _index, int _count)
+    private bool FireOne(int _index, int _count, bool _notifyFired)
     {
         Projectile p = projectilePool.Get();
         if (null == p)
@@ -356,6 +377,11 @@ public class Weapon
         if (WEAPON_TYPE.Capped == weaponType || WEAPON_TYPE.Wave == weaponType)
         {
             aliveProjectiles.Add(p);
+        }
+
+        if (true == _notifyFired && null != Fired)
+        {
+            Fired(this);
         }
         return true;
     }
@@ -749,8 +775,15 @@ public class Weapon
         }
     }
 
+    private void OnEnable()
+    {
+        Enabled?.Invoke(this);
+    }
+
     private void OnDisable()
     {
+        Disabled?.Invoke(this);
+
         // 꺼지면 코루틴이 멈추므로 발사 중 상태를 풀어준다
         fireRoutine = null;
 
@@ -813,7 +846,7 @@ public class Weapon
         if (timer >= coolTime)
         {
             // 발사하지 못하면(타겟 없음) 다음 프레임에 다시 시도한다
-            if (true == FireOne(aliveProjectiles.Count, count))
+            if (true == FireOne(aliveProjectiles.Count, count, true))
             {
                 timer = 0f;
             }
@@ -845,7 +878,7 @@ public class Weapon
             int count = LaunchCount;
             for (int i = 0; i < count; ++i)
             {
-                if (false == FireOne(i, count))
+                if (false == FireOne(i, count, 0 == i))
                 {
                     break;
                 }
@@ -966,5 +999,14 @@ public class Weapon
     private void OnDespawn(Projectile _object)
     {
         Destroy(_object.gameObject);
+    }
+
+    // Enter Play Mode 옵션으로 도메인 리로드를 끈 경우를 위해 static 초기화
+    [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
+    private static void ResetStatics()
+    {
+        Fired = null;
+        Enabled = null;
+        Disabled = null;
     }
 }

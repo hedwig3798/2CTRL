@@ -32,6 +32,11 @@ public class LightningProjectile
     [SerializeField]
     private float effectDuration = 0.25f;
 
+    [Header("sound")]
+    [Tooltip("낙뢰가 떨어지는 순간 (표식 소리는 SoundLibrary 무기 항목 fire 로 낸다)")]
+    [SerializeField]
+    private SoundId strikeSound = SoundId.WPN_LIGHTNING_STRIKE;
+
     [Header("storm link (★)")]
     [Tooltip("FlagStormLink 연결 데미지 비율 (0.6 = 60%)")]
     [Min(0f)]
@@ -222,6 +227,7 @@ public class LightningProjectile
         TrackTargets();
         HideMarkers();
         isStriking = true;
+        SoundManager.Play(strikeSound, SoundLayerSide.GetSide(gameObject.layer));
         endTime = Time.time + effectDuration;
 
         float radius = FinalAreaRadius;

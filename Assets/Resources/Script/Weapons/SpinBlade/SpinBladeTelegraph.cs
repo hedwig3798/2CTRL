@@ -29,6 +29,11 @@ public class SpinBladeTelegraph
     [SerializeField]
     private float startRadius = 0f;
 
+    [Header("sound")]
+    [Tooltip("예고 칼날이 나오기 시작할 때 (숨김 → 표시)")]
+    [SerializeField]
+    private SoundId tellSound = SoundId.WPN_SPINBLADE_TELL;
+
     [Header("visual")]
     [Tooltip("칼날 렌더러 정렬 레이어 (Default 면 BG 에 가려진다). 비워두면 바꾸지 않는다")]
     [SerializeField]
@@ -136,6 +141,11 @@ public class SpinBladeTelegraph
         }
 
         ApplyVisible(_visible);
+        if (true == _visible && null != weapon)
+        {
+            PlayerStats stats = weapon.OwnerStats;
+            SoundManager.Play(tellSound, null != stats ? stats.Side : SoundLayerSide.GetSide(weapon.gameObject.layer));
+        }
     }
 
     private void ApplyVisible(bool _visible)

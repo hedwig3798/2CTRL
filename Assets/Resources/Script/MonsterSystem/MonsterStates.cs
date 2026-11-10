@@ -134,6 +134,7 @@ public sealed class MonsterActionState
         if (null != rt)
         {
             rt.OnActionStart(brain.Context);
+            brain.RaiseActionStarted(rt);
         }
     }
 

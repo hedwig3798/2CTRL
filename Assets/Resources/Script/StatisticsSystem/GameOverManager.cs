@@ -29,6 +29,12 @@ public class GameOverManager
     /// </summary>
     public Action OnGameOver;
 
+    [Header("sound")]
+    [SerializeField]
+    private SoundId winSound = SoundId.RESULT_WIN;
+    [SerializeField]
+    private SoundId loseSound = SoundId.RESULT_LOSE;
+
     private bool isGameOver = false;
     private bool isVictory = false;
 
@@ -77,6 +83,7 @@ public class GameOverManager
         isVictory = _victory;
 
         GamePause.Pause(this);
+        SoundManager.Play(true == _victory ? winSound : loseSound);
 
         StatisticsManager stats = null != statisticsManager ? statisticsManager : StatisticsManager.Instance;
         if (null != stats)

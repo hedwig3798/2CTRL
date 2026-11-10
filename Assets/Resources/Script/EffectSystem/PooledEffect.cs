@@ -62,6 +62,11 @@ public static class EffectPool
     private static Dictionary<PooledEffect, IObjectPool<PooledEffect>> pools = new Dictionary<PooledEffect, IObjectPool<PooledEffect>>();
 
     /// <summary>
+    /// 연출을 꺼냈을 때 (프리팹, 위치, 레이어). 연출 소리 재생용 (CombatSoundBinder 가 구독)
+    /// </summary>
+    public static event System.Action<PooledEffect, Vector3, int> Spawned;
+
+    /// <summary>
     /// _prefab 연출을 _position 에 꺼낸다. _radius 가 0 보다 크면 그 반지름에 맞춰 크기를 바꾼다
     /// _layer 로 자식까지 레이어를 맞춘다. 분할 카메라는 Default 레이어를 그리지 않으므로 반드시 연출을 낸 쪽의 레이어를 넘긴다
     /// _prefab 이 없으면 null
@@ -93,7 +98,15 @@ public static class EffectPool
             LayerUtils.SetLayer(effect.gameObject, _layer);
         }
         effect.gameObject.SetActive(true);
+        Spawned?.Invoke(_prefab, _position, _layer);
         return effect;
+    }
+
+    // Enter Play Mode 옵션으로 도메인 리로드를 끈 경우를 위해 static 초기화
+    [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
+    private static void ResetStatics()
+    {
+        Spawned = null;
     }
 
     private static IObjectPool<PooledEffect> CreatePool(PooledEffect _prefab)

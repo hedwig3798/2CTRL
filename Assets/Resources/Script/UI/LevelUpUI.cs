@@ -229,6 +229,7 @@ public class LevelUpUI
             }
 
             rewardManager.ApplyReward(selected.Data1, group.Side);
+            RewardSound.PlayConfirm(selected.Data1, selected.Data2, group.Side);
 
             // 무기 / 무기 업그레이드 패널은 디버프가 없다
             if (null != selected.Data2)

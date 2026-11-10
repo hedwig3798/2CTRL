@@ -105,6 +105,11 @@ public class DimensionSelectController
     /// </summary>
     public event Action OnBothConfirmed;
 
+    /// <summary>
+    /// 확정할 수 없는 차원을 확정하려 했을 때 (진영)
+    /// </summary>
+    public event Action<PlayerSide> OnConfirmDenied;
+
     private readonly int[] cursors = new int[2];
     private readonly bool[] confirmed = new bool[2];
 
@@ -270,6 +275,7 @@ public class DimensionSelectController
         int i = (int)_side;
         if (false == confirmed[i] && false == CanConfirm(_side, cursors[i]))
         {
+            OnConfirmDenied?.Invoke(_side);
             return false;
         }
 

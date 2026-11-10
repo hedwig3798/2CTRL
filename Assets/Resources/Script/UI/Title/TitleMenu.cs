@@ -14,6 +14,8 @@ public class TitleMenu
 {
     [SerializeField] private Button startButton;
     [SerializeField] private string gameSceneName = "DimensionSelectScene";
+    [Tooltip("시작 버튼 소리")]
+    [SerializeField] private SoundId startSound = SoundId.UI_START;
 
     [Header("설정")]
     [SerializeField] private Button settingsButton;
@@ -25,6 +27,8 @@ public class TitleMenu
         if (null != startButton)
         {
             startButton.onClick.AddListener(OnClickStart);
+            // 자동 부착 클릭음(UI_CLICK) 대신 시작음
+            UIButtonSound.Assign(startButton, startSound);
         }
         if (null != settingsButton)
         {

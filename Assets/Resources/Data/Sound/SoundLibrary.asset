@@ -1,0 +1,241 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 45b2b00c0bdba764ab624b3f63655a8a, type: 3}
+  m_Name: SoundLibrary
+  m_EditorClassIdentifier: Game.Runtime::SoundLibrary
+  events:
+  - {fileID: 11400000, guid: 49f9d8bd942542a4fa9a075bfccefde6, type: 2}
+  - {fileID: 11400000, guid: 56ce75b8720b93e46afcdeaf89ca8ac3, type: 2}
+  - {fileID: 11400000, guid: 0269cf1db91259d4b87477514a3ddcca, type: 2}
+  - {fileID: 11400000, guid: 3c6f745287084984eb205c7b7e60fdbc, type: 2}
+  - {fileID: 11400000, guid: 934999947c8f9244b84be2b7a0b0d047, type: 2}
+  - {fileID: 11400000, guid: 6359ec19d65a6d64aa4605f000669e11, type: 2}
+  - {fileID: 11400000, guid: 2b69015ce36d4ec4783bb8fd2957ab82, type: 2}
+  - {fileID: 11400000, guid: 4b7f73d2915effb4e80b69d07f3c90fb, type: 2}
+  - {fileID: 11400000, guid: 0d6870f4a83d83b4093a2d6361cd1388, type: 2}
+  - {fileID: 11400000, guid: 7d9d1a2fcbfdd3649947e288cc47f9e3, type: 2}
+  - {fileID: 11400000, guid: 82896c4a4a3926b4aae9f48ffe4ccfc0, type: 2}
+  - {fileID: 11400000, guid: d3f91cdfdc1f3494595eca9e80a9fb08, type: 2}
+  - {fileID: 11400000, guid: b6de84df9f1f8924e9556d2e445bf072, type: 2}
+  - {fileID: 11400000, guid: 15b12bb0ef139ac4a9a65007de5e5c52, type: 2}
+  - {fileID: 11400000, guid: 581fb99fb701f0f46ac83630a91b158c, type: 2}
+  - {fileID: 11400000, guid: 0dccaaed96d7d134687ae8973154a5d8, type: 2}
+  - {fileID: 11400000, guid: c020026555767c347848227b25a1f099, type: 2}
+  - {fileID: 11400000, guid: b74701a21e2f22241b78bcedcd6f7fd2, type: 2}
+  - {fileID: 11400000, guid: 920f100ed646946478d606cf4e851715, type: 2}
+  - {fileID: 11400000, guid: 116e499e625da624ab22ae8fae61ecad, type: 2}
+  - {fileID: 11400000, guid: dc02ee0ee0555754f866a19765f168dd, type: 2}
+  - {fileID: 11400000, guid: ece6b8560179a8a49b7d44eae0761ffc, type: 2}
+  - {fileID: 11400000, guid: 0fae925f1f46b1e4b954fee9406d17f8, type: 2}
+  - {fileID: 11400000, guid: 5b9fe4885c4846d4481a99ad09682f33, type: 2}
+  - {fileID: 11400000, guid: 8ece2d258dfec834a95297c643d0b60c, type: 2}
+  - {fileID: 11400000, guid: bc1ec42bdbaf2be4388ed5f1deb013bd, type: 2}
+  - {fileID: 11400000, guid: 2ed406c060f174342a2903fcf18df9c3, type: 2}
+  - {fileID: 11400000, guid: 6ecb3f0f5ff01e14f837cd2cbf17b36d, type: 2}
+  - {fileID: 11400000, guid: 9e6a0874868627a43b72e18f5b8c064f, type: 2}
+  - {fileID: 11400000, guid: 46fb24e80d563f941a0c0f8b0b245279, type: 2}
+  - {fileID: 11400000, guid: ee284fa079af82a4fb3d56840e06608b, type: 2}
+  - {fileID: 11400000, guid: 360826f640d43414b8ce85cb2b56aa9d, type: 2}
+  - {fileID: 11400000, guid: 40cf971235db57e42a43575316d15d0b, type: 2}
+  - {fileID: 11400000, guid: eb1dad36d43c04245bf49ecc54e58b11, type: 2}
+  - {fileID: 11400000, guid: 4ff0268c311d4f642ba6d488a16bdd55, type: 2}
+  - {fileID: 11400000, guid: 8300f307cda47b448b08c3f835fcab72, type: 2}
+  - {fileID: 11400000, guid: b45446e1da8387141bbf36c1fa6e3d80, type: 2}
+  - {fileID: 11400000, guid: b5109df1f295727418c5c51100d45ffc, type: 2}
+  - {fileID: 11400000, guid: c03a84694d4b91645972c64205ffd392, type: 2}
+  - {fileID: 11400000, guid: d3e21c16b2f3a7b438b4a5e1b4cae440, type: 2}
+  - {fileID: 11400000, guid: ab034b3a7838d3647b8b13e041c0897c, type: 2}
+  - {fileID: 11400000, guid: 8226b30c6244d7749821e051a32a9eea, type: 2}
+  - {fileID: 11400000, guid: 34b54057cd725cc408c3ef4a0933fec3, type: 2}
+  - {fileID: 11400000, guid: 3739c027c8388dc45bc5853ad0975e65, type: 2}
+  - {fileID: 11400000, guid: 1dc56604ef62dab4d9a9568d8d0e341d, type: 2}
+  - {fileID: 11400000, guid: 25438253988717742906da4471e87347, type: 2}
+  - {fileID: 11400000, guid: adecf809898ec5949b504e801da7ff25, type: 2}
+  - {fileID: 11400000, guid: ebbe7e66cac72d6458a02fc42fa5afd5, type: 2}
+  - {fileID: 11400000, guid: acdb27465554a434681d065af13bdd5a, type: 2}
+  - {fileID: 11400000, guid: 65145cd3ce6e37d489c69132ea588567, type: 2}
+  - {fileID: 11400000, guid: 3a9ede673d6e4a340bcc6d0b3d8d9243, type: 2}
+  - {fileID: 11400000, guid: 2afaf062b1d78e4469ac6d99b9568728, type: 2}
+  - {fileID: 11400000, guid: 0853f9969f299bc48b4f9e592c95bb3e, type: 2}
+  - {fileID: 11400000, guid: d08265f747120744a958c076b832be2c, type: 2}
+  - {fileID: 11400000, guid: d18a945d36bdd8e429a26ccc87777243, type: 2}
+  - {fileID: 11400000, guid: 848a53fd5e178b142b6aefc92a5efee0, type: 2}
+  - {fileID: 11400000, guid: 126e1e43f58d20f4fb0f196cf500737f, type: 2}
+  - {fileID: 11400000, guid: aaad028d39d3c914c9ef5bcf61252075, type: 2}
+  - {fileID: 11400000, guid: 8cfb8b48eb2bd3f4f8a5f62ef595b085, type: 2}
+  - {fileID: 11400000, guid: b601367176d1f2147b07eff77b86a1ef, type: 2}
+  - {fileID: 11400000, guid: 17280bdca863c3842913d36910a50d0e, type: 2}
+  - {fileID: 11400000, guid: d3b51f7d5d7f83e4fb30bbd492daf7c0, type: 2}
+  - {fileID: 11400000, guid: 1a92dd5650f0ee94bbcc91fbf44377cf, type: 2}
+  - {fileID: 11400000, guid: 28c98ffdf455b10428ce00709b9aaaf1, type: 2}
+  - {fileID: 11400000, guid: cc8ae51d15c570f46901b9cbb7f81ed6, type: 2}
+  - {fileID: 11400000, guid: 61fd555a4d35c464aaefef948714e857, type: 2}
+  - {fileID: 11400000, guid: 86a203867b4a75b4c8cdcc97e34d2f81, type: 2}
+  - {fileID: 11400000, guid: 75e1f773d84b14a48ad3a7fdc0437b3c, type: 2}
+  - {fileID: 11400000, guid: 1217a1f151e919145bb3528e2a0db71e, type: 2}
+  - {fileID: 11400000, guid: f83b2fbb6d05f8141962c5d2b5076fd3, type: 2}
+  groupGains:
+  - group: 0
+    gainDb: -6
+  - group: 1
+    gainDb: -10
+  - group: 2
+    gainDb: -12
+  - group: 3
+    gainDb: -14
+  - group: 4
+    gainDb: -22
+  - group: 5
+    gainDb: -20
+  - group: 6
+    gainDb: -16
+  weapons:
+  - weaponKey: Boomerang
+    fire: 400
+    hit: 500
+    loop: 0
+  - weaponKey: PoisonZone
+    fire: 401
+    hit: 500
+    loop: 0
+  - weaponKey: Sweep
+    fire: 403
+    hit: 500
+    loop: 0
+  - weaponKey: SplitShot
+    fire: 404
+    hit: 500
+    loop: 0
+  - weaponKey: Vine
+    fire: 0
+    hit: 500
+    loop: 0
+  - weaponKey: Spirit
+    fire: 407
+    hit: 500
+    loop: 0
+  - weaponKey: Root
+    fire: 409
+    hit: 500
+    loop: 0
+  - weaponKey: Laser
+    fire: 410
+    hit: 501
+    loop: 0
+  - weaponKey: Drone
+    fire: 0
+    hit: 501
+    loop: 0
+  - weaponKey: gun
+    fire: 411
+    hit: 501
+    loop: 0
+  - weaponKey: Mine
+    fire: 412
+    hit: 501
+    loop: 0
+  - weaponKey: Saw
+    fire: 0
+    hit: 501
+    loop: 414
+  - weaponKey: Flame
+    fire: 0
+    hit: 501
+    loop: 415
+  - weaponKey: SpinBlade
+    fire: 0
+    hit: 501
+    loop: 417
+  - weaponKey: Chain
+    fire: 418
+    hit: 502
+    loop: 0
+  - weaponKey: Shockwave
+    fire: 419
+    hit: 502
+    loop: 0
+  - weaponKey: Explosive
+    fire: 420
+    hit: 502
+    loop: 0
+  - weaponKey: Tornado
+    fire: 0
+    hit: 502
+    loop: 422
+  - weaponKey: Lightning
+    fire: 423
+    hit: 502
+    loop: 0
+  - weaponKey: StormOrb
+    fire: 0
+    hit: 502
+    loop: 425
+  monsters:
+  - monsterKey: BomberData
+    die: 601
+  - monsterKey: WraithData
+    die: 601
+  - monsterKey: ShamanData
+    die: 601
+  - monsterKey: GolemData
+    die: 602
+  - monsterKey: SlimeData
+    die: 600
+  - monsterKey: MiniSlimeData
+    die: 600
+  defaultMonsterDie: 600
+  effects:
+  - effectKey: MineExplosion
+    sound: 413
+  - effectKey: ExplosiveExplosionEffect
+    sound: 421
+  - effectKey: SplitShotBurst
+    sound: 405
+  - effectKey: BomberExplosion
+    sound: 604
+  dimensions:
+  - dimensionKey: Forest
+    confirm: 111
+    layer: 905
+  - dimensionKey: Factory
+    confirm: 112
+    layer: 906
+  - dimensionKey: Storm
+    confirm: 113
+    layer: 907
+  bgmScenes:
+  - sceneName: TitleScene
+    mode: 1
+    single: 900
+  - sceneName: DimensionSelectScene
+    mode: 1
+    single: 901
+  - sceneName: GameScene
+    mode: 2
+    single: 0
+  bgmLayerPan: 0.6
+  bgmBpm: 128
+  bgmMidFromWave: 3
+  bgmHighFromWave: 6
+  bgmCrossfadeBars: 2
+  bgmPauseCutoff: 900
+  bgmPauseDb: -6
+  rushWaveIndex: 10
+  lowHpRatio: 0.25
+  starUpgradeLevels: 050000000a000000i
+  cullViewportMargin: 0.1
+  cameraRetryInterval: 1
+  oneShotVoices: 16
+  loopVoices: 6
+  expComboWindow: 0.4
+  expComboStepSemitones: 1
+  expComboMaxSemitones: 12

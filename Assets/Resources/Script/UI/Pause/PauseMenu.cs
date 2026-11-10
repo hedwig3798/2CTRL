@@ -29,12 +29,20 @@ public class PauseMenu
     [Tooltip("Build Settings 에 등록된 타이틀 씬 이름")]
     [SerializeField] private string titleSceneName = "TitleScene";
 
+    [Header("sound")]
+    [SerializeField] private SoundId openSound = SoundId.PAUSE_OPEN;
+    [Tooltip("ESC / 재개 버튼으로 닫을 때 (재개 버튼의 자동 클릭음은 끈다)")]
+    [SerializeField] private SoundId closeSound = SoundId.PAUSE_CLOSE;
+
     private bool isOpen;
 
     public bool IsOpen => isOpen;
 
     private void Awake()
     {
+        // 재개 버튼은 Close 의 closeSound 가 대신한다 (클릭음과 겹치지 않도록)
+        UIButtonSound.Assign(resumeButton, SoundId.None);
+
         if (null != panel)
         {
             panel.SetActive(false);
@@ -132,6 +140,7 @@ public class PauseMenu
 
         isOpen = true;
         GamePause.Pause(this);
+        SoundManager.Play(openSound);
         if (null != panel)
         {
             panel.SetActive(true);
@@ -158,6 +167,7 @@ public class PauseMenu
             panel.SetActive(false);
         }
         GamePause.Resume(this);
+        SoundManager.Play(closeSound);
     }
 
     public void OpenSettings()

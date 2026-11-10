@@ -1,0 +1,26 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2be203dca700cc94caa1fc749d68ff21, type: 3}
+  m_Name: WPN_MINE_SET
+  m_EditorClassIdentifier: Game.Runtime::SoundEvent
+  id: 412
+  clips:
+  - {fileID: 8300000, guid: 42e97a90a0c22184eb36005fcb661f38, type: 3}
+  group: 3
+  volume: 1
+  pitchMin: 0.94
+  pitchMax: 1.06
+  minInterval: 0.06
+  maxVoices: 2
+  ignorePause: 0
+  priority: 128
+  loop: 0

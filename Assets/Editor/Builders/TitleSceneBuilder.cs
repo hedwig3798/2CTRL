@@ -55,7 +55,7 @@ namespace Builders
             Scene scene = EditorSceneManager.NewScene(NewSceneSetup.EmptyScene, NewSceneMode.Single);
 
             // 1. Camera
-            var camGo = new GameObject("Main Camera", typeof(Camera), typeof(AudioListener));
+            var camGo = new GameObject("Main Camera", typeof(Camera));
             camGo.tag = "MainCamera";
             System.Type urpCam = System.Type.GetType("UnityEngine.Rendering.Universal.UniversalAdditionalCameraData, Unity.RenderPipelines.Universal.Runtime");
             if (null != urpCam)

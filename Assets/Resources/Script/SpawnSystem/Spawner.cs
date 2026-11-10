@@ -98,6 +98,16 @@ public class Spawner
     public System.Action<Spawner> OnAllWavesFinished;
 
     /// <summary>
+    /// 웨이브가 시작될 때 (이 Spawner, 웨이브 번호 0 부터). 웨이브 효과음 등에 쓴다
+    /// </summary>
+    public System.Action<Spawner, int> OnWaveChanged;
+
+    /// <summary>
+    /// 웨이브 데이터 수 (마지막 웨이브 = WaveCount - 1)
+    /// </summary>
+    public int WaveCount => null != waveArray ? waveArray.Length : 0;
+
+    /// <summary>
     /// 모든 웨이브의 time 이 끝났는지
     /// </summary>
     public bool IsFinished => isFinished;
@@ -609,6 +619,8 @@ public class Spawner
             {
                 spawCoroutine.Add(StartCoroutine(Spawn(waveArray[i].spwanArray[j])));
             }
+
+            OnWaveChanged?.Invoke(this, i);
 
 #if UNITY_EDITOR || DEVELOPMENT_BUILD
             // 디버그 : DebugSkipWave 가 요청되면 대기를 끊고 다음 웨이브로 넘어간다

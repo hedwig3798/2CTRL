@@ -189,7 +189,7 @@ namespace Builders
                 .FirstOrDefault(c => null != c && (c.CompareTag("MainCamera") || c.name == CAMERA_NAME));
             if (null == cam)
             {
-                var go = new GameObject(CAMERA_NAME, typeof(Camera), typeof(AudioListener));
+                var go = new GameObject(CAMERA_NAME, typeof(Camera));
                 SceneManager.MoveGameObjectToScene(go, _scene);
                 go.tag = "MainCamera";
                 cam = go.GetComponent<Camera>();

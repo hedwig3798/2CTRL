@@ -18,6 +18,11 @@ public class PoisonZoneLandMovement
     [Tooltip("날아가는 동안 위로 솟는 높이 (던지는 연출). 0 이면 직선")]
     public float arcHeight = 0.8f;
 
+    [Header("sound")]
+    [Tooltip("날아가서 착지한 순간 (바로 착지하면 내지 않는다)")]
+    [SerializeField]
+    private SoundId landSound = SoundId.WPN_POISON_LAND;
+
     private float baseFlightTime;
     private float currFlightTime;
     private float elapsed;
@@ -78,6 +83,7 @@ public class PoisonZoneLandMovement
         {
             transform.position = endPoint;
             landed = true;
+            SoundManager.Play(landSound, SoundLayerSide.GetSide(gameObject.layer));
             return;
         }
 

@@ -38,6 +38,13 @@ public class MonsterBrain
     /// </summary>
     public event Action<MonsterBrain> OnDespawned;
 
+    /// <summary>
+    /// 아무 몬스터의 행동 예고 시작 / 행동 시작(OnActionStart 직후) / 부활 (효과음용, CombatSoundBinder 가 구독)
+    /// </summary>
+    public static event Action<MonsterBrain, KeywordRuntime> AnyActionTelegraph;
+    public static event Action<MonsterBrain, KeywordRuntime> AnyActionStarted;
+    public static event Action<MonsterBrain> AnyRevived;
+
     private MonsterContext ctx;
     private KeywordRuntime[] runtimes;
     private StateMachine machine;
@@ -272,6 +279,15 @@ public class MonsterBrain
     public void RaiseActionTelegraph(KeywordRuntime _rt)
     {
         OnActionTelegraph?.Invoke(_rt);
+        AnyActionTelegraph?.Invoke(this, _rt);
+    }
+
+    /// <summary>
+    /// 행동 상태에 들어가 OnActionStart 를 부른 직후 (MonsterActionState 가 호출)
+    /// </summary>
+    public void RaiseActionStarted(KeywordRuntime _rt)
+    {
+        AnyActionStarted?.Invoke(this, _rt);
     }
 
     /// <summary>
@@ -293,6 +309,16 @@ public class MonsterBrain
         }
 
         machine.ChangeState(moveState);
+        AnyRevived?.Invoke(this);
+    }
+
+    // Enter Play Mode 옵션으로 도메인 리로드를 끈 경우를 위해 static 초기화
+    [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
+    private static void ResetStatics()
+    {
+        AnyActionTelegraph = null;
+        AnyActionStarted = null;
+        AnyRevived = null;
     }
 
     private void HandleStateChanged(MonsterStateId _id)

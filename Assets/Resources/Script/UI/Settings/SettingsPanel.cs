@@ -37,6 +37,9 @@ public class SettingsPanel
     [Header("닫기")]
     [SerializeField] private Button closeButton;
 
+    [Tooltip("창을 닫을 때 (닫기 버튼 / ESC)")]
+    [SerializeField] private SoundId closeSound = SoundId.UI_BACK;
+
     // TMP_Dropdown 이 펼친 목록 오브젝트 이름 (템플릿의 부모 = 드롭다운 아래에 만들어진다)
     private const string DROPDOWN_LIST_NAME = "Dropdown List";
 
@@ -85,11 +88,15 @@ public class SettingsPanel
 
         gameObject.SetActive(false);
         GameSettings.Save();
+        SoundManager.Play(closeSound);
         OnClosed?.Invoke();
     }
 
     private void Awake()
     {
+        // 닫기 버튼은 Close 의 closeSound 가 대신한다 (클릭음과 겹치지 않도록)
+        UIButtonSound.Assign(closeButton, SoundId.None);
+
         if (null == volumeRows || 0 == volumeRows.Length)
         {
             volumeRows = GetComponentsInChildren<VolumeSettingRow>(true);
