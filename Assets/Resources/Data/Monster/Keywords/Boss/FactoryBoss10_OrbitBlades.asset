@@ -1,0 +1,24 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 50eb7276d2c81824c868c29d767f8a89, type: 3}
+  m_Name: FactoryBoss10_OrbitBlades
+  m_EditorClassIdentifier: Game.Runtime::OrbitBladesKeyword
+  bladePrefab: {fileID: 4524667010873307123, guid: e69707a64acb4e5468b62e3bbcb0ba77, type: 3}
+  count: 3
+  enragedCount: 4
+  enrageHPRatio: 0.5
+  radius: 2.2
+  angularSpeed: 45
+  hitRadius: 0.5
+  damage: 15
+  hitCooldown: 0.5
+  rotateBlades: 1

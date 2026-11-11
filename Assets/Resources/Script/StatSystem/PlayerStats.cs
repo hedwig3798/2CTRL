@@ -41,6 +41,10 @@ public class PlayerStats
     private readonly float[] addValues = new float[StatCount];
     private readonly float[] mulValues = new float[StatCount];
 
+    // 시간 제한 임시 둔화 (MoveSpeed Multiply 로 적용 중인 비율과 종료 시각, Time.time 기준)
+    private float timedSlowRate = 0f;
+    private float timedSlowEndTime = 0f;
+
     // AddWeapon 으로 얻은 무기 (프리팹 → 생성된 무기), 같은 무기를 두 번 얻지 않도록 사용
     private readonly Dictionary<Weapon, Weapon> acquiredWeapons = new Dictionary<Weapon, Weapon>();
 
@@ -129,10 +133,78 @@ public class PlayerStats
     }
 
     /// <summary>
+    /// 지금 걸려 있는 임시 둔화 비율 (없으면 0)
+    /// </summary>
+    public float TimedSlowRate => timedSlowRate;
+
+    /// <summary>
+    /// 임시 둔화가 풀리는 Time.time (없으면 0)
+    /// </summary>
+    public float TimedSlowEndTime => timedSlowEndTime;
+
+    /// <summary>
+    /// _duration 초 동안 이동 속도를 _rate 만큼 줄인다 (0.4 = -40%, MoveSpeed Multiply 로 적용)
+    /// 이미 둔화 중이면 더 강한 비율과 더 늦은 종료 시각을 쓴다. 종료 시각이 지나면 Update 에서 되돌린다
+    /// </summary>
+    public void ApplyTimedSlow(float _rate, float _duration)
+    {
+        _rate = Mathf.Clamp01(_rate);
+        if (_rate <= 0f || _duration <= 0f)
+        {
+            return;
+        }
+
+        float endTime = Time.time + _duration;
+        if (timedSlowRate > 0f && Time.time < timedSlowEndTime)
+        {
+            endTime = Mathf.Max(endTime, timedSlowEndTime);
+        }
+        else
+        {
+            ClearTimedSlow();
+        }
+        timedSlowEndTime = endTime;
+
+        if (_rate > timedSlowRate)
+        {
+            float delta = _rate - timedSlowRate;
+            timedSlowRate = _rate;
+            AddModifier(ValueType.MoveSpeed, StatModifierMode.Multiply, -delta);
+        }
+    }
+
+    /// <summary>
+    /// 임시 둔화를 바로 푼다
+    /// </summary>
+    public void ClearTimedSlow()
+    {
+        timedSlowEndTime = 0f;
+        if (timedSlowRate <= 0f)
+        {
+            return;
+        }
+
+        float rate = timedSlowRate;
+        timedSlowRate = 0f;
+        AddModifier(ValueType.MoveSpeed, StatModifierMode.Multiply, rate);
+    }
+
+    private void Update()
+    {
+        if (timedSlowRate > 0f && Time.time >= timedSlowEndTime)
+        {
+            ClearTimedSlow();
+        }
+    }
+
+    /// <summary>
     /// 보상으로 누적된 ΣAdd / ΣMultiply 를 모두 0 으로 되돌린다 (base 는 유지. 무기 테스트 씬 등 디버그용)
     /// </summary>
     public void ResetModifiers()
     {
+        // 임시 둔화도 배열과 함께 지워진다
+        timedSlowRate = 0f;
+        timedSlowEndTime = 0f;
         Array.Clear(addValues, 0, addValues.Length);
         Array.Clear(mulValues, 0, mulValues.Length);
         OnStatChanged?.Invoke(this);
@@ -281,6 +353,8 @@ public class PlayerStats
 
     private void OnDisable()
     {
+        ClearTimedSlow();
+
         if (registry.TryGetValue(side, out PlayerStats registered) && this == registered)
         {
             registry.Remove(side);

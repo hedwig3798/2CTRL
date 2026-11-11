@@ -237,3 +237,13 @@ upgrade.star_orbs_plus_2_4_total,★ 구체 +2 (4개),★ Orbs +2 (4 total)
 upgrade.orbs_plus_2_4_total,구체 +2 (4개),Orbs +2 (4 total)
 upgrade.star_electric_link,★ 전기선 연결,★ Electric Link
 upgrade.electric_link,전기선 연결,Electric Link
+# 중간 보스
+boss.ForestBoss10,뿌리 거인,Root Giant
+boss.FactoryBoss10,톱날 기계,Sawblade Machine
+boss.StormBoss10,폭풍의 눈,Eye of the Storm
+boss.ForestBoss20,도약하는 고목,Leaping Elder Tree
+boss.FactoryBoss20,폭주 기관,Runaway Engine
+boss.StormBoss20,판정의 고리,Ring of Judgment
+ui.boss.warning,경고! {0} 출현,Warning! {0} approaches
+ui.boss.reward_title,보스 보상,Boss Reward
+boss.FinalBoss.name,차원의 군주,Lord of Dimensions

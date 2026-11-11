@@ -442,6 +442,7 @@ MonoBehaviour:
   markDelay: 0.5
   defaultAreaRadius: 0.8
   effectDuration: 0.25
+  strikeSound: 424
   linkDamageRate: 0.6
   linkWidth: 0.6
   markerTemplate: {fileID: 2414644907650702767}

@@ -35,9 +35,11 @@ Unity 제어: Unity CLI(`unity`, Pipeline 패키지). 열린 에디터는 `unity
 3. 기본 테스트만으로 "완료"라고 하지 말 것. 직접 실행해서 화면을 보고, 사람이 플레이하기 전까지 끝이 아니다.
 4. 같은 실수를 반복하지 말 것. 실수는 여기에 한줄씩 적는다.
    - 발사체·이펙트 렌더러를 Default 정렬 레이어로 두지 말 것 (BG 보다 먼저 그려져 GameScene 바닥에 가려짐). 무기는 `attack` 레이어.
-   - `InGameHudBuilder` 를 다시 돌린 뒤에는 `Builders.Visual.InGameHudVisual.Build()` 도 실행 (안 하면 슬롯 프레임·레벨 배지가 사라짐).
+   - `InGameHudBuilder` 를 다시 돌린 뒤에는 `Builders.Visual.InGameHudVisual.Build()` 와 `Builders.Visual.BossVisual.Build()` 도 실행 (안 하면 슬롯 프레임·레벨 배지·보스 경고 배너가 사라짐).
    - 아트는 `Builders.Visual.ArtResourceBuilder.Build()` 로 적용한다. 다른 씬·프리팹 빌더를 다시 돌린 뒤에는 이것도 다시 실행 (안 하면 아트가 덮어써짐).
    - internal 헬퍼(예: `SettingsUIKit`)를 쓰는 빌더는 `script run` 이 CS0122 로 실패한다. `unity command script eval "return Builders.X.Build();"` 로 실행.
    - 무기 프리팹을 다시 만드는 빌더를 돌린 뒤에는 `Builders.WeaponTagBuilder.Build()` 도 다시 실행 (안 하면 무기 태그가 All 로 돌아감).
    - 런타임에 Instantiate 하는 연출·오브젝트는 낸 쪽의 레이어로 맞출 것 (분할 카메라 culling mask 에 Default 가 없어 안 보임). `EffectPool.Spawn` 은 레이어 인자 필수.
+   - URP 에서 화면 위에 덮어 그릴 카메라는 Base 로 만들지 말 것 (배경을 보존하지 못해 아래 화면을 통째로 덮음). 해당 Base 카메라의 스택에 Overlay 카메라로 붙인다.
+   - `Game.Editor` / `Game.Runtime` asmdef 에 URP 참조가 없다. URP 타입(UniversalAdditionalCameraData 등)을 직접 쓰면 컴파일 실패 — SerializedObject 로 다룬다.
    - `capture game_view --save_path` 는 절대 경로를 줘도 `Assets/` 아래에 저장된다. 캡처 후 `.claude/tmp/` 로 옮기고 지울 것. Game 뷰가 Free Aspect 면 캡처가 찌그러진다.

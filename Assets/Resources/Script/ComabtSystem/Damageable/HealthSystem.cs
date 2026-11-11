@@ -89,6 +89,30 @@ public class HealthSystem
         set => isInvincibility = value;
     }
 
+    // 즉사(Execute) 면역. 켜면 Execute 가 일반 데미지로 처리된다 (중간 보스)
+    private bool isExecuteImmune = false;
+
+    /// <summary>
+    /// 즉사(Execute) 면역 여부. Initialize 에서 리셋하지 않으므로 쓰는 쪽(MidBoss)이 켠다
+    /// </summary>
+    public bool IsExecuteImmune
+    {
+        get => isExecuteImmune;
+        set => isExecuteImmune = value;
+    }
+
+    private float incomingDamageMultiplier = 1f;
+
+    /// <summary>
+    /// 받는 데미지 배율 (기본 1, 0 이면 데미지를 받지 않음). 공장 20분 보스 과열(×1.5)·도약 중 피격 불가(0) 등
+    /// Initialize 에서 리셋하지 않으므로 바꾼 쪽이 되돌린다
+    /// </summary>
+    public float IncomingDamageMultiplier
+    {
+        get => incomingDamageMultiplier;
+        set => incomingDamageMultiplier = Mathf.Max(0f, value);
+    }
+
     private DropManager boundDropManager;
 
     // 죽을 때 드롭할 EXP 배율 (Initialize 에서 BlackBoard 의 expRate 를 저장, 0 이하면 DropManager 기본값)
@@ -184,7 +208,8 @@ public class HealthSystem
         }
 
         float prevHP = CurrHP;
-        CurrHP -= _msg.damage;
+        float damage = _msg.damage * incomingDamageMultiplier;
+        CurrHP -= damage;
         if (CurrHP <= 0)
         {
             CurrHP = 0;
@@ -194,7 +219,7 @@ public class HealthSystem
         float appliedDamage = prevHP - CurrHP;
 
         // 무적이면 HP 가 다시 채워지므로 받은 데미지를 그대로 출력
-        float displayDamage = (true == isInvincibility) ? _msg.damage : appliedDamage;
+        float displayDamage = (true == isInvincibility) ? damage : appliedDamage;
         if (0f < displayDamage)
         {
             OnDamaged?.Invoke(displayDamage);
@@ -235,9 +260,16 @@ public class HealthSystem
     /// <summary>
     /// 즉사. 남은 HP 전부를 _msg 의 무기 데미지로 처리하고 부활 가로채기 없이 최종 사망한다
     /// 부활 대기(다운) 중이면 바로 최종 사망으로 넘긴다. 무적이면 ProcessDamage 처럼 죽지 않는다
+    /// 즉사 면역(IsExecuteImmune)이면 _msg 의 데미지를 일반 데미지로 처리한다
     /// </summary>
     public void Execute(ref DamageMassage _msg)
     {
+        if (true == isExecuteImmune)
+        {
+            ProcessDamage(ref _msg);
+            return;
+        }
+
         if (true == isDowned)
         {
             isExecuted = true;

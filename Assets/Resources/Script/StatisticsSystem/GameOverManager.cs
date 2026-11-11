@@ -280,12 +280,24 @@ public class GameOverManager
 
     private void HandleWavesFinished(Spawner _spawner)
     {
+        if (true == isGameOver)
+        {
+            return;
+        }
+
         foreach (Spawner spawner in spawners)
         {
             if (null != spawner && false == spawner.IsFinished)
             {
                 return;
             }
+        }
+
+        // 활성 최종 보스 Director 가 있으면 승리 대신 보스전 시작 (처치 시 TriggerVictory)
+        FinalBossDirector director = FinalBossDirector.Active;
+        if (null != director && true == director.isActiveAndEnabled && true == director.Begin())
+        {
+            return;
         }
 
         TriggerVictory();

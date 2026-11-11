@@ -64,6 +64,41 @@ public class EventManager
     /// </summary>
     public Action<PlayerSide> OnPlayerDeath;
 
+    /// <summary>
+    /// 중간 보스 출현 예고 (보스가 나올 진영, 보스 프리팹의 MidBoss. 씬 인스턴스가 아니므로 표시 정보만 읽는다)
+    /// </summary>
+    public Action<PlayerSide, MidBoss> OnBossWarning;
+
+    /// <summary>
+    /// 중간 보스 출현 (보스가 나온 진영, 스폰된 보스)
+    /// </summary>
+    public Action<PlayerSide, MidBoss> OnBossSpawned;
+
+    /// <summary>
+    /// 중간 보스 처치 (보스가 나온 진영 = 처치한 진영, 처치된 보스). LevelUpUI 가 보스 보상을 연다
+    /// </summary>
+    public Action<PlayerSide, MidBoss> OnBossDefeated;
+
+    /// <summary>
+    /// 경고만 하고 아직 나오지 않은 중간 보스 출현 취소 (진영). BossHudUI 가 경고 배너를 숨긴다
+    /// </summary>
+    public Action<PlayerSide> OnBossWarningCancelled;
+
+    /// <summary>
+    /// 최종 보스전 시작 (모든 웨이브 종료 직후, 인트로 연출 시작). HP 바 표시
+    /// </summary>
+    public Action OnFinalBossStart;
+
+    /// <summary>
+    /// 최종 보스 HP 변경 (현재치, 최대치)
+    /// </summary>
+    public Action<float, float> OnFinalBossHPChanged;
+
+    /// <summary>
+    /// 최종 보스 처치. FinalBossDirector 가 GameOverManager.TriggerVictory 를 부른다
+    /// </summary>
+    public Action OnFinalBossDefeated;
+
     #endregion
 
     public static EventManager Instance

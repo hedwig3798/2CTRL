@@ -1,0 +1,27 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b4b90efb8938ce54684ed8b61a74877b, type: 3}
+  m_Name: FactoryBoss20_ScreenBounce
+  m_EditorClassIdentifier: Game.Runtime::ScreenBounceKeyword
+  speed: 7
+  edgeInset: 1
+  overheatInterval: 8
+  overheatDuration: 2.5
+  overheatDamageMultiplier: 1.5
+  enrageHPRatio: 0.5
+  enragedSpeed: 9
+  dropMinesWhenEnraged: 1
+  mineDelay: 2
+  mineRadius: 1.5
+  mineDamage: 20
+  telegraphStyle: {fileID: 11400000, guid: fa1044dba1f8e9242a7fa85742b14994, type: 2}
+  mineColor: {r: 1, g: 0.25, b: 0.1, a: 0.9}

@@ -502,6 +502,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Game.Runtime::TitleMenu
   startButton: {fileID: 7334354}
   gameSceneName: DimensionSelectScene
+  startSound: 105
   settingsButton: {fileID: 214537194}
   settingsPanel: {fileID: 14734829}
 --- !u!114 &111222150

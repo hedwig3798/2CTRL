@@ -49,6 +49,19 @@ MonoBehaviour:
   - monster: {fileID: 11400000, guid: f37e7a716d20b074fad33787132250a4, type: 2}
     animator: {fileID: 22100000, guid: 2f50b724ca8073e4aa23f322d6b5a913, type: 2}
     sprite: {fileID: 6944624050992326926, guid: bd57136bca137f84b86354241862fbc5, type: 3}
+  midBosses:
+  - prefab: {fileID: 6125221506366034990, guid: a6b75ddcaa97e69429833b30d639e72f, type: 3}
+    spawnTime: 600
+    warningLead: 3
+    spawnCountMultiplier: 0.7
+    expTotal: 60
+    gemCount: 12
+  - prefab: {fileID: 4488691559444149342, guid: f4b2d1a5943d17541b51658c11df35f6, type: 3}
+    spawnTime: 1200
+    warningLead: 3
+    spawnCountMultiplier: 0.6
+    expTotal: 150
+    gemCount: 20
   chunkLoaderPrefab: {fileID: 7907613963683787990, guid: 85fd78786f8f5e24bb47ca80ff0422cc, type: 3}
   playerAnimator: {fileID: 22100000, guid: 731748bca97b7f941825991cf203cdac, type: 2}
   playerSprite: {fileID: -3348434432890180856, guid: 832986b125c96ac438ef71014b9c6893, type: 3}

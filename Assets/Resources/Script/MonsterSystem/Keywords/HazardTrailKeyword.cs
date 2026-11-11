@@ -29,6 +29,10 @@ public class HazardTrailKeyword
     [Min(0f)]
     public float damagePerTick = 3f;
 
+    [Tooltip("장판 안 플레이어 이동 둔화 비율 (0 이면 둔화 없음, 0.4 = -40%)")]
+    [Range(0f, 1f)]
+    public float slowRate = 0f;
+
     public override MonsterKeywordCategory Category => MonsterKeywordCategory.Attack;
 
     public override KeywordRuntime CreateRuntime()
@@ -70,6 +74,8 @@ public class HazardTrailRuntime
             , data.tickInterval
             , data.damagePerTick * _ctx.damageRate
             , _ctx.TargetLayer
-            , _ctx.pipeline);
+            , _ctx.pipeline
+            , data.slowRate
+            , _ctx.root.gameObject.layer);
     }
 }

@@ -143,6 +143,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::PoisonZoneLandMovement
   flightTime: 0.3
   arcHeight: 0.8
+  landSound: 402
 --- !u!114 &3136798487399242752
 MonoBehaviour:
   m_ObjectHideFlags: 0

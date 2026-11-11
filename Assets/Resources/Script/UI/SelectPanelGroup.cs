@@ -57,6 +57,12 @@ public class SelectPanelGroup
 
     private bool isInitialized = false;
 
+    /// <summary>
+    /// 레벨업 이벤트를 받으면 스스로 보상을 다시 뽑을지 (기본 true)
+    /// LevelUpUI 가 보상 순서(일반 레벨업 / 보스 보상)를 관리할 때는 끄고 직접 RefreshRewards / RefreshBossRewards 를 부른다
+    /// </summary>
+    public bool AutoRefreshOnLevelUp { get; set; } = true;
+
     // 패널의 첫 번째 데이터를 뽑을 풀
     private static readonly RewardPoolType[] MainPoolTypes =
     {
@@ -117,12 +123,50 @@ public class SelectPanelGroup
 
     private void HandleLevelUp(GameObject _owner, int _amount)
     {
-        if (_amount <= 0)
+        if (_amount <= 0 || false == AutoRefreshOnLevelUp)
         {
             return;
         }
 
         RefreshRewards();
+    }
+
+    // 보스 보상 풀 목록 버퍼
+    private readonly List<RewardPoolType> bossTypeBuffer = new List<RewardPoolType>();
+
+    /// <summary>
+    /// 보스 보상: Weapon / WeaponUpgrade 풀에서만 뽑고 디버프는 없다
+    /// 보스 보상 풀이 비어 있으면 일반 레벨업 보상(RefreshRewards)으로 대신 채운다. 보스 보상으로 채웠으면 true
+    /// </summary>
+    public bool RefreshBossRewards()
+    {
+        PlayerStats player = PlayerStats.Find(side);
+        BossRewardRules.GetPoolTypes(null != player && true == player.IsWeaponFull, bossTypeBuffer);
+
+        RefreshRewards(bossTypeBuffer, System.Array.Empty<RewardPoolType>());
+
+        if (true == BossRewardRules.ShouldFallback(CountVisiblePanels()))
+        {
+            RefreshRewards();
+            return false;
+        }
+        return true;
+    }
+
+    /// <summary>
+    /// 보이는 패널 수
+    /// </summary>
+    public int CountVisiblePanels()
+    {
+        int count = 0;
+        foreach (SelectPanel selectPanel in selectPanels)
+        {
+            if (null != selectPanel && true == selectPanel.gameObject.activeSelf)
+            {
+                ++count;
+            }
+        }
+        return count;
     }
 
     /// <summary>

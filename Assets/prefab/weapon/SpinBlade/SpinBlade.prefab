@@ -302,4 +302,5 @@ MonoBehaviour:
   - {fileID: 1100199581859127840}
   telegraphDuration: 1.5
   startRadius: 0
+  tellSound: 416
   sortingLayerName: attack

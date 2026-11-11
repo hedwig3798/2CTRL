@@ -144,6 +144,52 @@ public class BgmDirector
 
     public static BgmMode CurrentMode => null != instance ? instance.mode : BgmMode.None;
 
+    // 씬 BGM 대신 재생 중인 덮어쓰기 BGM (최종 보스 등). 씬이 바뀌면 해제
+    private bool overrideActive = false;
+
+    /// <summary>
+    /// 덮어쓰기 BGM 재생 중인지
+    /// </summary>
+    public static bool HasOverride => null != instance && true == instance.overrideActive;
+
+    /// <summary>
+    /// 씬 BGM 을 _id 한 곡으로 크로스페이드해 덮어쓴다 (전투 강도 전환 중지). _id 가 None 이거나 클립이 없으면 무시
+    /// </summary>
+    public static void PlayOverride(SoundId _id)
+    {
+        if (null == instance || SoundId.None == _id || null == instance.library)
+        {
+            return;
+        }
+        if (false == instance.library.TryGetEvent(_id, out SoundEvent evt) || null == evt || null == FirstClip(evt))
+        {
+            Debug.LogWarning("[BgmDirector] 덮어쓰기 BGM 클립이 없습니다: " + _id);
+            return;
+        }
+
+        instance.overrideActive = true;
+        instance.PlaySingle(_id);
+    }
+
+    /// <summary>
+    /// 덮어쓰기를 풀고 현재 씬의 BGM 을 다시 적용한다
+    /// </summary>
+    public static void ClearOverride()
+    {
+        if (null == instance || false == instance.overrideActive)
+        {
+            return;
+        }
+
+        instance.overrideActive = false;
+        instance.hasAppliedScene = false;
+        Scene active = SceneManager.GetActiveScene();
+        if (true == active.isLoaded)
+        {
+            instance.ApplyScene(active);
+        }
+    }
+
     /// <summary>
     /// 재생 중인 BGM 을 페이드 없이 즉시 멈춘다 (게임 오버 연출 시작 등)
     /// </summary>
@@ -410,6 +456,7 @@ public class BgmDirector
         }
         hasAppliedScene = true;
         appliedScene = _scene;
+        overrideActive = false;
 
         UnbindScene();
         lastWaveIndex = -1;
@@ -737,7 +784,7 @@ public class BgmDirector
 
     private void HandleGameOver()
     {
-        if (BgmMode.Combat == mode)
+        if (BgmMode.Combat == mode || true == overrideActive)
         {
             StopAll(gameOverFadeSeconds);
         }

@@ -40,6 +40,11 @@ public class DimensionData
     [SerializeField]
     private MonsterSkin[] monsterSkins;
 
+    [Header("Boss")]
+    [Tooltip("상대 진영 스포너에서 나올 중간 보스 (10분·20분)")]
+    [SerializeField]
+    private MidBossEntry[] midBosses;
+
     [Header("Map")]
     [Tooltip("이 진영의 맵")]
     [SerializeField]
@@ -64,6 +69,7 @@ public class DimensionData
     public RewardData[] WeaponRewards => weaponRewards;
     public WaveData[] Waves => waves;
     public MonsterSkin[] MonsterSkins => monsterSkins;
+    public MidBossEntry[] MidBosses => midBosses;
     public WFCChunkLoader ChunkLoaderPrefab => chunkLoaderPrefab;
     public AnimatorOverrideController PlayerAnimator => playerAnimator;
     public Sprite PlayerSprite => playerSprite;

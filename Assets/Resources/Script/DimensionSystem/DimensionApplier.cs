@@ -176,6 +176,7 @@ public class DimensionApplier
 
         opponentSpawner.SetWaves(dimension.Waves);
         opponentSpawner.SetMonsterSkins(dimension.MonsterSkins);
+        opponentSpawner.SetMidBosses(dimension.MidBosses);
 
         // 반대 진영 스포너는 반대 진영 플레이어를 노리므로, 그 진영이 받은 몬스터 보상이 이 스포너에 적용된다
         RewardManager manager = ResolveRewardManager();

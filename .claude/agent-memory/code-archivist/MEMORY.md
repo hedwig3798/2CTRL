@@ -1,5 +1,6 @@
 # 코드 지도 목차 (초기 작성 2026-10-28, 선언부 위주)
 - [combat.md](combat.md) — Projectile/Weapon/DamagePipeline/IDamageable, Weapons 파생
+- [boss.md](boss.md) — 중간 보스 BossSystem, 키워드 5종, 보스 관련 공유 파일 변경(HealthSystem/Spawner/LevelUpUI 등)
 - [move.md](move.md) — MoveSystem 이동 컴포넌트
 - [spawn-item.md](spawn-item.md) — Spawner, 풀, 드롭, ExpSystem, Tile(WFC)
 - [reward-ui.md](reward-ui.md) — RewardEffect/Manager, PlayerStats, Description, UI

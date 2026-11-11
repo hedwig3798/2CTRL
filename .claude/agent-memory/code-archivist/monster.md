@@ -16,7 +16,7 @@
 - `MonsterBrain` (MonoBehaviour, `Initializable`): 런타임 Awake에서 1회 생성, Initialize(BlackBoard)마다 리셋. 흐름 Move -> (CanStartAction) Telegraph -> Action -> Move; 사망 가로채기 시 Downed -> ReviveFromDowned; 최종 Dead.
   public: Initialize, StartAction(rt), ChangeToMove, ChangeToAction, EndActiveAction, RaiseActionTelegraph(rt), ReviveFromDowned. 이벤트 `OnStateChanged(MonsterStateId)`.
   HealthSystem.DeathInterceptor에 키워드 InterceptDeath를 연결.
-- `HazardZone` (풀링 장판 MonoBehaviour): SetPool, Activate(...), static Spawn(...). 일정 간격 범위 데미지.
+- `HazardZone` (풀링 장판 MonoBehaviour): SetPool, Activate(...), static Spawn(...). 일정 간격 범위 데미지. 둔화(slowRate)·레이어 인자 추가(HazardTrailKeyword.slowRate), 보스 키워드는 boss.md.
 - `MonsterAreaDamage` (static): `Apply(center, radius, layer, damage, knockbackForce, attacker)` -> 맞은 수. DamagePipeline로 데미지, 중심에서 바깥 넉백.
 
 ## 키워드 10종 (Keywords/, 메뉴 `2CTRL/Monster/Keyword/*`)

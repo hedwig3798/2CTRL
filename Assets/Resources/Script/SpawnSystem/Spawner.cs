@@ -58,6 +58,12 @@ public class Spawner
     // 생성한 몬스터 -> 처치 시 EXP 배율 (MonsterData.expValue, 생성할 때 한 번만 찾는다. 없으면 DropManager 기본값)
     private readonly Dictionary<Spawnable, float> expRates = new Dictionary<Spawnable, float>();
 
+    // 생성한 몬스터 중 고정 HP·데미지·속도를 쓰는 개체 (MidBoss 가 붙은 중간 보스. 웨이브/보상 배율 무시, 처치 드롭은 MidBoss 가 한다)
+    private readonly HashSet<Spawnable> fixedRateObjects = new HashSet<Spawnable>();
+
+    // 중간 보스 생존 중 개체수 곱셈 보정 (보스마다 하나, 최종 Count 에 모두 곱한다. 보상 보정과 별개)
+    private readonly List<float> bossCountMultipliers = new List<float>();
+
     //
     [Header("Spawn Data")]
     public Transform target;
@@ -111,6 +117,11 @@ public class Spawner
     /// 모든 웨이브의 time 이 끝났는지
     /// </summary>
     public bool IsFinished => isFinished;
+
+    /// <summary>
+    /// 이 스포너의 드롭 매니져 (중간 보스가 처치 시 보석을 흩뿌릴 때 사용)
+    /// </summary>
+    public DropManager DropManager => dropManager;
 
     /// <summary>
     /// 웨이브가 시작됐는지 (Start 의 Wave 코루틴 시작 시점부터 true)
@@ -196,7 +207,52 @@ public class Spawner
     {
         int i = (int)_type;
         float rate = GetWaveRate(_type) * (GetBaseRate(_type) + addRates[i]) * (1f + mulRates[i]);
+        if (SpawnModifierType.Count == _type)
+        {
+            rate *= BossCountMultiplier;
+        }
         return SpawnModifierType.Count == _type ? Mathf.Max(MinCountRate, rate) : Mathf.Max(0f, rate);
+    }
+
+    /// <summary>
+    /// 살아 있는 중간 보스들의 개체수 배율 곱 (없으면 1)
+    /// </summary>
+    public float BossCountMultiplier
+    {
+        get
+        {
+            float m = 1f;
+            for (int i = 0; i < bossCountMultipliers.Count; ++i)
+            {
+                m *= bossCountMultipliers[i];
+            }
+            return m;
+        }
+    }
+
+    /// <summary>
+    /// 중간 보스 개체수 배율을 하나 더한다 (최종 Count 에 곱함, 0.7 = ×0.7)
+    /// </summary>
+    public void AddBossCountMultiplier(float _multiplier)
+    {
+        bossCountMultipliers.Add(Mathf.Max(0f, _multiplier));
+    }
+
+    /// <summary>
+    /// AddBossCountMultiplier 로 넣은 배율 하나를 뺀다. 없으면 false
+    /// </summary>
+    public bool RemoveBossCountMultiplier(float _multiplier)
+    {
+        float m = Mathf.Max(0f, _multiplier);
+        for (int i = 0; i < bossCountMultipliers.Count; ++i)
+        {
+            if (true == Mathf.Approximately(bossCountMultipliers[i], m))
+            {
+                bossCountMultipliers.RemoveAt(i);
+                return true;
+            }
+        }
+        return false;
     }
 
     /// <summary>
@@ -307,6 +363,34 @@ public class Spawner
     }
 
     /// <summary>
+    /// 이 스포너에서 나올 중간 보스 목록을 넣는다 (같은 오브젝트의 MidBossScheduler 가 출현시킨다. 없으면 붙인다)
+    /// </summary>
+    /// <summary>
+    /// 스폰을 완전히 멈춘다 (최종 보스 진입): 웨이브·스폰 코루틴 정지, 중간 보스 스케줄 정지·활성 보스 조용히 제거
+    /// 마지막 웨이브의 스폰 코루틴은 웨이브가 끝나도 계속 돌기 때문에 여기서 끊는다
+    /// </summary>
+    public void StopSpawning()
+    {
+        StopAllCoroutines();
+
+        MidBossScheduler scheduler = GetComponent<MidBossScheduler>();
+        if (null != scheduler)
+        {
+            scheduler.StopAndRemoveAll();
+        }
+    }
+
+    public void SetMidBosses(MidBossEntry[] _entries)
+    {
+        MidBossScheduler scheduler = GetComponent<MidBossScheduler>();
+        if (null == scheduler)
+        {
+            scheduler = gameObject.AddComponent<MidBossScheduler>();
+        }
+        scheduler.SetEntries(_entries);
+    }
+
+    /// <summary>
     /// 웨이브에 있는 프리팹의 풀을 미리 만든다
     /// </summary>
     private void PreparePools()
@@ -395,11 +479,13 @@ public class Spawner
             return null;
         }
 
-        data.dropManager = dropManager;
+        // 중간 보스는 고정 수치 (배율 1) 이고, 일반 보석 대신 MidBoss 가 처치 시 보석을 흩뿌린다
+        bool isFixedRate = fixedRateObjects.Contains(sa);
+        data.dropManager = true == isFixedRate ? null : dropManager;
         data.spawner = this;
-        data.SetFloat(DATA_TYPE.HPRate, GetRate(SpawnModifierType.HP));
-        data.SetFloat(DATA_TYPE.moveSpeedRate, GetRate(SpawnModifierType.Speed));
-        data.SetFloat(DATA_TYPE.damageRate, GetRate(SpawnModifierType.Damage));
+        data.SetFloat(DATA_TYPE.HPRate, true == isFixedRate ? 1f : GetRate(SpawnModifierType.HP));
+        data.SetFloat(DATA_TYPE.moveSpeedRate, true == isFixedRate ? 1f : GetRate(SpawnModifierType.Speed));
+        data.SetFloat(DATA_TYPE.damageRate, true == isFixedRate ? 1f : GetRate(SpawnModifierType.Damage));
         // 0 이면 DropManager 기본값을 쓴다
         data.SetFloat(DATA_TYPE.expRate, expRates.TryGetValue(sa, out float expRate) ? expRate : 0f);
         data.SetTransform(DATA_TYPE.moveTarget, target);
@@ -519,6 +605,11 @@ public class Spawner
 
         RegisterSkinTarget(sa);
 
+        if (null != sa.GetComponent<MidBoss>())
+        {
+            fixedRateObjects.Add(sa);
+        }
+
         return sa;
     }
 
@@ -540,6 +631,7 @@ public class Spawner
     {
         skinTargets.Remove(_object);
         expRates.Remove(_object);
+        fixedRateObjects.Remove(_object);
         Destroy(_object.gameObject);
     }
 

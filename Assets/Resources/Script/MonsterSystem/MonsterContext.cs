@@ -29,6 +29,11 @@ public class MonsterContext
     /// </summary>
     public float MoveSpeed => (null != data ? data.baseMoveSpeed : 0f) * moveSpeedRate * SlowMultiplier;
 
+    /// <summary>
+    /// 받는 둔화·속박 효과 배율 (기본 1, 중간 보스 0.3). MonsterBrain 이 리셋하지 않으므로 쓰는 쪽(MidBoss)이 Initialize 마다 넣는다
+    /// </summary>
+    public float slowEffectRate = 1f;
+
     // 둔화 (독 장판 등). slowEndTime 이 지나면 풀린다
     private float slowRate;
     private float slowEndTime;
@@ -40,11 +45,11 @@ public class MonsterContext
 
     /// <summary>
     /// _duration 초 동안 이동 속도를 _rate 만큼 줄인다 (0.4 = -40%)
-    /// 이미 둔화 중이면 더 강한 비율과 더 늦은 종료 시간을 쓴다
+    /// 이미 둔화 중이면 더 강한 비율과 더 늦은 종료 시간을 쓴다. 비율에는 slowEffectRate 를 곱한다
     /// </summary>
     public void ApplySlow(float _rate, float _duration)
     {
-        _rate = Mathf.Clamp01(_rate);
+        _rate = Mathf.Clamp01(_rate) * Mathf.Clamp01(slowEffectRate);
         float endTime = Time.time + Mathf.Max(0f, _duration);
         if (Time.time >= slowEndTime)
         {

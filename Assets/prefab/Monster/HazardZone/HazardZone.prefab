@@ -200,6 +200,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Game.Runtime::HazardZone
   unitRadius: 0.5
+  slowGrace: 0.15
 --- !u!114 &1911312464260349588
 MonoBehaviour:
   m_ObjectHideFlags: 0

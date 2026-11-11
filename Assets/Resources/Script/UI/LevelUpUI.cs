@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
 using UnityEngine.InputSystem;
@@ -10,6 +11,8 @@ using UnityEngine.UI;
 /// - 자식 SelectPanelGroup 에서 선택지를 고르기 전에는 재개 버튼이 비활성화된다.
 /// - 스페이스바로도 재개 버튼을 누를 수 있다.
 /// - 재개 버튼 글자는 resumeLabelKey 로 채운다 (프리팹에 박힌 글자 대신. 언어가 바뀌면 다시 채움)
+/// - 중간 보스 처치(EventManager.OnBossDefeated) 시 그 진영 그룹만 보스 보상(무기·무기 업그레이드, 디버프 없음)을 연다
+///   일반 레벨업과 보스 보상은 들어온 순서대로 큐에서 하나씩 처리한다
 /// </summary>
 public class LevelUpUI
     : MonoBehaviour
@@ -26,8 +29,37 @@ public class LevelUpUI
     [SerializeField]
     private TMP_Text resumeLabel;
 
-    // 아직 처리하지 않은 레벨업 횟수
-    private int pendingCount = 0;
+    /// <summary>
+    /// 보상 선택 한 번 (일반 레벨업: 양쪽 그룹, 보스 보상: side 그룹만)
+    /// </summary>
+    private struct RewardRound
+    {
+        public bool isBoss;
+        public PlayerSide side;
+    }
+
+    // 아직 처리하지 않은 보상 선택 (맨 앞이 지금 보이는 것)
+    private readonly Queue<RewardRound> rounds = new Queue<RewardRound>();
+
+    /// <summary>
+    /// 지금 보이는 선택이 보스 보상인지
+    /// </summary>
+    public bool IsBossRound => 0 < rounds.Count && true == rounds.Peek().isBoss;
+
+    /// <summary>
+    /// 지금 보이는 보스 보상의 진영 (IsBossRound 일 때만 의미 있음)
+    /// </summary>
+    public PlayerSide BossRoundSide => 0 < rounds.Count ? rounds.Peek().side : PlayerSide.Left;
+
+    /// <summary>
+    /// 남은 선택 수 (지금 보이는 것 포함)
+    /// </summary>
+    public int PendingRoundCount => rounds.Count;
+
+    /// <summary>
+    /// 새 선택이 보일 때 (보스 보상인지, 보스 보상 진영). 보스 보상 제목 등 연출용
+    /// </summary>
+    public event System.Action<bool, PlayerSide> OnRoundShown;
 
     private bool isOpen = false;
 
@@ -55,6 +87,8 @@ public class LevelUpUI
         foreach (SelectPanelGroup group in selectPanelGroups)
         {
             group.Initialize();
+            // 보상 순서(일반 / 보스)는 이 UI 가 관리한다
+            group.AutoRefreshOnLevelUp = false;
         }
 
         SetChildrenActive(false);
@@ -88,6 +122,8 @@ public class LevelUpUI
     {
         EventManager.Instance.OnLevelUp -= HandleLevelUp;
         EventManager.Instance.OnLevelUp += HandleLevelUp;
+        EventManager.Instance.OnBossDefeated -= HandleBossDefeated;
+        EventManager.Instance.OnBossDefeated += HandleBossDefeated;
 
         if (null != resumeButton)
         {
@@ -145,6 +181,7 @@ public class LevelUpUI
         if (true == EventManager.HasInstance)
         {
             EventManager.Instance.OnLevelUp -= HandleLevelUp;
+            EventManager.Instance.OnBossDefeated -= HandleBossDefeated;
         }
 
         if (null != resumeButton)
@@ -174,12 +211,78 @@ public class LevelUpUI
             return;
         }
 
-        pendingCount += _amount;
+        for (int i = 0; i < _amount; ++i)
+        {
+            EnqueueRound(false, PlayerSide.Left);
+        }
+    }
+
+    private void HandleBossDefeated(PlayerSide _side, MidBoss _boss)
+    {
+        OpenBossReward(_side);
+    }
+
+    /// <summary>
+    /// _side 진영에 보스 보상 선택 1회를 연다 (이미 열려 있으면 큐 뒤에 붙는다)
+    /// 그 진영 그룹만 보이고 Weapon / WeaponUpgrade 풀에서 디버프 없이 뽑는다. 풀이 비면 그 진영 일반 레벨업 보상으로 대신한다
+    /// </summary>
+    public void OpenBossReward(PlayerSide _side)
+    {
+        EnqueueRound(true, _side);
+    }
+
+    private void EnqueueRound(bool _isBoss, PlayerSide _side)
+    {
+        RewardRound round = new RewardRound();
+        round.isBoss = _isBoss;
+        round.side = _side;
+        rounds.Enqueue(round);
 
         if (false == IsOpen)
         {
             Open();
         }
+    }
+
+    /// <summary>
+    /// 큐 맨 앞 선택을 그룹에 채운다. 보스 보상이면 다른 진영 그룹은 숨겨 재개 조건과 보상 적용에서 빠진다
+    /// </summary>
+    private void ShowCurrentRound()
+    {
+        if (0 == rounds.Count)
+        {
+            return;
+        }
+
+        RewardRound round = rounds.Peek();
+        bool hasGroup = false;
+        foreach (SelectPanelGroup group in selectPanelGroups)
+        {
+            bool visible = false == round.isBoss || round.side == group.Side;
+            group.gameObject.SetActive(visible);
+            if (false == visible)
+            {
+                continue;
+            }
+
+            hasGroup = true;
+            if (true == round.isBoss)
+            {
+                group.RefreshBossRewards();
+            }
+            else
+            {
+                group.RefreshRewards();
+            }
+        }
+
+        if (true == round.isBoss && false == hasGroup)
+        {
+            Debug.LogWarning($"[LevelUpUI] {round.side} 진영 SelectPanelGroup 이 없어 보스 보상을 건너뜁니다. ({name})", this);
+        }
+
+        UpdateResumeButton();
+        OnRoundShown?.Invoke(round.isBoss, round.side);
     }
 
     private void Update()
@@ -215,20 +318,19 @@ public class LevelUpUI
         }
 
         ApplySelectedRewards();
-        pendingCount--;
+        if (0 < rounds.Count)
+        {
+            rounds.Dequeue();
+        }
 
-        if (pendingCount <= 0)
+        if (0 == rounds.Count)
         {
             Close();
         }
         else
         {
-            // 남은 레벨업은 새 선택지를 뽑아 다시 선택해야 재개된다
-            foreach (SelectPanelGroup group in selectPanelGroups)
-            {
-                group.RefreshRewards();
-            }
-            UpdateResumeButton();
+            // 남은 선택은 새 선택지를 뽑아 다시 선택해야 재개된다
+            ShowCurrentRound();
         }
     }
 
@@ -248,6 +350,12 @@ public class LevelUpUI
 
         foreach (SelectPanelGroup group in selectPanelGroups)
         {
+            // 보스 보상 중 숨긴 그룹은 이전 선택이 남아 있으므로 건너뛴다
+            if (false == group.gameObject.activeInHierarchy)
+            {
+                continue;
+            }
+
             SelectPanel selected = group.SelectedPanel;
             if (null == selected)
             {
@@ -277,6 +385,12 @@ public class LevelUpUI
     {
         foreach (SelectPanelGroup group in selectPanelGroups)
         {
+            // 숨긴 그룹(보스 보상의 다른 진영)은 선택하지 않아도 된다
+            if (false == group.gameObject.activeInHierarchy)
+            {
+                continue;
+            }
+
             if (true == group.HasSelectablePanel && null == group.SelectedPanel)
             {
                 return false;
@@ -312,12 +426,21 @@ public class LevelUpUI
         SetChildrenActive(true);
         isOpen = true;
         GamePause.Pause(this);
-        UpdateResumeButton();
+        ShowCurrentRound();
     }
 
     private void Close()
     {
-        pendingCount = 0;
+        rounds.Clear();
+
+        // 보스 보상으로 숨긴 그룹을 다음에 열 때를 위해 되돌린다
+        foreach (SelectPanelGroup group in selectPanelGroups)
+        {
+            if (null != group)
+            {
+                group.gameObject.SetActive(true);
+            }
+        }
 
         SetChildrenActive(false);
         isOpen = false;

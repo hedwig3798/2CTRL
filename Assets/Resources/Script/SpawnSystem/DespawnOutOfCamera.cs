@@ -64,8 +64,11 @@ public class DespawnOutOfCamera
         return cachedCamera;
     }
 
-    // 분할 화면에서 각 오브젝트가 자기 카메라를 기준으로 삼도록 (WFCChunkLoader 와 동일한 방식)
-    private static Camera FindCameraForLayer(int _layer)
+    /// <summary>
+    /// _layer 를 렌더링하는 첫 카메라 (없으면 Camera.main)
+    /// 분할 화면에서 각 오브젝트가 자기 카메라를 기준으로 삼도록 (WFCChunkLoader 와 동일한 방식). 중간 보스 재배치에도 쓴다
+    /// </summary>
+    public static Camera FindCameraForLayer(int _layer)
     {
         int layerBit = 1 << _layer;
         foreach (Camera cam in Camera.allCameras)

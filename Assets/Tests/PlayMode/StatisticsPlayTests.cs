@@ -229,6 +229,12 @@ public class StatisticsPlayTests
         Assert.AreEqual(0f, Time.timeScale);
         Assert.AreEqual(0, stats.PendingCount);
         Assert.AreEqual(30f, stats.Get(PlayerSide.Left).DamageTaken);
+        // 게임 오버 연출(freeze + dim + hold, 실시간) 이 끝나야 결과 패널이 켜진다
+        float waitStart = Time.realtimeSinceStartup;
+        while (false == panel.activeSelf && Time.realtimeSinceStartup - waitStart < 6f)
+        {
+            yield return null;
+        }
         Assert.IsTrue(panel.activeSelf);
         Assert.AreEqual(1, calls);
 

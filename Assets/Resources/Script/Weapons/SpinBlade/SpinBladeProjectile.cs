@@ -229,7 +229,8 @@ public class SpinBladeProjectile
         }
 
         Vector2 hitPoint = Origin.position;
-        if (true == isExecute)
+        // 즉사 면역(중간 보스)은 아래 일반 데미지로 처리한다
+        if (true == isExecute && false == _health.IsExecuteImmune)
         {
             DamageMassage message = damageMassage;
             message.hitPoint = hitPoint;

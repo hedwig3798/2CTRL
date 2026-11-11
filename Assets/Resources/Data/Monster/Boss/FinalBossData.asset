@@ -1,0 +1,79 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d1d3701f23994da428bb50c6cdcd60a8, type: 3}
+  m_Name: FinalBossData
+  m_EditorClassIdentifier: Game.Runtime::FinalBossData
+  maxHP: 160000
+  bodyRadius: 1.8
+  contactDamage: 20
+  contactCooldown: 0.5
+  playerHitRadius: 0.3
+  introDuration: 3
+  playerClampMargin: 0.5
+  entryStartAbove: 1
+  entryStopFromTop: 4
+  entryDuration: 2
+  bossBgm: 908
+  phase2Ratio: 0.66
+  phase3Ratio: 0.33
+  patternInterval:
+  - 2.5
+  - 2
+  - 1.6
+  telegraphScale:
+  - 1
+  - 0.85
+  - 0.85
+  minTelegraph: 1
+  p1SideStagger: 0.5
+  p3ComboChance: 0.5
+  enrageTime: 300
+  enrageInterval: 1
+  idleMoveSpeed: 3
+  idleInset: 2.5
+  meteorWindup: 0.6
+  meteorCountPerSide: 030000000500000005000000i
+  meteorFlightTime: 1.8
+  meteorRadius: 1.6
+  meteorDamage: 30
+  meteorArcHeight: 3
+  meteorSideInset: 1
+  fireDuration: 3
+  fireRadius: 1.6
+  fireDamage: 8
+  fireTickInterval: 0.5
+  dashTelegraph: 1
+  dashSpeed: 16
+  dashMaxDuration: 3
+  dashMaxBounces: 4
+  dashRest: 1.5
+  dashDamage: 35
+  dashArrowLength: 6
+  dashArrowWidth: 0.9
+  laserCount: 030000000400000005000000i
+  laserWarn: 1.2
+  laserBlink: 0.2
+  laserBlinkInterval: 0.05
+  laserFire: 0.4
+  laserWidth: 1
+  laserWarnWidth: 0.07
+  laserDamage: 40
+  laserSafeGap: 2
+  laserMaxAttempts: 12
+  laserGapSampleStep: 0.4
+  laserCoarseStep: 1.2
+  telegraphStyle: {fileID: 11400000, guid: 39e435ba232ac664bb185fc497953e87, type: 2}
+  warnColor: {r: 1, g: 0.35, b: 0.2, a: 1}
+  fillColor: {r: 1, g: 0.25, b: 0.1, a: 0.5}
+  fireColor: {r: 1, g: 0.5, b: 0.1, a: 0.5}
+  arrowColor: {r: 1, g: 0.85, b: 0.15, a: 0.95}
+  laserColor: {r: 1, g: 0.92, b: 0.95, a: 1}

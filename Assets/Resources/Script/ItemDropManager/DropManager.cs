@@ -17,7 +17,15 @@ public class DropManager
     [SerializeField]
     private float defaultExpRate = 1f;
 
+    [Tooltip("DropExp(보스 처치) 로 보석을 흩뿌리는 반경")]
+    [Min(0f)]
+    [SerializeField]
+    private float scatterRadius = 3f;
+
     private IObjectPool<Spawnable> dropItemPool;
+
+    // dropItem 의 ExpItem.BaseExp (DropExp 에서 보석 하나의 배율을 계산할 때 사용, 없으면 1)
+    private float itemBaseExp = 1f;
 
     public void DropItem(GameObject _deadObject)
     {
@@ -40,6 +48,50 @@ public class DropManager
             item.blackBoardHandler.GetBlackBoard().SetFloat(DATA_TYPE.expRate, GetExpRate(_deadObject));
             item.blackBoardHandler.Initialize();
         }
+    }
+
+    /// <summary>
+    /// _position 주변(scatterRadius)에 EXP 보석 _gemCount 개를 흩뿌린다. 보석 EXP 합이 _totalExp 가 되도록 나눈다 (중간 보스 처치)
+    /// </summary>
+    public void DropExp(Vector2 _position, float _totalExp, int _gemCount)
+    {
+        if (null == dropItemPool || _gemCount <= 0 || _totalExp <= 0f)
+        {
+            return;
+        }
+
+        float expRate = CalculateGemExpRate(_totalExp, _gemCount, itemBaseExp);
+        for (int i = 0; i < _gemCount; ++i)
+        {
+            Spawnable item = dropItemPool.Get();
+            if (null == item)
+            {
+                continue;
+            }
+
+            LayerUtils.SetLayer(item.gameObject, gameObject.layer);
+            Vector2 pos = _position + Random.insideUnitCircle * scatterRadius;
+            item.transform.position = new Vector3(pos.x, pos.y, item.transform.position.z);
+
+            if (null != item.blackBoardHandler)
+            {
+                item.blackBoardHandler.GetBlackBoard().SetFloat(DATA_TYPE.expRate, expRate);
+                item.blackBoardHandler.Initialize();
+            }
+        }
+    }
+
+    /// <summary>
+    /// 보석 하나의 expRate. 보석 EXP = baseExp × expRate 이므로 합이 _totalExp 가 되도록 나눈다 (baseExp 0 이하는 1)
+    /// </summary>
+    public static float CalculateGemExpRate(float _totalExp, int _gemCount, float _baseExp)
+    {
+        if (_gemCount <= 0)
+        {
+            return 0f;
+        }
+        float baseExp = _baseExp > 0f ? _baseExp : 1f;
+        return Mathf.Max(0f, _totalExp) / _gemCount / baseExp;
     }
 
     /// <summary>
@@ -70,6 +122,12 @@ public class DropManager
         {
             Debug.LogError("DropManager has no item");
             return;
+        }
+
+        ExpItem expItem = dropItem.GetComponentInChildren<ExpItem>(true);
+        if (null != expItem && expItem.BaseExp > 0f)
+        {
+            itemBaseExp = expItem.BaseExp;
         }
 
         dropItemPool = new ObjectPool<Spawnable>

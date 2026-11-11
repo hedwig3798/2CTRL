@@ -37,24 +37,39 @@ public class ItemCollector
             return;
         }
 
-        float exp = expItem.Collect();
+        Absorb(expItem, ownerStats);
+    }
+
+    /// <summary>
+    /// EXP 아이템을 수집해 공용 ExpSystem 에 넣고 _owner 진영으로 OnExpGained 를 알린다 (최종 보스 진입 시 강제 흡수에도 쓴다)
+    /// 획득한 EXP 를 돌려준다 (이미 수집됐으면 0)
+    /// </summary>
+    public static float Absorb(ExpItem _item, PlayerStats _owner)
+    {
+        if (null == _item)
+        {
+            return 0f;
+        }
+
+        float exp = _item.Collect();
         if (exp <= 0f)
         {
-            return;
+            return 0f;
         }
 
         ExpSystem expSystem = ExpSystem.Instance;
         if (null == expSystem)
         {
             Debug.LogWarning("[ItemCollector] 씬에 공용 ExpSystem 이 없습니다.");
-            return;
+            return 0f;
         }
 
         expSystem.GetExp(exp);
 
-        if (null != ownerStats && true == EventManager.HasInstance)
+        if (null != _owner && true == EventManager.HasInstance)
         {
-            EventManager.Instance.OnExpGained?.Invoke(ownerStats.Side, exp);
+            EventManager.Instance.OnExpGained?.Invoke(_owner.Side, exp);
         }
+        return exp;
     }
 }
