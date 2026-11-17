@@ -1,0 +1,21 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7f760cde4b91e10469ffd3d0629d3c37, type: 3}
+  m_Name: ThornSawData
+  m_EditorClassIdentifier: Game.Runtime::DimensionWeaponData
+  nameKey: dimension_weapon.thorn_saw.name
+  explainKey: dimension_weapon.thorn_saw.explain
+  icon: {fileID: 21300000, guid: f696dc614896cbe42922c3a1bfa1e662, type: 3}
+  materialA: {fileID: 4307955513310795974, guid: 927d0b178a935b840a7ced4a52521c5a, type: 3}
+  materialB: {fileID: 3750892015563446428, guid: 1c9ac8429755f6e4dae6de4b8d69b9cc, type: 3}
+  fallbackRequiredLevel: 10
+  resultPrefab: {fileID: 1655713590320357846, guid: a85d06bf9bf7b6545977a62326cc6d3a, type: 3}

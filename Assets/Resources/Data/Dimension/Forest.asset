@@ -23,7 +23,6 @@ MonoBehaviour:
   - {fileID: 11400000, guid: 4d15f3ea9028493484e99cb28d7332dc, type: 2}
   - {fileID: 11400000, guid: 84f35eb7512166a48b77dd0b769ab9bd, type: 2}
   - {fileID: 11400000, guid: dca77d4f4903b3e45a4a0f81d0d3c84e, type: 2}
-  - {fileID: 11400000, guid: eb0c3cd1b50dd724daff3ee7b81596ef, type: 2}
   waves:
   - {fileID: 11400000, guid: cb8c47a35ff823c40b7eadc22c7bcccb, type: 2}
   - {fileID: 11400000, guid: d554bbae773fbc44dac91deba9cb1ca6, type: 2}

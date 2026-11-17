@@ -1,0 +1,87 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!1 &4491422242707563973
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 2328054075873729007}
+  - component: {fileID: 7633692059350266829}
+  m_Layer: 19
+  m_Name: SpiritSquadron
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &2328054075873729007
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4491422242707563973}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &7633692059350266829
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4491422242707563973}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5545b87bd8db8514c86a227ae0a1fc2f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Game.Runtime::SpiritSquadron
+  damage: 39
+  attackSpeed: 2
+  range: 40
+  fireCount: 3
+  lifetime: 0
+  areaRadius: 0
+  statTags: 23
+  minAttackSpeed: 0.1
+  spawnPerFire: 1
+  spiritHitCount: 20
+  spiritDamageRate: 1
+  spiritTickInterval: 0.5
+  spiritChaseSpeed: 7
+  spiritContactRadius: 0.35
+  spiritIdleRadius: 1.2
+  spiritIdleOrbitSpeed: 60
+  spiritIdleSharpness: 5
+  dronesPerSpirit: 1
+  droneDamageRate: 1
+  droneOrbitRadius: 0.8
+  droneOrbitSpeed: 180
+  droneFollowSharpness: 10
+  droneFallbackToSpiritTarget: 0
+  bulletSpeed: 14
+  bulletRadius: 0.15
+  bulletExtraTravel: 2
+  spiritPrefab: {fileID: 0}
+  spiritSprite: {fileID: 0}
+  spiritColor: {r: 1, g: 1, b: 1, a: 1}
+  spiritScale: 1
+  dronePrefab: {fileID: 0}
+  droneSprite: {fileID: 0}
+  droneColor: {r: 1, g: 1, b: 1, a: 1}
+  droneScale: 1
+  bulletPrefab: {fileID: 0}
+  bulletSprite: {fileID: 0}
+  bulletColor: {r: 1, g: 1, b: 1, a: 1}
+  bulletScale: 1
+  sortingLayerName: attack
+  sortingOrder: 10
+  flipSpiritByDirection: 1

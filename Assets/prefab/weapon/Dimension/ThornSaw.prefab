@@ -1,0 +1,78 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!1 &8436868781529542104
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 4084305666897806878}
+  - component: {fileID: 1655713590320357846}
+  m_Layer: 19
+  m_Name: ThornSaw
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &4084305666897806878
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8436868781529542104}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1655713590320357846
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8436868781529542104}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 20900dd971f7239468eabcdd97478986, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Game.Runtime::ThornSaw
+  damage: 31.2
+  attackSpeed: 0.5
+  range: 5
+  fireCount: 2
+  lifetime: 0
+  areaRadius: 0
+  statTags: 11
+  minAttackSpeed: 0.1
+  sawCountMultiplier: 3
+  sawDamageRate: 1
+  sawSpeed: 8
+  sawRadius: 0.5
+  sawSpinSpeed: 720
+  edgeMargin: 1
+  verticalPadding: 0.5
+  vineSpacing: 1
+  vineRadius: 0.6
+  vineLifetime: 2
+  vineTickInterval: 0.5
+  vineDamageRate: 1
+  maxVinePieces: 400
+  vineFadeTime: 0.3
+  sawPrefab: {fileID: 0}
+  sawSprite: {fileID: 0}
+  sawColor: {r: 1, g: 1, b: 1, a: 1}
+  sawScale: 1
+  vinePrefab: {fileID: 0}
+  vineSprite: {fileID: 0}
+  vineColor: {r: 1, g: 1, b: 1, a: 1}
+  vineScale: 1
+  sortingLayerName: attack
+  sortingOrder: 10

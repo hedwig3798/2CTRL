@@ -3455,6 +3455,7 @@ MonoBehaviour:
   rightProxy: {fileID: 335256448}
   gameOverManager: {fileID: 1692497236}
   spawners: []
+  victoryDelay: 1.2
 --- !u!4 &413991291
 Transform:
   m_ObjectHideFlags: 0
@@ -4832,6 +4833,61 @@ PrefabInstance:
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: f4f172b61efe1d242baab2dfb2f65b32, type: 3}
+--- !u!1 &699154934
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 699154936}
+  - component: {fileID: 699154935}
+  m_Layer: 0
+  m_Name: StageSpace
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &699154935
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 699154934}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7440a99de5bacfd4ca82ffd2ca2131da, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Game.Runtime::StageSpace
+  leftCamera: {fileID: 2083139459}
+  rightCamera: {fileID: 1196257383}
+  leftOverlayCamera: {fileID: 61646740}
+  rightOverlayCamera: {fileID: 858146216}
+  stageWorldOrigin: {x: 0, y: 500}
+  nodeCapacity: 8
+  maxDepth: 6
+  linearThreshold: 32
+  leftMonsterLayerName: LMonster
+  rightMonsterLayerName: RMonster
+  defaultTargetRadius: 0.3
+--- !u!4 &699154936
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 699154934}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &704802162
 GameObject:
   m_ObjectHideFlags: 0
@@ -18538,3 +18594,4 @@ SceneRoots:
   - {fileID: 413991291}
   - {fileID: 61646741}
   - {fileID: 858146217}
+  - {fileID: 699154936}

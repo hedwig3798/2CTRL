@@ -1,0 +1,21 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5570054cdbcf916448ad765e154e118a, type: 3}
+  m_Name: DimensionFusionRegistry
+  m_EditorClassIdentifier: Game.Runtime::DimensionFusionRegistry
+  recipes:
+  - {fileID: 11400000, guid: e7bfe2f843dde5b439d80603876a5ea0, type: 2}
+  - {fileID: 11400000, guid: 1648a147ba8b6f547897d62075ce2cdf, type: 2}
+  - {fileID: 11400000, guid: 9a84af9fb0bc1cf41a5c595d8ad7f425, type: 2}
+  - {fileID: 11400000, guid: 43f91510ec1798a4da4d0fcf4645c2f9, type: 2}
+  - {fileID: 11400000, guid: 0406776f15233a446aaf129131430ebd, type: 2}
+  - {fileID: 11400000, guid: 6a236ca44fdd0874f90683c6cc45e7bd, type: 2}
