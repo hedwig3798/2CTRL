@@ -14,7 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Game.Runtime::DimensionWeaponData
   nameKey: dimension_weapon.spirit_squadron.name
   explainKey: dimension_weapon.spirit_squadron.explain
-  icon: {fileID: 21300000, guid: 3517be029f2ca7d479fb134aff17a5e4, type: 3}
+  icon: {fileID: 21300000, guid: abc3685bdf5658e42a73b2beceacb1e0, type: 3}
   materialA: {fileID: 7771203638674778116, guid: dab6ac6ca339da741bea946f933a75ca, type: 3}
   materialB: {fileID: 6602184377150928473, guid: 0887418b6cdb4a3ab8ede9c7fbc29d56, type: 3}
   fallbackRequiredLevel: 10

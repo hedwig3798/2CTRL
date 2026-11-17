@@ -59,11 +59,11 @@ MonoBehaviour:
   branchRange: 6
   branchDamageRate: 0.16666667
   maxBeams: 64
-  beamMaterial: {fileID: 0}
-  primaryColor: {r: 1, g: 0.95, b: 0.8, a: 1}
-  branchColor: {r: 0.7, g: 0.6, b: 1, a: 1}
-  primaryVisualWidth: 0.3
-  branchVisualWidth: 0.18
+  beamMaterial: {fileID: 2100000, guid: 4098da44f0e907d4fbe058b6137bd8e6, type: 2}
+  primaryColor: {r: 1, g: 0.78, b: 0.4, a: 1}
+  branchColor: {r: 0.5, g: 1, b: 0.6, a: 1}
+  primaryVisualWidth: 0.4
+  branchVisualWidth: 0.22
   beamVisualTime: 0.2
   sortingLayerName: attack
   sortingOrder: 0

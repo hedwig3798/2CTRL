@@ -52,9 +52,9 @@ MonoBehaviour:
   areaRadius: 1.5
   statTags: 15
   minAttackSpeed: 0.1
-  minePrefab: {fileID: 0}
-  zonePrefab: {fileID: 0}
-  explosionEffect: {fileID: 0}
+  minePrefab: {fileID: 6575376417791316048, guid: 200a7a329b849174ca6b785a0381cebd, type: 3}
+  zonePrefab: {fileID: 8465125965155584790, guid: 65fd33ceb1f7b374890523ec59600303, type: 3}
+  explosionEffect: {fileID: 218584166023542072, guid: 20ac1a06391d9ab4fa2cb3099a1d3744, type: 3}
   chaseSpeed: 1.2
   triggerRadius: 0.35
   armDelay: 0.3

@@ -29,6 +29,9 @@ public class WeaponSlotUI
     [SerializeField]
     private GameObject contentRoot;
 
+    private const string LEVEL_BADGE_NAME = "LevelBadge";
+    private Transform levelBadge;
+
     [Tooltip("레벨 표시 포멧 StringTable 키 ({0} = 레벨)")]
     [SerializeField]
     private string levelFormatKey = "hud.weapon_slot.level";
@@ -82,7 +85,28 @@ public class WeaponSlotUI
         ApplyName();
 
         displayedLevel = -1;
+        SetLevelBadgeActive(true);
         RefreshLevel();
+    }
+
+    /// <summary>
+    /// 레벨 배지(InGameHudVisual 이 만든 "LevelBadge") 표시 여부. 차원 무기는 레벨이 없어 숨긴다
+    /// </summary>
+    private void SetLevelBadgeActive(bool _active)
+    {
+        if (null == levelBadge)
+        {
+            Transform root = null != contentRoot ? contentRoot.transform : transform;
+            levelBadge = root.Find(LEVEL_BADGE_NAME);
+        }
+        if (null != levelBadge)
+        {
+            levelBadge.gameObject.SetActive(_active);
+        }
+        if (null != levelText)
+        {
+            levelText.gameObject.SetActive(_active);
+        }
     }
 
     /// <summary>
@@ -110,6 +134,7 @@ public class WeaponSlotUI
         {
             levelText.text = string.Empty;
         }
+        SetLevelBadgeActive(false);
     }
 
     /// <summary>

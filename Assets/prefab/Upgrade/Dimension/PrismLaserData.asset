@@ -14,7 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Game.Runtime::DimensionWeaponData
   nameKey: dimension_weapon.prism_laser.name
   explainKey: dimension_weapon.prism_laser.explain
-  icon: {fileID: 21300000, guid: 260b5935f2af4f144a8471993361be4c, type: 3}
+  icon: {fileID: 21300000, guid: 5cc4c2d3627cc3546b2e29166aef8d5d, type: 3}
   materialA: {fileID: 6578139319317758734, guid: adf238321391433ea0a7c8e4cc84ea0e, type: 3}
   materialB: {fileID: 5536439645276528640, guid: 384bb9388fa9441a852324600bf99205, type: 3}
   fallbackRequiredLevel: 10

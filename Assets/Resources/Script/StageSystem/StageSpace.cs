@@ -217,7 +217,24 @@ public class StageSpace
         _overlay.orthographic = true;
         _overlay.orthographicSize = _side.orthographicSize;
         _overlay.cullingMask = _mask;
-        _overlay.transform.position = new Vector3(_center.x, _center.y, _side.transform.position.z);
+        _overlay.transform.position = new Vector3(_center.x, _center.y, ResolveOverlayZ(_overlay, _side));
+    }
+
+    private const float DEFAULT_OVERLAY_Z = -10f;
+
+    /// <summary>
+    /// 오버레이 카메라 z. 무대 오브젝트는 z=0 이라 카메라는 반드시 음수 z 여야 보인다
+    /// - 진영 카메라가 아직 배치 전(z=0)일 수 있으므로 음수가 아니면 오버레이 자신의 z, 그것도 아니면 -10
+    /// </summary>
+    private static float ResolveOverlayZ(Camera _overlay, Camera _side)
+    {
+        float z = _side.transform.position.z;
+        if (z < 0f)
+        {
+            return z;
+        }
+        z = _overlay.transform.position.z;
+        return z < 0f ? z : DEFAULT_OVERLAY_Z;
     }
 
     private static int ResolveCullingMask()

@@ -14,7 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Game.Runtime::DimensionWeaponData
   nameKey: dimension_weapon.phantom_whirl.name
   explainKey: dimension_weapon.phantom_whirl.explain
-  icon: {fileID: 21300000, guid: 4823da4930fb68c4ea80941378a05971, type: 3}
+  icon: {fileID: 21300000, guid: fa604de0e63256b4ba085cda2e58f32a, type: 3}
   materialA: {fileID: 1143293158503042432, guid: e405b693010d48ab983005cc8068c943, type: 3}
   materialB: {fileID: 9160331678826088532, guid: 28f7730839da8e44db83ed72c5b9ea61, type: 3}
   fallbackRequiredLevel: 10

@@ -66,11 +66,11 @@ MonoBehaviour:
   vineDamageRate: 1
   maxVinePieces: 400
   vineFadeTime: 0.3
-  sawPrefab: {fileID: 0}
+  sawPrefab: {fileID: 5508084044398799291, guid: d1fa2e926bd03ad49b754604163ef8df, type: 3}
   sawSprite: {fileID: 0}
   sawColor: {r: 1, g: 1, b: 1, a: 1}
   sawScale: 1
-  vinePrefab: {fileID: 0}
+  vinePrefab: {fileID: 6801323673544287070, guid: a20d0525c4bea114a9f82dcdc3340cb1, type: 3}
   vineSprite: {fileID: 0}
   vineColor: {r: 1, g: 1, b: 1, a: 1}
   vineScale: 1

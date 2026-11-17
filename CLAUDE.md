@@ -42,4 +42,5 @@ Unity 제어: Unity CLI(`unity`, Pipeline 패키지). 열린 에디터는 `unity
    - 런타임에 Instantiate 하는 연출·오브젝트는 낸 쪽의 레이어로 맞출 것 (분할 카메라 culling mask 에 Default 가 없어 안 보임). `EffectPool.Spawn` 은 레이어 인자 필수.
    - URP 에서 화면 위에 덮어 그릴 카메라는 Base 로 만들지 말 것 (배경을 보존하지 못해 아래 화면을 통째로 덮음). 해당 Base 카메라의 스택에 Overlay 카메라로 붙인다.
    - `Game.Editor` / `Game.Runtime` asmdef 에 URP 참조가 없다. URP 타입(UniversalAdditionalCameraData 등)을 직접 쓰면 컴파일 실패 — SerializedObject 로 다룬다.
+   - 오버레이 카메라 z 를 진영 카메라에서 복사하지 말 것 (게임 시작 시 진영 카메라가 아직 z=0 이라 z=0 무대 오브젝트가 안 보임). 음수 z 보장.
    - `capture game_view --save_path` 는 절대 경로를 줘도 `Assets/` 아래에 저장된다. 캡처 후 `.claude/tmp/` 로 옮기고 지울 것. Game 뷰가 Free Aspect 면 캡처가 찌그러진다.

@@ -14,7 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Game.Runtime::DimensionWeaponData
   nameKey: dimension_weapon.plague_mine.name
   explainKey: dimension_weapon.plague_mine.explain
-  icon: {fileID: 21300000, guid: 347e99b9fdf0e464abb39398fb8e2dcf, type: 3}
+  icon: {fileID: 21300000, guid: e8d531ecf2f5e214e966c5d2038d1751, type: 3}
   materialA: {fileID: 7651606874026120192, guid: be440b095820487e8bcb844511d9e6c6, type: 3}
   materialB: {fileID: 76705273114334461, guid: cf14849d689c4a1f9bce6ef75b994e4c, type: 3}
   fallbackRequiredLevel: 10

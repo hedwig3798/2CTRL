@@ -14,7 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Game.Runtime::DimensionWeaponData
   nameKey: dimension_weapon.thorn_saw.name
   explainKey: dimension_weapon.thorn_saw.explain
-  icon: {fileID: 21300000, guid: f696dc614896cbe42922c3a1bfa1e662, type: 3}
+  icon: {fileID: 21300000, guid: 85b67c1a312e60d4bb638a69003f1617, type: 3}
   materialA: {fileID: 4307955513310795974, guid: 927d0b178a935b840a7ced4a52521c5a, type: 3}
   materialB: {fileID: 3750892015563446428, guid: 1c9ac8429755f6e4dae6de4b8d69b9cc, type: 3}
   fallbackRequiredLevel: 10

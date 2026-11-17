@@ -70,15 +70,15 @@ MonoBehaviour:
   bulletSpeed: 14
   bulletRadius: 0.15
   bulletExtraTravel: 2
-  spiritPrefab: {fileID: 0}
+  spiritPrefab: {fileID: 4004294399225007352, guid: f839dcf796eaa0241bb74a830519bae5, type: 3}
   spiritSprite: {fileID: 0}
   spiritColor: {r: 1, g: 1, b: 1, a: 1}
   spiritScale: 1
-  dronePrefab: {fileID: 0}
+  dronePrefab: {fileID: 8162801885627472012, guid: 6d592633d9f41934b8474944f2005057, type: 3}
   droneSprite: {fileID: 0}
   droneColor: {r: 1, g: 1, b: 1, a: 1}
   droneScale: 1
-  bulletPrefab: {fileID: 0}
+  bulletPrefab: {fileID: 8395832655996463605, guid: 704c8e3de1bfaa04987fe762c3811a4a, type: 3}
   bulletSprite: {fileID: 0}
   bulletColor: {r: 1, g: 1, b: 1, a: 1}
   bulletScale: 1

@@ -85,6 +85,7 @@ namespace Builders.Visual
             TMP_FontAsset font = BuildFont();
             BuildPrefabUI(font);
             BuildScenes(font);
+            log.AppendLine(Builders.Visual.DimensionWeaponVisual.Build());
 
             AssetDatabase.SaveAssets();
             AssetDatabase.Refresh();

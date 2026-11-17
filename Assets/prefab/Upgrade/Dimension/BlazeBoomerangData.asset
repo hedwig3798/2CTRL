@@ -14,7 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Game.Runtime::DimensionWeaponData
   nameKey: dimension_weapon.blaze_boomerang.name
   explainKey: dimension_weapon.blaze_boomerang.explain
-  icon: {fileID: 21300000, guid: 9bcd85619210454449030f927a6d002d, type: 3}
+  icon: {fileID: 21300000, guid: 9b97881b19cdca94cbdbc1dcf1563e53, type: 3}
   materialA: {fileID: 2378375243013374915, guid: 51032cf65ded45d8ad5215dfe58623f5, type: 3}
   materialB: {fileID: 1531015672605070998, guid: 8baf1a8b19f6ba24197bd8f46c004f92, type: 3}
   fallbackRequiredLevel: 10

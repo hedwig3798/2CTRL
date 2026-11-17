@@ -52,7 +52,7 @@ MonoBehaviour:
   areaRadius: 1.2
   statTags: 31
   minAttackSpeed: 0.1
-  projectilePrefab: {fileID: 0}
+  projectilePrefab: {fileID: 7950536531362429294, guid: d005538338bf34d4d8e02e876e4d40ed, type: 3}
   flightSpeed: 8
   overshoot: 1
   minDistance: 2
