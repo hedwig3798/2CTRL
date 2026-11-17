@@ -1,6 +1,6 @@
 # 차원 무기 (화면 공용 합성 무기) — 2026-11-17 기록
 설계서: docs/dimension-weapon-design.md. 숲 6종 + 공장 6종 10레벨 재료 1:1 합성 -> 화면 공용 무기 6종. Root(뿌리 속박) 무기/RootProjectile 삭제됨.
-경로 접두 S = Assets/Resources/Script/. 1076b3a 커밋 = 공통 베이스, 나머지(UI 카드·6종·테스트)는 미커밋(작성 시점).
+경로 접두 S = Assets/Resources/Script/. 전부 커밋됨(~7436ee0).
 
 ## StageSystem (S/StageSystem/, 신규)
 - StageSpace: 게임 시작부터 BossSpace 월드를 화면 공간으로 사용. [DefaultExecutionOrder(-500)]로 매 프레임 무기 Update 전 쿼드트리 재구성. static Instance/Targets(준비 안 됐으면 null)/StageLayer(레이어 "Stage"). IsReady, Space(BossSpace), Tree, StageRect, StageCenter, WorldToStage/StageToWorld(PlayerSide,Vector2), IsOnScreen. FinalBossDirector가 오버레이 배치를 재사용.
@@ -26,4 +26,14 @@ SpiritSquadron(정령 추격+드론 사격), ThornSaw(톱날 3배+덩굴 장판)
 - WeaponHUD: 일반 무기 뒤에 차원 무기 슬롯 채움. WeaponSlotUI.SetDimensionWeapon(inst, icon, nameKey).
 - 통계: DamageMassage.dimensionWeapon 있으면 HealthSystem이 EventManager.OnDimensionWeaponDamage(DimensionWeapon, float) 발행 후 return (기존 무기별 통계 경로 우회).
 - 테스트(EditMode): DimensionFusionTests, StageQuadTreeTests, DimensionFusionCursorTests, DimensionWeapons_{MineBoomerang,SpiritThorn,WhirlPrism}Tests.
-- 미반영(빌더/프리팹/SO/레이어 Stage 등록 등 에디터 작업은 이 기록 범위 밖, editor.md 미갱신).
+
+## 수정 루프 API (7436ee0까지)
+- DimensionFusionEffect: IsFused(recipe)/TryApply(재료·중복 검증 후 적용 여부 반환). DimensionFusion: 진영별 FindUpgradeTable/GetRequiredLevel(side별 재료 기준). LevelUpUI.AbandonFusion(합성 카드 포기/복귀).
+- Knockback: ResolvedRoot/Generation(루트 해석 캐시 및 세대 카운터). DimensionStatMath.ScaledTickInterval(공격속도 배율 반영 틱 간격).
+- StageSpace: 오버레이 카메라 z 보장(ResolveOverlayZ: 진영 카메라 z<0이면 그 값, 아니면 오버레이 z<0, 아니면 -10). 무대 오브젝트 z=0이라 음수 필수.
+- WeaponSlotUI: SetLevelBadgeActive, "LevelBadge"+levelText를 일반 무기는 표시/차원 무기는 숨김.
+
+## 에디터 빌더 (Game.Editor)
+- Assets/Editor/Builders/DimensionWeaponBuilder.cs (Builders.DimensionWeaponBuilder.Build()): Root(뿌리 속박) 에셋 정리, 레이어 Stage(19번) 등록, 차원 무기 프리팹/DimensionWeaponData SO/DimensionFusionRegistry 생성, LevelUpUI 합성 카드 배치, StageSpace 배치.
+- Assets/Editor/Builders/Visual/DimensionWeaponVisual.cs (Build()): 차원 무기 비주얼 적용. ArtResourceBuilder.Build() 끝에서 호출됨(다른 빌더 재실행 후 ArtResourceBuilder 재실행 규칙에 포함).
+- 에셋 위치: Assets/prefab/weapon/Dimension/(+Parts/), Assets/prefab/Upgrade/Dimension/. Stage 레이어=19.
