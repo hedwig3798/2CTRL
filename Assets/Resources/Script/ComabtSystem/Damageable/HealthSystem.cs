@@ -355,6 +355,12 @@ public class HealthSystem
             return;
         }
 
+        if (null != _msg.dimensionWeapon)
+        {
+            EventManager.Instance.OnDimensionWeaponDamage?.Invoke(_msg.dimensionWeapon, _applied);
+            return;
+        }
+
         if (null == _msg.weapon)
         {
             return;

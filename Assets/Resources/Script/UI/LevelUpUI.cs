@@ -29,6 +29,60 @@ public class LevelUpUI
     [SerializeField]
     private TMP_Text resumeLabel;
 
+    [Header("dimension fusion")]
+    [Tooltip("차원 무기 합성법 목록 (비우면 합성 카드를 띄우지 않음)")]
+    [SerializeField]
+    private DimensionFusionRegistry fusionRegistry;
+
+    [Tooltip("중앙 합성 카드 (비우면 합성 카드를 띄우지 않음)")]
+    [SerializeField]
+    private DimensionFusionCard fusionCard;
+
+    [Tooltip("합성 카드가 있는 라운드에서 양쪽 그룹을 바깥쪽으로 미는 거리 (px)")]
+    [Min(0f)]
+    [SerializeField]
+    private float fusionGroupOffset = 200f;
+
+    [Tooltip("왼쪽 그룹 RectTransform (비우면 Left 진영 SelectPanelGroup)")]
+    [SerializeField]
+    private RectTransform leftGroupRect;
+
+    [Tooltip("오른쪽 그룹 RectTransform (비우면 Right 진영 SelectPanelGroup)")]
+    [SerializeField]
+    private RectTransform rightGroupRect;
+
+    // 중앙 합성 카드 커서 상태
+    private readonly DimensionFusionCursor fusionCursor = new DimensionFusionCursor();
+
+    // 이번 라운드 합성 후보 (없으면 null)
+    private DimensionWeaponData fusionCandidate;
+
+    // 카드로 옮기기 전에 그룹에서 고르고 있던 패널 (복귀할 때 되돌림)
+    private SelectPanel leftRememberedPanel;
+    private SelectPanel rightRememberedPanel;
+
+    // 밀어낸 그룹과 원래 위치
+    private bool isGroupShifted;
+    private RectTransform shiftedLeftRect;
+    private RectTransform shiftedRightRect;
+    private Vector2 leftGroupOrigin;
+    private Vector2 rightGroupOrigin;
+
+    /// <summary>
+    /// 지금 라운드에 중앙 합성 카드가 있는지
+    /// </summary>
+    public bool HasFusionCard => fusionCursor.HasCard;
+
+    /// <summary>
+    /// 지금 라운드의 합성 후보 (없으면 null)
+    /// </summary>
+    public DimensionWeaponData FusionCandidate => fusionCandidate;
+
+    /// <summary>
+    /// _side 커서가 중앙 합성 카드에 있는지
+    /// </summary>
+    public bool IsFusionSelected(PlayerSide _side) => fusionCursor.IsOnCard(_side);
+
     /// <summary>
     /// 보상 선택 한 번 (일반 레벨업: 양쪽 그룹, 보스 보상: side 그룹만)
     /// </summary>
@@ -134,6 +188,10 @@ public class LevelUpUI
         {
             group.OnSelectionChanged += HandleSelectionChanged;
         }
+        if (null != fusionCard)
+        {
+            fusionCard.OnClicked += HandleFusionCardClicked;
+        }
         UpdateResumeButton();
 
         StringTable.OnLanguageChanged += HandleLanguageChanged;
@@ -196,6 +254,10 @@ public class LevelUpUI
                 group.OnSelectionChanged -= HandleSelectionChanged;
             }
         }
+        if (null != fusionCard)
+        {
+            fusionCard.OnClicked -= HandleFusionCardClicked;
+        }
 
         // 열린 채로 비활성화되면 게임이 멈춘 상태로 남지 않도록 닫음
         if (true == IsOpen)
@@ -255,6 +317,10 @@ public class LevelUpUI
         }
 
         RewardRound round = rounds.Peek();
+
+        // 커서 상태를 먼저 새 라운드로 돌린다 (RefreshRewards 의 선택 변경 콜백이 이전 라운드 커서를 보지 않도록)
+        SetupFusion(round.isBoss);
+
         bool hasGroup = false;
         foreach (SelectPanelGroup group in selectPanelGroups)
         {
@@ -293,7 +359,19 @@ public class LevelUpUI
         }
 
         Keyboard keyboard = Keyboard.current;
-        if (null == keyboard || false == keyboard.spaceKey.wasPressedThisFrame)
+        if (null == keyboard)
+        {
+            return;
+        }
+
+        // 중앙 합성 카드 커서: 왼쪽 D / A, 오른쪽 ← / →
+        if (true == fusionCursor.HasCard)
+        {
+            HandleFusionKey(PlayerSide.Left, keyboard.dKey.wasPressedThisFrame, keyboard.aKey.wasPressedThisFrame);
+            HandleFusionKey(PlayerSide.Right, keyboard.leftArrowKey.wasPressedThisFrame, keyboard.rightArrowKey.wasPressedThisFrame);
+        }
+
+        if (false == keyboard.spaceKey.wasPressedThisFrame)
         {
             return;
         }
@@ -317,7 +395,20 @@ public class LevelUpUI
             return;
         }
 
-        ApplySelectedRewards();
+        // 어느 한쪽이라도 중앙 합성 카드를 골랐으면 합성만 적용 (다른 선택 무시)
+        if (true == fusionCursor.ShouldApplyFusion)
+        {
+            // 합성에 실패하면 카드를 거두고 라운드를 유지한다 (일반 보상을 다시 고르게)
+            if (false == ApplyFusionReward())
+            {
+                AbandonFusion();
+                return;
+            }
+        }
+        else
+        {
+            ApplySelectedRewards();
+        }
         if (0 < rounds.Count)
         {
             rounds.Dequeue();
@@ -375,13 +466,327 @@ public class LevelUpUI
 
     private void HandleSelectionChanged(SelectPanel _selected)
     {
+        // 카드에 있던 쪽이 그룹 패널을 다시 고르면(클릭 / W·S / ↑·↓) 커서를 그룹으로 되돌린다
+        if (true == fusionCursor.AnyOnCard)
+        {
+            bool changed = false;
+            foreach (SelectPanelGroup group in selectPanelGroups)
+            {
+                if (null != group && null != group.SelectedPanel && true == fusionCursor.MoveToGroup(group.Side))
+                {
+                    SetRememberedPanel(group.Side, null);
+                    changed = true;
+                }
+            }
+            if (true == changed)
+            {
+                ApplyFusionCursor();
+            }
+        }
+
         UpdateResumeButton();
+    }
+
+    /// <summary>
+    /// 일반 라운드면 합성 후보를 찾아 중앙 카드를 띄우고 양쪽 그룹을 바깥으로 민다. 보스 라운드 / 후보 없음이면 카드를 숨기고 원위치
+    /// </summary>
+    private void SetupFusion(bool _isBoss)
+    {
+        fusionCandidate = null;
+        if (false == _isBoss && null != fusionRegistry && null != fusionCard)
+        {
+            fusionCandidate = fusionRegistry.FindCandidate();
+        }
+
+        fusionCursor.Begin(null != fusionCandidate);
+        leftRememberedPanel = null;
+        rightRememberedPanel = null;
+
+        if (null != fusionCandidate)
+        {
+            fusionCard.Show(fusionCandidate);
+            ShiftGroups(true);
+        }
+        else
+        {
+            if (null != fusionCard)
+            {
+                fusionCard.Hide();
+            }
+            ShiftGroups(false);
+        }
+    }
+
+    /// <summary>
+    /// 합성 카드를 숨기고 그룹을 원위치 (UI 를 닫을 때)
+    /// </summary>
+    private void EndFusion()
+    {
+        fusionCandidate = null;
+        fusionCursor.End();
+        leftRememberedPanel = null;
+        rightRememberedPanel = null;
+        if (null != fusionCard)
+        {
+            fusionCard.Hide();
+        }
+        ShiftGroups(false);
+    }
+
+    /// <summary>
+    /// 키 입력 판정은 DimensionFusionCursor.HandleInput 에 맡기고, 상태가 바뀌었을 때 UI 후처리만 한다
+    /// </summary>
+    private void HandleFusionKey(PlayerSide _side, bool _towardCenter, bool _towardOutside)
+    {
+        if (false == fusionCursor.HandleInput(_side, _towardCenter, _towardOutside))
+        {
+            return;
+        }
+
+        if (true == fusionCursor.IsOnCard(_side))
+        {
+            OnMovedToCard(_side);
+        }
+        else
+        {
+            OnMovedToGroup(_side);
+        }
+    }
+
+    private void HandleFusionCardClicked(PlayerSide _side)
+    {
+        SelectFusionCard(_side);
+    }
+
+    /// <summary>
+    /// _side 커서를 중앙 합성 카드로 옮기고 그 쪽 그룹 선택을 해제한다 (카드가 없으면 무시)
+    /// </summary>
+    public void SelectFusionCard(PlayerSide _side)
+    {
+        if (false == fusionCursor.MoveToCard(_side))
+        {
+            return;
+        }
+        OnMovedToCard(_side);
+    }
+
+    /// <summary>
+    /// 커서가 카드로 옮겨진 뒤: 그 쪽 그룹 선택을 기억하고 해제
+    /// </summary>
+    private void OnMovedToCard(PlayerSide _side)
+    {
+        SelectPanelGroup group = FindVisibleGroup(_side);
+        if (null != group)
+        {
+            SetRememberedPanel(_side, group.SelectedPanel);
+            group.ClearSelection();
+        }
+
+        ApplyFusionCursor();
+        UpdateResumeButton();
+    }
+
+    /// <summary>
+    /// _side 커서를 그룹으로 되돌린다. 카드로 옮기기 전 패널을 다시 고르고, 없으면 첫 번째 패널
+    /// </summary>
+    public void ReturnToGroup(PlayerSide _side)
+    {
+        if (false == fusionCursor.MoveToGroup(_side))
+        {
+            return;
+        }
+        OnMovedToGroup(_side);
+    }
+
+    /// <summary>
+    /// 커서가 그룹으로 돌아온 뒤: 기억한 패널(없으면 첫 패널) 을 다시 고른다
+    /// </summary>
+    private void OnMovedToGroup(PlayerSide _side)
+    {
+        ApplyFusionCursor();
+
+        SelectPanel remembered = PlayerSide.Left == _side ? leftRememberedPanel : rightRememberedPanel;
+        SetRememberedPanel(_side, null);
+
+        SelectPanelGroup group = FindVisibleGroup(_side);
+        if (null != group)
+        {
+            if (null != remembered && true == remembered.gameObject.activeSelf && group == remembered.GetComponentInParent<SelectPanelGroup>(true))
+            {
+                remembered.Click();
+            }
+            else
+            {
+                group.SelectFirst();
+            }
+        }
+
+        UpdateResumeButton();
+    }
+
+    private void SetRememberedPanel(PlayerSide _side, SelectPanel _panel)
+    {
+        if (PlayerSide.Left == _side)
+        {
+            leftRememberedPanel = _panel;
+        }
+        else
+        {
+            rightRememberedPanel = _panel;
+        }
+    }
+
+    private void ApplyFusionCursor()
+    {
+        if (null != fusionCard)
+        {
+            fusionCard.SetCursor(fusionCursor.IsOnCard(PlayerSide.Left), fusionCursor.IsOnCard(PlayerSide.Right));
+        }
+    }
+
+    private SelectPanelGroup FindVisibleGroup(PlayerSide _side)
+    {
+        foreach (SelectPanelGroup group in selectPanelGroups)
+        {
+            if (null != group && _side == group.Side && true == group.gameObject.activeInHierarchy)
+            {
+                return group;
+            }
+        }
+        return null;
+    }
+
+    /// <summary>
+    /// 양쪽 그룹을 바깥쪽으로 fusionGroupOffset 만큼 밀거나(true) 원위치(false)
+    /// </summary>
+    private void ShiftGroups(bool _shift)
+    {
+        if (_shift == isGroupShifted)
+        {
+            return;
+        }
+
+        if (true == _shift)
+        {
+            shiftedLeftRect = ResolveGroupRect(PlayerSide.Left, leftGroupRect);
+            shiftedRightRect = ResolveGroupRect(PlayerSide.Right, rightGroupRect);
+            if (null != shiftedLeftRect)
+            {
+                leftGroupOrigin = shiftedLeftRect.anchoredPosition;
+                shiftedLeftRect.anchoredPosition = leftGroupOrigin + Vector2.left * fusionGroupOffset;
+            }
+            if (null != shiftedRightRect)
+            {
+                rightGroupOrigin = shiftedRightRect.anchoredPosition;
+                shiftedRightRect.anchoredPosition = rightGroupOrigin + Vector2.right * fusionGroupOffset;
+            }
+        }
+        else
+        {
+            if (null != shiftedLeftRect)
+            {
+                shiftedLeftRect.anchoredPosition = leftGroupOrigin;
+            }
+            if (null != shiftedRightRect)
+            {
+                shiftedRightRect.anchoredPosition = rightGroupOrigin;
+            }
+            shiftedLeftRect = null;
+            shiftedRightRect = null;
+        }
+        isGroupShifted = _shift;
+    }
+
+    private RectTransform ResolveGroupRect(PlayerSide _side, RectTransform _assigned)
+    {
+        if (null != _assigned)
+        {
+            return _assigned;
+        }
+
+        foreach (SelectPanelGroup group in selectPanelGroups)
+        {
+            if (null != group && _side == group.Side)
+            {
+                return group.transform as RectTransform;
+            }
+        }
+        return null;
+    }
+
+    /// <summary>
+    /// 중앙 합성 카드 보상만 적용한다 (합성 효과는 고른 쪽과 무관하게 양쪽 플레이어를 처리)
+    /// - 보상 데이터는 적용할 때 만들고 바로 지운다
+    /// </summary>
+    /// <returns>실제로 합성했으면 true (RewardManager 없음, 합성법 무효, 재료 부족 등이면 false)</returns>
+    private bool ApplyFusionReward()
+    {
+        RewardManager rewardManager = RewardManager.Instance;
+        if (null == rewardManager)
+        {
+            Debug.LogWarning($"[LevelUpUI] RewardManager 가 없어 합성 보상을 적용하지 못했습니다. ({name})", this);
+            return false;
+        }
+
+        RewardData data = DimensionFusionEffect.CreateReward(fusionCandidate);
+        if (null == data)
+        {
+            Debug.LogWarning($"[LevelUpUI] 합성법이 비어 있거나 유효하지 않아 합성하지 못했습니다. ({name})", this);
+            return false;
+        }
+
+        PlayerSide side = fusionCursor.FusionContextSide;
+        bool fused = DimensionFusionEffect.TryApply(rewardManager, data, side);
+        if (true == fused)
+        {
+            RewardSound.PlayConfirm(data, null, side);
+        }
+        else
+        {
+            Debug.LogWarning($"[LevelUpUI] 합성에 실패해 합성 카드를 거둡니다. 일반 보상을 고르세요. ({name})", this);
+        }
+
+        RewardEffect effect = data.GetEffect();
+        if (null != effect)
+        {
+            Destroy(effect);
+        }
+        Destroy(data);
+        return fused;
+    }
+
+    /// <summary>
+    /// 합성 실패 시: 카드에 있던 커서를 그룹으로 되돌리고(기억한 패널 또는 첫 패널) 카드를 숨긴 뒤 그룹을 원위치. 라운드는 유지
+    /// </summary>
+    private void AbandonFusion()
+    {
+        ReturnToGroup(PlayerSide.Left);
+        ReturnToGroup(PlayerSide.Right);
+
+        fusionCandidate = null;
+        fusionCursor.Begin(false);
+        leftRememberedPanel = null;
+        rightRememberedPanel = null;
+        if (null != fusionCard)
+        {
+            fusionCard.Hide();
+        }
+        ShiftGroups(false);
+        UpdateResumeButton();
+    }
+
+    /// <summary>
+    /// 재개 가능 여부: 어느 한쪽이라도 중앙 합성 카드를 골랐거나, 보이는 그룹이 모두 선택됨
+    /// </summary>
+    private bool CanResume()
+    {
+        return fusionCursor.CanResume(AreGroupsReady());
     }
 
     /// <summary>
     /// 보이는 패널이 있는 그룹은 모두 선택되어 있어야 재개 가능
     /// </summary>
-    private bool CanResume()
+    private bool AreGroupsReady()
     {
         foreach (SelectPanelGroup group in selectPanelGroups)
         {
@@ -432,6 +837,7 @@ public class LevelUpUI
     private void Close()
     {
         rounds.Clear();
+        EndFusion();
 
         // 보스 보상으로 숨긴 그룹을 다음에 열 때를 위해 되돌린다
         foreach (SelectPanelGroup group in selectPanelGroups)

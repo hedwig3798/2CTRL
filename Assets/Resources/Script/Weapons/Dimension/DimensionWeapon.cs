@@ -60,6 +60,21 @@ public abstract class DimensionWeapon
     private bool hasWarnedLayer;
     private float timer;
 
+    // 양쪽 플레이어 참조 (없을 때만 PlayerStats.Find)
+    private PlayerStats leftStats;
+    private PlayerStats rightStats;
+
+    // ApplyCombinedStat 용 스텟 캐시 (Time.frameCount 기준 프레임당 1회, ValueType 별로 처음 쓸 때 채운다)
+    private static readonly int ValueTypeCount = GetValueTypeCount();
+    private readonly float[] cachedAddLeft = new float[ValueTypeCount];
+    private readonly float[] cachedAddRight = new float[ValueTypeCount];
+    private readonly float[] cachedMulLeft = new float[ValueTypeCount];
+    private readonly float[] cachedMulRight = new float[ValueTypeCount];
+    private readonly bool[] cachedValid = new bool[ValueTypeCount];
+    private int cachedFrame = -1;
+    private bool cachedHasPlayer;
+    private float cachedMinMultiplier;
+
     /// <summary>
     /// 합성법 (Initialize 전이면 null)
     /// </summary>
@@ -176,24 +191,72 @@ public abstract class DimensionWeapon
             return _value;
         }
 
-        PlayerStats left = PlayerStats.Find(PlayerSide.Left);
-        PlayerStats right = PlayerStats.Find(PlayerSide.Right);
-        if (null == left && null == right)
+        RefreshStatCache();
+        if (false == cachedHasPlayer)
         {
             return _value;
         }
 
-        float minMultiplier = Mathf.Max(
-            null != left ? left.MinMultiplier : 0f,
-            null != right ? right.MinMultiplier : 0f);
+        int i = (int)_type;
+        if (i < 0 || i >= ValueTypeCount)
+        {
+            return _value;
+        }
+
+        if (false == cachedValid[i])
+        {
+            cachedAddLeft[i] = null != leftStats ? leftStats.GetAdd(_type) : 0f;
+            cachedAddRight[i] = null != rightStats ? rightStats.GetAdd(_type) : 0f;
+            cachedMulLeft[i] = null != leftStats ? leftStats.GetMultiply(_type) : 0f;
+            cachedMulRight[i] = null != rightStats ? rightStats.GetMultiply(_type) : 0f;
+            cachedValid[i] = true;
+        }
 
         return DimensionStatMath.Apply(
             _value,
-            null != left ? left.GetAdd(_type) : 0f,
-            null != right ? right.GetAdd(_type) : 0f,
-            null != left ? left.GetMultiply(_type) : 0f,
-            null != right ? right.GetMultiply(_type) : 0f,
-            minMultiplier);
+            cachedAddLeft[i],
+            cachedAddRight[i],
+            cachedMulLeft[i],
+            cachedMulRight[i],
+            cachedMinMultiplier);
+    }
+
+    /// <summary>
+    /// 프레임이 바뀌었으면 플레이어 참조(없을 때만 Find) 와 배율 하한을 다시 잡고 ValueType 별 캐시를 비운다
+    /// </summary>
+    private void RefreshStatCache()
+    {
+        int frame = Time.frameCount;
+        if (frame == cachedFrame)
+        {
+            return;
+        }
+        cachedFrame = frame;
+
+        if (null == leftStats)
+        {
+            leftStats = PlayerStats.Find(PlayerSide.Left);
+        }
+        if (null == rightStats)
+        {
+            rightStats = PlayerStats.Find(PlayerSide.Right);
+        }
+
+        cachedHasPlayer = null != leftStats || null != rightStats;
+        cachedMinMultiplier = Mathf.Max(
+            null != leftStats ? leftStats.MinMultiplier : 0f,
+            null != rightStats ? rightStats.MinMultiplier : 0f);
+        System.Array.Clear(cachedValid, 0, cachedValid.Length);
+    }
+
+    private static int GetValueTypeCount()
+    {
+        int max = 0;
+        foreach (ValueType type in System.Enum.GetValues(typeof(ValueType)))
+        {
+            max = Mathf.Max(max, (int)type);
+        }
+        return max + 1;
     }
     #endregion
 

@@ -8,6 +8,11 @@ using UnityEngine;
 public static class DimensionStatMath
 {
     /// <summary>
+    /// 틱 간격 하한 (초)
+    /// </summary>
+    public const float MinTickInterval = 0.05f;
+
+    /// <summary>
     /// 양쪽 비율 합으로 만든 배율 (하한 _minMultiplier)
     /// </summary>
     public static float CombinedMultiplier(float _mulLeft, float _mulRight, float _minMultiplier)
@@ -29,5 +34,18 @@ public static class DimensionStatMath
     public static int RoundCount(float _value)
     {
         return Mathf.Max(1, Mathf.FloorToInt(_value + 0.5f));
+    }
+
+    /// <summary>
+    /// 공격 속도 스텟을 반영한 틱 간격 (PoisonZoneProjectile 과 같은 방식: 기본 간격 × 기본 공격 속도 / 최종 공격 속도, 최소 MinTickInterval)
+    /// </summary>
+    public static float ScaledTickInterval(float _interval, float _baseAttackSpeed, float _finalAttackSpeed)
+    {
+        float interval = Mathf.Max(MinTickInterval, _interval);
+        if (_baseAttackSpeed <= 0f || _finalAttackSpeed <= 0f)
+        {
+            return interval;
+        }
+        return Mathf.Max(MinTickInterval, interval * (_baseAttackSpeed / _finalAttackSpeed));
     }
 }

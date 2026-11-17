@@ -25,8 +25,20 @@ public class Knockback
 
     private Vector2 velocity;
     private HealthSystem healthSystem;
+    private int generation;
 
     public bool IsKnockedBack => velocity.sqrMagnitude > StopSpeed * StopSpeed;
+
+    /// <summary>
+    /// 실제로 밀려날 대상. moveRoot 가 있으면 그것, 없으면 부모의 Rigidbody2D 가 붙은 오브젝트, 그것도 없으면 최상위 오브젝트
+    /// (Awake 전에 불러도 같은 규칙으로 찾는다)
+    /// </summary>
+    public Transform ResolvedRoot => null != moveRoot ? moveRoot : FindDefaultRoot();
+
+    /// <summary>
+    /// 활성 세대. 꺼지거나(풀 반환) 다시 초기화될 때마다 바뀐다 (외부에서 붙잡은 대상이 재사용됐는지 확인용)
+    /// </summary>
+    public int Generation => generation;
 
     public void ProcessDamage(ref DamageMassage _msg)
     {
@@ -54,6 +66,7 @@ public class Knockback
     public void Initialize(BlackBoard _data)
     {
         velocity = Vector2.zero;
+        ++generation;
     }
 
     private void Awake()
@@ -62,14 +75,20 @@ public class Knockback
 
         if (null == moveRoot)
         {
-            Rigidbody2D body = GetComponentInParent<Rigidbody2D>();
-            moveRoot = null != body ? body.transform : transform.root;
+            moveRoot = FindDefaultRoot();
         }
+    }
+
+    private Transform FindDefaultRoot()
+    {
+        Rigidbody2D body = GetComponentInParent<Rigidbody2D>();
+        return null != body ? body.transform : transform.root;
     }
 
     private void OnDisable()
     {
         velocity = Vector2.zero;
+        ++generation;
     }
 
     private void Update()

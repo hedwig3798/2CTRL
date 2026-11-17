@@ -8,7 +8,7 @@ using UnityEngine;
 /// - 어느 한쪽이라도 같은 차원 무기를 이미 보유하면 제외
 /// - 후보가 여럿이면 무작위 1개
 /// - 재료의 최대 단계 = 씬 DimensionApplier 차원의 무기 보상(WeaponRewardEffect.UpgradeTable.StepCount),
-///   못 찾으면 DimensionWeaponData.FallbackRequiredLevel
+///   그 플레이어 진영 applier(차원) 를 먼저 보고, 없으면 다른 진영. 못 찾으면 DimensionWeaponData.FallbackRequiredLevel
 /// - 중보스 보상 라운드에서는 부르지 않는다 (호출하는 쪽 책임)
 /// </summary>
 public static class DimensionFusion
@@ -60,8 +60,8 @@ public static class DimensionFusion
             bool owned = true == left.HasDimensionWeapon(recipe) || true == right.HasDimensionWeapon(recipe);
             bool candidate = IsCandidate(
                 recipe,
-                prefab => IsMaxLevel(left.GetWeapon(prefab), GetRequiredLevel(prefab, appliers, fallback)),
-                prefab => IsMaxLevel(right.GetWeapon(prefab), GetRequiredLevel(prefab, appliers, fallback)),
+                prefab => IsMaxLevel(left.GetWeapon(prefab), GetRequiredLevel(prefab, appliers, fallback, PlayerSide.Left)),
+                prefab => IsMaxLevel(right.GetWeapon(prefab), GetRequiredLevel(prefab, appliers, fallback, PlayerSide.Right)),
                 owned);
 
             if (true == candidate)
@@ -138,6 +138,15 @@ public static class DimensionFusion
     }
 
     /// <summary>
+    /// _side 플레이어 기준 _prefab 무기의 최대 업그레이드 단계 (_side 진영 차원을 먼저 본다, 못 찾으면 _fallbackLevel)
+    /// </summary>
+    public static int GetRequiredLevel(Weapon _prefab, IList<DimensionApplier> _appliers, int _fallbackLevel, PlayerSide _side)
+    {
+        WeaponUpgradeTable table = FindUpgradeTable(_prefab, _appliers, _side);
+        return null != table && table.StepCount > 0 ? table.StepCount : _fallbackLevel;
+    }
+
+    /// <summary>
     /// _appliers 차원의 무기 보상 중 _prefab 을 주는 보상의 업그레이드 테이블 (없으면 null)
     /// </summary>
     public static WeaponUpgradeTable FindUpgradeTable(Weapon _prefab, IList<DimensionApplier> _appliers)
@@ -149,17 +158,55 @@ public static class DimensionFusion
 
         foreach (DimensionApplier applier in _appliers)
         {
-            if (null == applier || null == applier.Dimension || null == applier.Dimension.WeaponRewards)
+            WeaponUpgradeTable table = FindUpgradeTable(_prefab, applier);
+            if (null != table)
             {
-                continue;
+                return table;
             }
+        }
+        return null;
+    }
 
-            foreach (RewardData reward in applier.Dimension.WeaponRewards)
+    /// <summary>
+    /// _side 진영 applier(차원) 에서 먼저 찾고, 없으면 나머지 applier 에서 찾는다 (없으면 null)
+    /// - 진영마다 차원이 달라 같은 무기라도 업그레이드 테이블이 다를 수 있다
+    /// </summary>
+    public static WeaponUpgradeTable FindUpgradeTable(Weapon _prefab, IList<DimensionApplier> _appliers, PlayerSide _side)
+    {
+        if (null == _prefab || null == _appliers)
+        {
+            return null;
+        }
+
+        foreach (DimensionApplier applier in _appliers)
+        {
+            if (null != applier && _side == applier.Side)
             {
-                if (null != reward && reward.GetEffect() is WeaponRewardEffect effect && _prefab == effect.WeaponPrefab && null != effect.UpgradeTable)
+                WeaponUpgradeTable table = FindUpgradeTable(_prefab, applier);
+                if (null != table)
                 {
-                    return effect.UpgradeTable;
+                    return table;
                 }
+            }
+        }
+        return FindUpgradeTable(_prefab, _appliers);
+    }
+
+    /// <summary>
+    /// _applier 차원의 무기 보상 중 _prefab 을 주는 보상의 업그레이드 테이블 (없으면 null)
+    /// </summary>
+    private static WeaponUpgradeTable FindUpgradeTable(Weapon _prefab, DimensionApplier _applier)
+    {
+        if (null == _applier || null == _applier.Dimension || null == _applier.Dimension.WeaponRewards)
+        {
+            return null;
+        }
+
+        foreach (RewardData reward in _applier.Dimension.WeaponRewards)
+        {
+            if (null != reward && reward.GetEffect() is WeaponRewardEffect effect && _prefab == effect.WeaponPrefab && null != effect.UpgradeTable)
+            {
+                return effect.UpgradeTable;
             }
         }
         return null;

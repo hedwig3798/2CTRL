@@ -165,6 +165,13 @@ public class StageSpace
             Layout();
         }
 
+        // 일시정지(레벨업 UI 등, timeScale 0) 중에는 적이 움직이지 않으므로 재구성을 생략한다
+        // 재개 직후 첫 프레임은 실행 순서에 따라 무기가 정지 전 트리를 볼 수 있다 (1프레임 지연 허용)
+        if (Time.timeScale <= 0f)
+        {
+            return;
+        }
+
         targets.Rebuild(tree, space);
     }
     #endregion

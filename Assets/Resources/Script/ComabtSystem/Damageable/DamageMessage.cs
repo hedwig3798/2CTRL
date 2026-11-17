@@ -19,4 +19,9 @@ public struct DamageMassage
     /// 이 데미지를 만든 무기 (통계 귀속용). 무기가 아닌 데미지(접촉, 몬스터 장판 등)는 null
     /// </summary>
     public Weapon weapon;
+
+    /// <summary>
+    /// 이 데미지를 만든 차원 무기 (화면 공용, 통계 귀속용). 일반 무기 데미지면 null
+    /// </summary>
+    public DimensionWeapon dimensionWeapon;
 }

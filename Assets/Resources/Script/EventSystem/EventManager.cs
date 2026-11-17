@@ -53,6 +53,10 @@ public class EventManager
     /// 플레이어 무기가 적에게 데미지를 줬을 때 (무기 주인, 무기, 실제로 깎인 양)
     /// </summary>
     public Action<PlayerSide, Weapon, float> OnWeaponDamage;
+    /// <summary>
+    /// 차원 무기(화면 공용)가 준 데미지 (무기, 실제 적용량)
+    /// </summary>
+    public Action<DimensionWeapon, float> OnDimensionWeaponDamage;
 
     /// <summary>
     /// 플레이어가 EXP 아이템을 수집했을 때 (수집한 플레이어, 획득 EXP)

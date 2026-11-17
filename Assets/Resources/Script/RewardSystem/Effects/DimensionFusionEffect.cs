@@ -14,6 +14,7 @@ public class DimensionFusionEffect
     private DimensionWeaponData recipe;
 
     private bool isApplied;
+    private bool isFused;
 
     public DimensionWeaponData Recipe => recipe;
 
@@ -21,6 +22,28 @@ public class DimensionFusionEffect
     /// 이 효과로 합성을 마쳤는지
     /// </summary>
     public bool IsApplied => isApplied;
+
+    /// <summary>
+    /// 이 효과가 실제로 재료를 소모하고 차원 무기를 만들었는지 (이미 보유해 건너뛴 경우 false)
+    /// </summary>
+    public bool IsFused => isFused;
+
+    /// <summary>
+    /// _manager 로 _data(CreateReward 로 만든 합성 보상) 를 _side 컨텍스트에 적용하고, 실제로 합성했는지 돌려준다
+    /// - _manager / _data 가 없거나 합성 효과가 아니면 false
+    /// - 합성법 무효, 플레이어 없음, 재료 부족, 이미 보유로 합성하지 않았으면 false
+    /// </summary>
+    public static bool TryApply(RewardManager _manager, RewardData _data, PlayerSide _side)
+    {
+        DimensionFusionEffect effect = null != _data ? _data.GetEffect() as DimensionFusionEffect : null;
+        if (null == _manager || null == effect)
+        {
+            return false;
+        }
+
+        _manager.ApplyReward(_data, _side);
+        return true == effect.isFused;
+    }
 
     /// <summary>
     /// _recipe 합성 보상을 만든다 (_recipe 가 없거나 유효하지 않으면 null)
@@ -111,6 +134,7 @@ public class DimensionFusionEffect
         }
 
         isApplied = true;
+        isFused = true;
 
         left.RemoveWeapon(leftMaterial);
         right.RemoveWeapon(rightMaterial);

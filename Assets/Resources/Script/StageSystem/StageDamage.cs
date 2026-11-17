@@ -11,6 +11,7 @@ public static class StageDamage
     /// <summary>
     /// _damage 만큼 일반 데미지. 대상이 이미 죽었거나 꺼져 있으면 false
     /// _source 가 DamagePipeline 이거나 그것을 가진 Component/GameObject 면 attacker 로 쓴다
+    /// 차원 무기는 투사체·장판도 소유 DimensionWeapon 을 _source 로 넘긴다 (귀속 유지). 이때 attacker 탐색은 생략
     /// </summary>
     public static bool Apply(HealthSystem _target, float _damage, Object _source = null)
     {
@@ -80,8 +81,8 @@ public static class StageDamage
         message.attacker = ResolveAttacker(_source);
         message.hitPoint = _target.transform.position;
         message.knockbackForce = 0f;
-        // TODO: DamageMassage.weapon 이 Weapon 타입이라 차원 무기를 넣을 수 없다. 통계 귀속용 필드 확장은 메인이 공유 파일에서 처리
-        message.weapon = null;
+        message.weapon = _source as Weapon;
+        message.dimensionWeapon = _source as DimensionWeapon;
         return message;
     }
 
@@ -90,6 +91,11 @@ public static class StageDamage
         if (_source is DamagePipeline pipeline)
         {
             return pipeline;
+        }
+        // 차원 무기는 DamagePipeline 을 갖지 않는다 (타격마다 GetComponentInParent 를 부르지 않도록 생략)
+        if (_source is DimensionWeapon)
+        {
+            return null;
         }
         if (_source is Component component && null != component)
         {

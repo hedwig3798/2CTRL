@@ -241,3 +241,16 @@ boss.StormBoss20,판정의 고리,Ring of Judgment
 ui.boss.warning,경고! {0} 출현,Warning! {0} approaches
 ui.boss.reward_title,보스 보상,Boss Reward
 boss.FinalBoss.name,차원의 군주,Lord of Dimensions
+ui.levelup.fusion.title,차원 합성,Dimension Fusion
+dimension_weapon.spirit_squadron.name,정령 편대,Spirit Squadron
+dimension_weapon.spirit_squadron.explain,"정령이 가장 가까운 적을 쫓아 공격하고, 정령 주위를 도는 드론이 다른 적을 쏩니다.",Spirits chase the nearest enemies while orbiting drones shoot other targets.
+dimension_weapon.thorn_saw.name,가시 톱날,Thorn Saw
+dimension_weapon.thorn_saw.explain,"화면 전체를 가로지르는 톱날을 날리고, 지나간 자리에 덩굴을 남겨 지속 피해를 줍니다.","Saws sweep across the whole screen, leaving thorny vines that deal damage over time."
+dimension_weapon.phantom_whirl.name,잔영 회전검,Phantom Whirl
+dimension_weapon.phantom_whirl.explain,화면 중앙에서 칼날이 회전하며 닿는 적에게 지속 피해를 줍니다. 30초마다 잔상이 한 바퀴 돌며 닿는 적을 즉사시킵니다.,"A blade spins at the screen center, damaging enemies it touches. Every 30s a phantom sweeps a full circle, executing enemies it hits."
+dimension_weapon.prism_laser.name,분광 레이저,Prism Laser
+dimension_weapon.prism_laser.explain,"양쪽 플레이어 위치에서 가장 가까운 적에게 레이저를 쏘고, 맞은 적에서 가까운 적 2명에게 갈라져 퍼집니다.","Fires lasers from both players at the nearest enemy, then splits from each hit enemy to the 2 nearest enemies."
+dimension_weapon.plague_mine.name,역병 지뢰,Plague Mine
+dimension_weapon.plague_mine.explain,화면 곳곳에 지뢰를 깔아 적을 천천히 쫓습니다. 폭발하면 적을 끌어당기고 독 장판을 남깁니다.,Scatters mines that slowly chase enemies. Explosions pull enemies in and leave a poison pool.
+dimension_weapon.blaze_boomerang.name,화염 부메랑,Blaze Boomerang
+dimension_weapon.blaze_boomerang.explain,두 플레이어가 화염 부메랑을 던집니다. 날아갔다 돌아오는 동안 주변을 계속 불태웁니다.,Both players hurl blazing boomerangs that scorch everything nearby on the way out and back.
