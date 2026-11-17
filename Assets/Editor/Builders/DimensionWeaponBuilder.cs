@@ -243,6 +243,12 @@ namespace Builders
                 so.FindProperty("lifetime").floatValue = _def.lifetime;
                 so.FindProperty("areaRadius").floatValue = _def.areaRadius;
                 so.FindProperty("statTags").intValue = (int)tags;
+                // 정령 편대: 적이 정령의 대상뿐이면(최종 보스 등) 드론도 그 대상을 쏜다
+                SerializedProperty droneFallback = so.FindProperty("droneFallbackToSpiritTarget");
+                if (null != droneFallback)
+                {
+                    droneFallback.boolValue = true;
+                }
                 so.ApplyModifiedPropertiesWithoutUndo();
 
                 GameObject saved = PrefabUtility.SaveAsPrefabAsset(root, path);

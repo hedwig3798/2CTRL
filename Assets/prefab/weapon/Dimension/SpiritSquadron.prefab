@@ -66,7 +66,7 @@ MonoBehaviour:
   droneOrbitRadius: 0.8
   droneOrbitSpeed: 180
   droneFollowSharpness: 10
-  droneFallbackToSpiritTarget: 0
+  droneFallbackToSpiritTarget: 1
   bulletSpeed: 14
   bulletRadius: 0.15
   bulletExtraTravel: 2

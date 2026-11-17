@@ -116,7 +116,7 @@ public class SpiritSquadron
 
     [Tooltip("정령의 대상밖에 없을 때 드론도 그 대상을 쏠지 (끄면 쏘지 않는다)")]
     [SerializeField]
-    private bool droneFallbackToSpiritTarget;
+    private bool droneFallbackToSpiritTarget = true;
 
     [Tooltip("드론 탄 속도 (화면 단위/초)")]
     [Min(0.01f)]
