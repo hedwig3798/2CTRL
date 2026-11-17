@@ -699,13 +699,6 @@ namespace Builders.Visual
                 StyleSprite(v.GetComponent<SpriteRenderer>(), "D1_Weapon_Vine_Thorn", 1);
                 SetScaleAt(v, 0f, 0f, 0.5f * WEAPON_VISUAL_SCALE, 0.5f * WEAPON_VISUAL_SCALE);
             });
-            EditPrefab(W + "Root/RootProjectile.prefab", root =>
-            {
-                Transform v = root.transform.Find("visual");
-                StyleSprite(v.GetComponent<SpriteRenderer>(), "D1_Weapon_Root_Area", 0);
-                v.GetComponent<SpriteRenderer>().color = new Color(1f, 1f, 1f, 0.85f);
-                SetScaleAt(v, 0f, 0f, 1f, 1f);
-            });
             EditPrefab(W + "Spirit/SpiritProjectile.prefab", root =>
             {
                 StyleSprite(root.GetComponent<SpriteRenderer>(), "D1_Weapon_Spirit_Body", 1);
@@ -876,7 +869,7 @@ namespace Builders.Visual
             ("Boomerang", "Boomerang"), ("PoisonZone", "PoisonZone"), ("Sweep", "Sweep"), ("SplitShot", "SplitShot"),
             ("Laser", "Laser"), ("Drone", "Drone"), ("Mine", "Mine"), ("Chain", "Chain"), ("Shockwave", "Shockwave"),
             ("Explosive", "Explosive"),
-            ("Vine", "Vine"), ("Spirit", "Spirit"), ("Root", "Root"), ("Saw", "Saw"),
+            ("Vine", "Vine"), ("Spirit", "Spirit"), ("Saw", "Saw"),
             ("Flame", "Flame"), ("Tornado", "Tornado"), ("Lightning", "Lightning"),
             ("SpinBlade", "SpinBlade"), ("StormOrb", "StormOrb"),
             ("ASUpgrade", "AttackSpeedUp"), ("DamageUpgrade", "DamageUp"), ("HPUpgrade", "HPUp"),

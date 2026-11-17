@@ -4,6 +4,8 @@ using UnityEngine;
 /// <summary>
 /// 한 진영 플레이어의 보유 무기 표시 (인게임 HUD, 왼쪽 = 좌상단 / 오른쪽 = 우상단)
 /// - PlayerStats.AcquiredWeapons 의 획득 순서대로 slots[0], slots[1] ... 에 채운다 (좌→우 / 우→좌 는 슬롯 배치 순서로 정한다)
+/// - 차원 무기(PlayerStats.DimensionWeapons) 는 일반 무기 뒤에 이어서 채운다 (아이콘은 DimensionWeaponData.Icon, 레벨 표시 없음)
+/// - PlayerStats.OnWeaponsChanged (획득 / 제거 / 차원 무기 등록) 마다 다시 채운다
 /// - 남는 슬롯은 비운다. 무기가 슬롯보다 많으면 넘치는 무기는 표시하지 않는다
 /// - 아이콘은 같은 진영 DimensionApplier.Dimension.WeaponRewards 에서
 ///   WeaponRewardEffect.WeaponPrefab 이 획득 프리팹과 같은 보상의 이미지를 쓴다 (없으면 fallbackRewards 에서 찾음)
@@ -111,7 +113,7 @@ public class WeaponHUD
         }
 
         boundPlayer = target;
-        boundPlayer.OnWeaponAdded += HandleWeaponAdded;
+        boundPlayer.OnWeaponsChanged += HandleWeaponsChanged;
         Rebuild();
         return true;
     }
@@ -120,12 +122,12 @@ public class WeaponHUD
     {
         if (false == ReferenceEquals(null, boundPlayer))
         {
-            boundPlayer.OnWeaponAdded -= HandleWeaponAdded;
+            boundPlayer.OnWeaponsChanged -= HandleWeaponsChanged;
         }
         boundPlayer = null;
     }
 
-    private void HandleWeaponAdded(PlayerStats _player, Weapon _prefab, Weapon _weapon)
+    private void HandleWeaponsChanged(PlayerStats _player)
     {
         Rebuild();
     }
@@ -143,11 +145,12 @@ public class WeaponHUD
         IReadOnlyList<Weapon> prefabs = boundPlayer.AcquiredWeaponPrefabs;
         IReadOnlyList<Weapon> weapons = boundPlayer.AcquiredWeapons;
         int count = Mathf.Min(prefabs.Count, slots.Length);
+        int total = prefabs.Count + boundPlayer.DimensionWeaponDatas.Count;
 
-        if (prefabs.Count > slots.Length && false == hasWarnedOverflow)
+        if (total > slots.Length && false == hasWarnedOverflow)
         {
             hasWarnedOverflow = true;
-            Debug.LogWarning($"[WeaponHUD] 무기({prefabs.Count}) 가 슬롯({slots.Length}) 보다 많아 일부를 표시하지 않습니다. ({name})", this);
+            Debug.LogWarning($"[WeaponHUD] 무기({total}) 가 슬롯({slots.Length}) 보다 많아 일부를 표시하지 않습니다. ({name})", this);
         }
 
         for (int i = 0; i < count; i++)
@@ -160,6 +163,24 @@ public class WeaponHUD
             Weapon prefab = prefabs[i];
             Sprite icon = GetIcon(prefab, out string fallbackName);
             slots[i].SetWeapon(weapons[i], icon, fallbackName);
+        }
+
+        // 차원 무기는 일반 무기 뒤에 이어서 채운다 (아이콘 / 이름은 합성법에서)
+        IReadOnlyList<DimensionWeaponData> dimensionData = boundPlayer.DimensionWeaponDatas;
+        IReadOnlyList<DimensionWeapon> dimensionWeapons = boundPlayer.DimensionWeapons;
+        for (int d = 0; d < dimensionData.Count && count < slots.Length; d++)
+        {
+            DimensionWeaponData data = dimensionData[d];
+            if (null == data)
+            {
+                continue;
+            }
+
+            if (null != slots[count])
+            {
+                slots[count].SetDimensionWeapon(dimensionWeapons[d], data.Icon, data.DisplayNameKey);
+            }
+            count++;
         }
 
         ClearSlots(count);

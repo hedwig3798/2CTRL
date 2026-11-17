@@ -62,6 +62,15 @@ public class PlayerStats
     /// </summary>
     public event Action<PlayerStats, Weapon, Weapon> OnWeaponAdded;
 
+    /// <summary>
+    /// 보유 무기 목록이 바뀌었을 때 호출 (AddWeapon / RemoveWeapon / AddDimensionWeapon). HUD 갱신용
+    /// </summary>
+    public event Action<PlayerStats> OnWeaponsChanged;
+
+    // 차원 무기 슬롯 (인스턴스는 양쪽 플레이어가 공유하므로 파괴 책임 없음, 같은 인덱스끼리 인스턴스 / 합성법)
+    private readonly List<DimensionWeapon> dimensionWeapons = new List<DimensionWeapon>();
+    private readonly List<DimensionWeaponData> dimensionWeaponData = new List<DimensionWeaponData>();
+
     public PlayerSide Side => side;
 
     /// <summary>
@@ -84,6 +93,11 @@ public class PlayerStats
         int i = (int)_type;
         return Mathf.Max(0f, (baseValues[i] + addValues[i]) * GetMultiplier(_type));
     }
+
+    /// <summary>
+    /// 배율(1 + ΣMultiply) 의 하한 (차원 무기가 양쪽 합산 배율에 쓴다)
+    /// </summary>
+    public float MinMultiplier => minMultiplier;
 
     /// <summary>
     /// 최종 배율 = max(minMultiplier, 1 + ΣMultiply)
@@ -213,9 +227,9 @@ public class PlayerStats
 
     #region Weapon
     /// <summary>
-    /// AddWeapon 으로 얻은 무기 수 (시작 무기 포함)
+    /// 차지한 무기 슬롯 수 = AddWeapon 으로 얻은 무기 (시작 무기 포함) + 차원 무기
     /// </summary>
-    public int WeaponCount => acquiredWeapons.Count;
+    public int WeaponCount => acquiredWeapons.Count + dimensionWeapons.Count;
 
     /// <summary>
     /// 보유할 수 있는 무기 수 (0 이하면 상한 없음)
@@ -225,7 +239,7 @@ public class PlayerStats
     /// <summary>
     /// 무기 보유 상한에 도달했는지
     /// </summary>
-    public bool IsWeaponFull => maxWeaponCount > 0 && acquiredWeapons.Count >= maxWeaponCount;
+    public bool IsWeaponFull => maxWeaponCount > 0 && WeaponCount >= maxWeaponCount;
 
     /// <summary>
     /// 무기 프리팹을 weaponHolder 아래에 생성한다
@@ -279,7 +293,78 @@ public class PlayerStats
         acquiredPrefabOrder.Add(_prefab);
         acquiredWeaponOrder.Add(weapon);
         OnWeaponAdded?.Invoke(this, _prefab, weapon);
+        OnWeaponsChanged?.Invoke(this);
         return true;
+    }
+
+    /// <summary>
+    /// AddWeapon 으로 얻은 _prefab 무기를 파괴하고 목록에서 뺀다 (차원 무기 합성 재료 소모용)
+    /// - 보상 풀 정리(남은 업그레이드 보상 제거 등) 는 호출하는 쪽이 한다
+    /// </summary>
+    /// <returns>뺐으면 true</returns>
+    public bool RemoveWeapon(Weapon _prefab)
+    {
+        if (null == _prefab || false == acquiredWeapons.TryGetValue(_prefab, out Weapon weapon))
+        {
+            return false;
+        }
+
+        acquiredWeapons.Remove(_prefab);
+        int index = acquiredPrefabOrder.IndexOf(_prefab);
+        if (index >= 0)
+        {
+            acquiredPrefabOrder.RemoveAt(index);
+            acquiredWeaponOrder.RemoveAt(index);
+        }
+
+        if (null != weapon)
+        {
+            // 바로 꺼서 이번 프레임에 더 발사하지 않게 한다 (OnDisable 에서 발사체도 정리)
+            weapon.gameObject.SetActive(false);
+            Destroy(weapon.gameObject);
+        }
+
+        OnWeaponsChanged?.Invoke(this);
+        return true;
+    }
+
+    /// <summary>
+    /// 차원 무기를 슬롯에 등록한다 (슬롯 1칸 차지, WeaponCount 에 포함)
+    /// - 인스턴스는 양쪽 플레이어가 공유하므로 이 플레이어는 파괴하지 않는다
+    /// - 같은 합성법을 이미 등록했으면 등록하지 않는다. 보유 상한을 넘겨도 등록한다 (합성은 재료를 먼저 빼므로 순증 0)
+    /// </summary>
+    /// <returns>등록했으면 true</returns>
+    public bool AddDimensionWeapon(DimensionWeapon _instance, DimensionWeaponData _data)
+    {
+        if (null == _instance || null == _data || true == dimensionWeaponData.Contains(_data))
+        {
+            return false;
+        }
+
+        if (true == IsWeaponFull)
+        {
+            Debug.LogWarning($"[PlayerStats] 무기 보유 상한({maxWeaponCount}) 을 넘겨 차원 무기 {_data.name} 을(를) 등록합니다. ({name})", this);
+        }
+
+        dimensionWeapons.Add(_instance);
+        dimensionWeaponData.Add(_data);
+        OnWeaponsChanged?.Invoke(this);
+        return true;
+    }
+
+    /// <summary>
+    /// 등록한 차원 무기 (등록 순서, 파괴됐으면 null 로 비교된다)
+    /// </summary>
+    public IReadOnlyList<DimensionWeapon> DimensionWeapons => dimensionWeapons;
+
+    /// <summary>
+    /// 등록한 차원 무기의 합성법 (DimensionWeapons 와 같은 인덱스)
+    /// </summary>
+    public IReadOnlyList<DimensionWeaponData> DimensionWeaponDatas => dimensionWeaponData;
+
+    public bool HasDimensionWeapon(DimensionWeaponData _data)
+    {
+        return null != _data && dimensionWeaponData.Contains(_data);
     }
 
     /// <summary>

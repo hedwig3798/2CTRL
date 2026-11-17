@@ -82,7 +82,8 @@ public enum WeaponParam
     FlagChainAmplify = 207,
     /// <summary>덩굴이 틱 데미지를 줄 때 가시 발사. Vine</summary>
     FlagVineThorn = 208,
-    /// <summary>뿌리 지역이 가장 가까운 적을 추적. Root</summary>
+    /// <summary>뿌리 지역이 가장 가까운 적을 추적. Root (무기 제거됨, 직렬화 번호 보존용으로 값만 남김)</summary>
+    [System.Obsolete("Root 무기 제거됨. 직렬화 번호 보존용으로 값만 남긴다")]
     FlagRootChase = 209,
     /// <summary>화면 경계에서 튕기고 소멸하지 않음. Saw</summary>
     FlagSawBounce = 210,

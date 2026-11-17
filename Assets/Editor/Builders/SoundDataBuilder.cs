@@ -136,7 +136,6 @@ namespace Builders
             ("SplitShot", SoundId.WPN_SPLIT_FIRE, SoundId.HIT_ORGANIC, SoundId.None),
             ("Vine", SoundId.None, SoundId.HIT_ORGANIC, SoundId.None),
             ("Spirit", SoundId.WPN_SPIRIT_SPAWN, SoundId.HIT_ORGANIC, SoundId.None),
-            ("Root", SoundId.WPN_ROOT, SoundId.HIT_ORGANIC, SoundId.None),
             ("Laser", SoundId.WPN_LASER, SoundId.HIT_METAL, SoundId.None),
             ("Drone", SoundId.None, SoundId.HIT_METAL, SoundId.None),
             ("gun", SoundId.WPN_DRONE, SoundId.HIT_METAL, SoundId.None),

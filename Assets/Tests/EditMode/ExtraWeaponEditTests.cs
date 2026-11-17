@@ -35,7 +35,7 @@ public class ExtraWeaponEditTests
 
         WeaponParam[] flags =
         {
-            WeaponParam.FlagVineThorn, WeaponParam.FlagRootChase, WeaponParam.FlagSawBounce
+            WeaponParam.FlagVineThorn, WeaponParam.FlagSawBounce
             , WeaponParam.FlagBurn, WeaponParam.FlagTornadoPermanent, WeaponParam.FlagStormLink
         };
         foreach (WeaponParam p in flags)

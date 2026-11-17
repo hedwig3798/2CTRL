@@ -94,8 +94,6 @@ reward.weapon.mine.name,지뢰,Mine
 reward.weapon.mine.explain,발밑에 지뢰를 설치합니다. 잠시 후 활성화된 지뢰를 적이 밟으면 폭발해 주변 적에게 피해를 주고 밀어냅니다.,"Plants a mine at your feet. Once armed, it explodes when an enemy steps on it, damaging and knocking back nearby enemies."
 reward.weapon.poison_zone.name,독 장판,Poison Pool
 reward.weapon.poison_zone.explain,"가장 가까운 적에게 독 장판을 던져, 장판 위의 적들에게 지속적으로 피해를 줍니다.",Throws a poison pool at the nearest enemy that continuously damages enemies standing in it.
-reward.weapon.root.name,뿌리 속박,Root Snare
-reward.weapon.root.explain,"주변 무작위 위치에 뿌리 지역을 만들어, 지역 위의 적에게 피해를 주고 느리게 만듭니다.",Creates root patches at random spots nearby that damage and slow enemies inside them.
 reward.weapon.saw.name,톱날,Saw Blade
 reward.weapon.saw.explain,화면 끝에서 톱날을 날려 가로로 지나가며 닿는 모든 적을 벱니다.,"Launches saw blades from the edge of the screen that sweep across, cutting every enemy they touch."
 reward.weapon.shockwave.name,충격파,Shockwave
@@ -202,11 +200,7 @@ upgrade.star_spirits_plus_2_max_5,★ 정령 +2 (최대 5),★ Spirits +2 (max 5
 upgrade.spirits_plus_2_max_5,정령 +2 (최대 5),Spirits +2 (max 5)
 upgrade.star_attacks_plus_4,★ 공격 횟수 +4,★ Attacks +4
 upgrade.attacks_plus_4,공격 횟수 +4,Attacks +4
-upgrade.star_patches_plus_1_2_total,★ 지역 +1 (2개),★ Patches +1 (2 total)
-upgrade.patches_plus_1_2_total,지역 +1 (2개),Patches +1 (2 total)
 upgrade.lifetime_plus_1s,수명 +1초,Lifetime +1s
-upgrade.star_homing,★ 추적,★ Homing
-upgrade.homing,추적,Homing
 upgrade.size_plus_20pct,크기 +20%,Size +20%
 upgrade.move_speed_plus_20pct,이동 속도 +20%,Move Speed +20%
 upgrade.star_blades_plus_2_4_total,★ 톱날 +2 (4개),★ Blades +2 (4 total)

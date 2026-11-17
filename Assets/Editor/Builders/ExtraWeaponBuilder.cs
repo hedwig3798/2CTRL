@@ -6,7 +6,7 @@ using UnityEngine;
 namespace Builders
 {
     /// <summary>
-    /// 차원별 추가 무기 9종(Vine, Spirit, Root, Saw, Flame, Tornado, Lightning, SpinBlade, StormOrb)의
+    /// 차원별 추가 무기 8종(Vine, Spirit, Saw, Flame, Tornado, Lightning, SpinBlade, StormOrb)의
     /// 무기 / 발사체 프리팹, 업그레이드 테이블, 보상 효과, 보상 에셋을 생성·갱신한다 (멱등)
     /// - 사양: docs/weapon-dimension-extra-design.md "통합 정보" + 차원별 10단계 표
     /// - 프리팹이 이미 있으면 내용을 열어 갱신한다 (GUID / fileID 유지, 다른 에셋의 참조가 끊기지 않게)
@@ -45,7 +45,6 @@ namespace Builders
         {
             new RewardDef { name = "Vine", iconFrom = "PoisonZone" },
             new RewardDef { name = "Spirit", iconFrom = "Drone" },
-            new RewardDef { name = "Root", iconFrom = "PoisonZone" },
             new RewardDef { name = "Saw", iconFrom = "Boomerang" },
             new RewardDef { name = "Flame", iconFrom = "Laser" },
             new RewardDef { name = "Tornado", iconFrom = "Shockwave" },
@@ -77,7 +76,6 @@ namespace Builders
             {
                 { "Vine", BuildVine() },
                 { "Spirit", BuildSpirit() },
-                { "Root", BuildRoot() },
                 { "Saw", BuildSaw() },
                 { "Flame", BuildFlame() },
                 { "Tornado", BuildTornado() },
@@ -172,11 +170,6 @@ namespace Builders
                         Set(w, WEAPON_TYPE.Capped, 8f, 0.5f, 4f, 3, 5);
                         w.hitCount = 6;
                         break;
-                    case "Root":
-                        Set(w, WEAPON_TYPE.Repeat, 5f, 0.4f, 6f, 1, 4);
-                        w.areaRadius = 1.2f;
-                        w.lifetime = 4f;
-                        break;
                     case "Saw":
                         Set(w, WEAPON_TYPE.Wave, 15f, 1f, 0f, 2, 4);
                         break;
@@ -257,29 +250,6 @@ namespace Builders
                 var so = new SerializedObject(p);
                 so.FindProperty("thornPrefab").objectReferenceValue = AssetDatabase.LoadAssetAtPath<GameObject>(thornPath).GetComponent<Projectile>();
                 SetRef(so, "segmentRenderer", sr);
-                SetString(so, "sortingLayerName", SORTING);
-                so.ApplyModifiedPropertiesWithoutUndo();
-            });
-            return AssetDatabase.LoadAssetAtPath<GameObject>(path);
-        }
-
-        private static GameObject BuildRoot()
-        {
-            string dir = WEAPON_DIR + "/Root";
-            EnsureFolder(dir);
-            string path = dir + "/RootProjectile.prefab";
-            EditOrCreatePrefab(path, "RootProjectile", root =>
-            {
-                RemoveIfAny<PoisonZoneLandMovement>(root);
-                var p = GetOrAdd<RootProjectile>(root);
-                p.blackBoardHandler = GetOrAdd<BlackBoardHandler>(root);
-                GetOrAdd<Lifetime>(root);
-                GetOrAdd<ScaleOverLifetime>(root).useAreaRadius = true;
-                var sr = ZoneVisual(root);
-
-                var so = new SerializedObject(p);
-                SetFloat(so, "rootSlowRate", 0.4f);
-                SetRef(so, "zoneRenderer", sr);
                 SetString(so, "sortingLayerName", SORTING);
                 so.ApplyModifiedPropertiesWithoutUndo();
             });
@@ -609,18 +579,6 @@ namespace Builders
                 Dmg(), As(), Dmg(),
                 S("사거리 +1.5", M(WeaponParam.Range, ADD, 1.5f)),
                 Star("공격 횟수 +4", M(WeaponParam.HitCount, ADD, 4f)),
-            };
-
-            t["Root"] = new[]
-            {
-                Dmg(),
-                S("범위 +20%", M(WeaponParam.AreaRadius, MUL, 0.2f)),
-                As(), Dmg(),
-                Star("지역 +1 (2개)", M(WeaponParam.FireCount, ADD, 1f)),
-                Dmg(),
-                S("수명 +1초", M(WeaponParam.Lifetime, ADD, 1f)),
-                Dmg(), Dmg(),
-                Flag(WeaponParam.FlagRootChase, "추적"),
             };
 
             t["Saw"] = new[]

@@ -39,6 +39,11 @@ public class BossHitProxy
     public bool IsLive => isLive;
     public DamagePipeline Pipeline => pipeline;
 
+    /// <summary>
+    /// 연결된 최종 보스 (Setup 전이나 Shutdown 뒤면 null)
+    /// </summary>
+    public FinalBoss Boss => boss;
+
     private void Awake()
     {
         hitCollider = GetComponent<CircleCollider2D>();

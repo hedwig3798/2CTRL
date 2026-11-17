@@ -35,6 +35,9 @@ public class WeaponSlotUI
 
     private Weapon weapon;
 
+    // 차원 무기를 표시 중이면 그 인스턴스 (weapon 과 동시에 쓰지 않음)
+    private DimensionWeapon dimensionWeapon;
+
     // 아이콘이 없을 때 표시할 이름 키 (또는 그대로 표시할 이름)
     private string fallbackNameKey;
     private bool hasIcon;
@@ -65,6 +68,7 @@ public class WeaponSlotUI
     public void SetWeapon(Weapon _weapon, Sprite _icon, string _fallbackName)
     {
         weapon = _weapon;
+        dimensionWeapon = null;
         SetContentActive(true);
 
         hasIcon = null != _icon;
@@ -81,6 +85,38 @@ public class WeaponSlotUI
         RefreshLevel();
     }
 
+    /// <summary>
+    /// 차원 무기를 표시한다 (업그레이드가 없으므로 레벨 글자는 비운다)
+    /// - _icon 이 null 이면 아이콘을 숨기고 _fallbackName(StringTable 키) 을 표시한다
+    /// </summary>
+    public void SetDimensionWeapon(DimensionWeapon _weapon, Sprite _icon, string _fallbackName)
+    {
+        weapon = null;
+        dimensionWeapon = _weapon;
+        SetContentActive(true);
+
+        hasIcon = null != _icon;
+        fallbackNameKey = _fallbackName;
+        if (null != iconImage)
+        {
+            iconImage.sprite = _icon;
+            iconImage.enabled = hasIcon;
+        }
+
+        ApplyName();
+
+        displayedLevel = -1;
+        if (null != levelText)
+        {
+            levelText.text = string.Empty;
+        }
+    }
+
+    /// <summary>
+    /// 이 슬롯에 표시 중인 차원 무기 (없으면 null)
+    /// </summary>
+    public DimensionWeapon DimensionWeapon => dimensionWeapon;
+
     private void OnEnable()
     {
         StringTable.OnLanguageChanged += HandleLanguageChanged;
@@ -95,6 +131,11 @@ public class WeaponSlotUI
 
     private void HandleLanguageChanged(Language _language)
     {
+        if (null != dimensionWeapon)
+        {
+            ApplyName();
+            return;
+        }
         if (null == weapon)
         {
             return;
@@ -120,6 +161,7 @@ public class WeaponSlotUI
     public void Clear()
     {
         weapon = null;
+        dimensionWeapon = null;
         displayedLevel = -1;
         fallbackNameKey = null;
 

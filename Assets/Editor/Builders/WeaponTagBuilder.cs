@@ -24,12 +24,12 @@ namespace Builders
         private static readonly HashSet<string> NoAttackSpeed = new HashSet<string> { "SpinBlade", "StormOrb" };
 
         // 지속형 공격 (장판 수명, Flame 분사 시간, Tornado 수명 - Capped 라 수명이 늘면 재시전 간격도 늘어난다)
-        private static readonly HashSet<string> Duration = new HashSet<string> { "Vine", "PoisonZone", "Root", "Flame", "Tornado" };
+        private static readonly HashSet<string> Duration = new HashSet<string> { "Vine", "PoisonZone", "Flame", "Tornado" };
 
         // 한 번에 발사하는 발사체 수 (Drone 은 드론 수, Lightning 은 낙뢰 수)
         private static readonly HashSet<string> ProjectileCount = new HashSet<string>
         {
-            "Boomerang", "Drone", "Explosive", "Laser", "Lightning", "Spirit", "SplitShot", "Tornado", "Root", "StormOrb",
+            "Boomerang", "Drone", "Explosive", "Laser", "Lightning", "Spirit", "SplitShot", "Tornado", "StormOrb",
         };
 
         /// <summary>

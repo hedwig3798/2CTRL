@@ -167,8 +167,17 @@ public class FinalBossDirector
         hasBegun = true;
 
         bossLayer = ResolveBossLayer();
-        LayoutOverlays();
-        space = new BossSpace(leftOverlayCamera, rightOverlayCamera, leftCamera, rightCamera);
+        // 화면 공간(StageSpace)이 있으면 이미 배치된 그 공간을 쓴다. 없으면 기존대로 직접 배치
+        StageSpace stage = StageSpace.Instance;
+        if (null != stage && true == stage.IsReady)
+        {
+            space = stage.Space;
+        }
+        else
+        {
+            LayoutOverlays();
+            space = new BossSpace(leftOverlayCamera, rightOverlayCamera, leftCamera, rightCamera);
+        }
         CachePlayer(PlayerSide.Left, leftPlayer);
         CachePlayer(PlayerSide.Right, rightPlayer);
 

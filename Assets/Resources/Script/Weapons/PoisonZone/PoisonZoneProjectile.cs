@@ -12,7 +12,7 @@ using UnityEngine;
 /// - 소멸은 Lifetime 이 담당한다
 /// - 업그레이드 : 틱 간격 기본값 = weapon.GetParam(TickInterval, tickInterval)
 /// - ★ FlagSlowZone : 틱마다 장판 안의 적을 slowRate 만큼 둔화시킨다 (다음 틱 + slowLinger 초까지 유지)
-/// - 상속 훅 : LaunchZone(발사 처리) / IsSlowActive(둔화 조건) / OnLandedUpdate(착지 후 매 프레임) / OnTick(틱 직후). 덩굴(Vine), 뿌리 속박(Root) 이 사용
+/// - 상속 훅 : LaunchZone(발사 처리) / IsSlowActive(둔화 조건) / OnLandedUpdate(착지 후 매 프레임) / OnTick(틱 직후). 덩굴(Vine) 이 사용
 ///   (파생 클래스는 Awake / Update 를 선언하지 말 것. 이 클래스의 private Awake / Update 가 가려진다)
 /// </summary>
 public class PoisonZoneProjectile

@@ -118,7 +118,6 @@ public class WeaponStatTagTests
     [TestCase("Vine/Vine.prefab", DA | WeaponStatTag.Duration)]
     [TestCase("PoisonZone/PoisonZone.prefab", DAR | WeaponStatTag.Duration)]
     [TestCase("Flame/Flame.prefab", DAR | WeaponStatTag.Duration)]
-    [TestCase("Root/Root.prefab", WeaponStatTag.All)]
     [TestCase("Boomerang/Boomerang.prefab", DAR | WeaponStatTag.ProjectileCount)]
     [TestCase("Drone/Drone.prefab", DAR | WeaponStatTag.ProjectileCount)]
     [TestCase("Explosive/Explosive.prefab", DAR | WeaponStatTag.ProjectileCount)]
