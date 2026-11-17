@@ -311,6 +311,14 @@ public class HealthSystem
 
     private void Die()
     {
+#if DEMO_INVINCIBLE
+        // 데모 영상 촬영용 빌드: 플레이어는 피격은 받되 HP 가 0 이 되면 다시 채워 게임 오버가 나지 않는다
+        if (null != playerStats)
+        {
+            CurrHP = MaxHP;
+            return;
+        }
+#endif
         isDead = true;
         SetCollidersEnabled(false);
 
