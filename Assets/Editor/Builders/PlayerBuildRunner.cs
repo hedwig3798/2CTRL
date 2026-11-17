@@ -1,4 +1,5 @@
 using System.IO;
+using System.IO.Compression;
 using System.Linq;
 using UnityEditor;
 using UnityEditor.Build.Reporting;
@@ -64,7 +65,35 @@ namespace Builders
             {
                 throw new System.Exception("[PlayerBuildRunner] 빌드 실패: " + result);
             }
-            return result;
+            string zipPath = Zip(outDir, _folder);
+            return result + " zip=" + Path.GetFullPath(zipPath);
+        }
+
+        /// <summary>
+        /// 배포용 zip (Builds/2CTRL-{버전}-win64.zip). Burst 디버그 정보(DoNotShip) 폴더는 뺀다
+        /// </summary>
+        private static string Zip(string _outDir, string _folder)
+        {
+            string zipPath = Path.Combine("Builds", $"2CTRL-{_folder}-win64.zip");
+            if (true == File.Exists(zipPath))
+            {
+                File.Delete(zipPath);
+            }
+
+            string root = Path.GetFullPath(_outDir);
+            using (ZipArchive archive = ZipFile.Open(zipPath, ZipArchiveMode.Create))
+            {
+                foreach (string file in Directory.GetFiles(root, "*", SearchOption.AllDirectories))
+                {
+                    string rel = file.Substring(root.Length + 1).Replace('\\', '/');
+                    if (true == rel.Contains("DoNotShip"))
+                    {
+                        continue;
+                    }
+                    archive.CreateEntryFromFile(file, rel, System.IO.Compression.CompressionLevel.Optimal);
+                }
+            }
+            return zipPath;
         }
     }
 }
