@@ -4,10 +4,12 @@ using UnityEngine;
 
 /// <summary>
 /// 플레이어 스텟 (Player 루트에 하나 배치)
-/// - ValueType 마다 base / ΣAdd / ΣMultiply 를 가지며, 최종값 = (base + ΣAdd) × 배율 (0 미만은 0)
-///   배율 = max(minMultiplier, 1 + ΣMultiply) (상대에게 너프를 몰아 받아도 일정 이하로 떨어지지 않게)
+/// - ValueType 마다 base / ΣAdd / ΣMultiply (레벨업 보상) 와 영구 Add / 영구 Mul (영구 강화) 을 가진다
+///   최종값 = (base + ΣAdd + 영구Add) × 배율 (0 미만은 0)
+///   배율 = max(minMultiplier, 1 + ΣMultiply) × (1 + 영구Mul) (하한은 레벨업 버프·너프에만 걸리고 영구 강화는 그 위에 곱한다)
+/// - 영구 계층은 PermanentUpgradeApplier 가 게임 시작 시 SetPermanentModifiers 로 넣는다. ResetModifiers 는 영구 계층을 지우지 않는다
 /// - base 는 MoveSpeed = ArrowMovemnt.speed, HP = HealthSystem.maxHP, PickupRange = ItemTrigger 반경에서 가져오고, 나머지(Damage / AttackSpeed / Range) 는 0
-/// - 무기 스텟과는 별개이며, Weapon 이 (무기 스텟 + ΣAdd) × 배율 로 사용한다 (Damage / AttackSpeed / Range 의 배율은 모든 무기에 곱해진다)
+/// - 무기 스텟과는 별개이며, Weapon 이 (무기 스텟 + GetAdd) × GetMultiplier 로 사용한다 (둘 다 영구 계층 포함) (Damage / AttackSpeed / Range 의 배율은 모든 무기에 곱해진다)
 /// - 무기 보유 상한(maxWeaponCount, 시작 무기 포함)에 도달하면 AddWeapon 이 더 이상 무기를 주지 않는다
 /// - 스텟이 바뀌면 OnStatChanged 로 알리고, ArrowMovemnt / HealthSystem / ItemTrigger 가 구독해서 반영한다
 /// - side 로 등록되어 Find 로 찾을 수 있다 (왼쪽 보상 → 왼쪽 플레이어)
@@ -40,6 +42,9 @@ public class PlayerStats
     private readonly float[] baseValues = new float[StatCount];
     private readonly float[] addValues = new float[StatCount];
     private readonly float[] mulValues = new float[StatCount];
+    // 영구 강화 계층 (레벨업 보상과 별도. ResetModifiers 로 지워지지 않는다)
+    private readonly float[] permAddValues = new float[StatCount];
+    private readonly float[] permMulValues = new float[StatCount];
 
     // 시간 제한 임시 둔화 (MoveSpeed Multiply 로 적용 중인 비율과 종료 시각, Time.time 기준)
     private float timedSlowRate = 0f;
@@ -84,14 +89,14 @@ public class PlayerStats
 
     #region Stat
     /// <summary>
-    /// 최종 수치 = (base + ΣAdd) × GetMultiplier, 0 미만은 0
+    /// 최종 수치 = (base + ΣAdd + 영구Add) × GetMultiplier, 0 미만은 0
     /// - Damage / AttackSpeed / Range 는 base 가 0 이므로 무기에서는 GetAdd / GetMultiplier 를 따로 쓴다
     /// </summary>
     public float Get(ValueType _type)
     {
         EnsureBaseValues();
         int i = (int)_type;
-        return Mathf.Max(0f, (baseValues[i] + addValues[i]) * GetMultiplier(_type));
+        return Mathf.Max(0f, (baseValues[i] + addValues[i] + permAddValues[i]) * GetMultiplier(_type));
     }
 
     /// <summary>
@@ -100,11 +105,12 @@ public class PlayerStats
     public float MinMultiplier => minMultiplier;
 
     /// <summary>
-    /// 최종 배율 = max(minMultiplier, 1 + ΣMultiply)
+    /// 최종 배율 = max(minMultiplier, 1 + ΣMultiply) × (1 + 영구Mul)
     /// </summary>
     public float GetMultiplier(ValueType _type)
     {
-        return Mathf.Max(minMultiplier, 1f + mulValues[(int)_type]);
+        int i = (int)_type;
+        return Mathf.Max(minMultiplier, 1f + mulValues[i]) * (1f + permMulValues[i]);
     }
 
     public float GetBase(ValueType _type)
@@ -114,19 +120,70 @@ public class PlayerStats
     }
 
     /// <summary>
-    /// 보상으로 누적된 고정값 합 (ΣAdd)
+    /// 고정값 합 = 보상으로 누적된 ΣAdd + 영구Add
     /// </summary>
     public float GetAdd(ValueType _type)
+    {
+        int i = (int)_type;
+        return addValues[i] + permAddValues[i];
+    }
+
+    /// <summary>
+    /// 보상으로 누적된 고정값 합 (ΣAdd, 영구 계층 미포함)
+    /// </summary>
+    public float GetLevelUpAdd(ValueType _type)
     {
         return addValues[(int)_type];
     }
 
     /// <summary>
-    /// 보상으로 누적된 비율 합 (ΣMultiply)
+    /// 보상으로 누적된 비율 합 (ΣMultiply, 영구 계층 미포함)
     /// </summary>
     public float GetMultiply(ValueType _type)
     {
         return mulValues[(int)_type];
+    }
+
+    /// <summary>
+    /// 영구 강화 고정값 (GetAdd 에 포함되어 있다)
+    /// </summary>
+    public float GetPermanentAdd(ValueType _type)
+    {
+        return permAddValues[(int)_type];
+    }
+
+    /// <summary>
+    /// 영구 강화 비율 (0.2 = +20%, GetMultiplier 에 (1 + 값) 으로 곱해져 있다)
+    /// </summary>
+    public float GetPermanentMultiply(ValueType _type)
+    {
+        return permMulValues[(int)_type];
+    }
+
+    /// <summary>
+    /// 한 스텟의 영구 계층을 바꾼다 (누적이 아니라 덮어쓰기, OnStatChanged 1회)
+    /// </summary>
+    public void SetPermanent(ValueType _type, float _add, float _mul)
+    {
+        EnsureBaseValues();
+        int i = (int)_type;
+        permAddValues[i] = _add;
+        permMulValues[i] = _mul;
+        OnStatChanged?.Invoke(this);
+    }
+
+    /// <summary>
+    /// 영구 계층 전체를 바꾼다 (인덱스 = (int)ValueType, 비었거나 짧으면 나머지는 0. OnStatChanged 1회)
+    /// </summary>
+    public void SetPermanentModifiers(IReadOnlyList<float> _add, IReadOnlyList<float> _mul)
+    {
+        EnsureBaseValues();
+        for (int i = 0; i < StatCount; ++i)
+        {
+            permAddValues[i] = null != _add && i < _add.Count ? _add[i] : 0f;
+            permMulValues[i] = null != _mul && i < _mul.Count ? _mul[i] : 0f;
+        }
+        OnStatChanged?.Invoke(this);
     }
 
     public void AddModifier(ValueType _type, StatModifierMode _mode, float _value)
@@ -212,7 +269,7 @@ public class PlayerStats
     }
 
     /// <summary>
-    /// 보상으로 누적된 ΣAdd / ΣMultiply 를 모두 0 으로 되돌린다 (base 는 유지. 무기 테스트 씬 등 디버그용)
+    /// 보상으로 누적된 ΣAdd / ΣMultiply 를 모두 0 으로 되돌린다 (base 와 영구 계층은 유지. 무기 테스트 씬 등 디버그용)
     /// </summary>
     public void ResetModifiers()
     {

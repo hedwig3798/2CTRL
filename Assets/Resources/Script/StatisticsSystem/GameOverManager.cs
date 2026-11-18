@@ -9,6 +9,7 @@ using UnityEngine.UI;
 /// - EventManager.OnPlayerDeath 를 구독하고, 게임 오버·승리 중 처음 한 번만 처리한다
 /// - 모든 Spawner 의 웨이브가 끝나면(Spawner.OnAllWavesFinished) 승리
 /// - 승리 순서: 일시정지(GamePause) → 통계 확정(StatisticsManager.Flush/Lock) → 결과 패널 표시(GameOverUI) → OnGameOver
+/// - 게임이 끝나는 즉시(통계 확정 직후) 차원력(MetaReward) 을 한 번만 계산·지급(MetaProgress) 하고, 결과 패널 표시 때 GameOverUI 에 넘긴다
 /// - 게임 오버 순서: 일시정지 + 효과음·BGM 즉시 정지 + 통계 확정 → freezeSeconds 대기
 ///   → 죽은 쪽 카메라 영역을 dimSeconds 동안 어둡게(런타임 오버레이 캔버스) → holdSeconds 대기 → 패배음 + 결과 패널 → OnGameOver
 /// </summary>
@@ -56,8 +57,17 @@ public class GameOverManager
     [SerializeField]
     private int dimSortingOrder = 95;
 
+    [Header("meta")]
+    [Tooltip("차원력 획득 계수 (비우면 MetaRewardConfig 기본값)")]
+    [SerializeField]
+    private MetaRewardConfig metaRewardConfig;
+
     private bool isGameOver = false;
     private bool isVictory = false;
+
+    // 차원력은 결과 표시 직전에 한 번만 지급한다
+    private bool metaRewardGranted = false;
+    private MetaRewardResult metaRewardResult;
 
     private bool statsLocked = false;
     private StatisticsManager resultStats;
@@ -75,6 +85,16 @@ public class GameOverManager
     public bool IsVictory => isVictory;
 
     public PlayerSide DeadSide => deadSide;
+
+    /// <summary>
+    /// 이번 판 차원력을 지급했는지
+    /// </summary>
+    public bool IsMetaRewardGranted => metaRewardGranted;
+
+    /// <summary>
+    /// 지급한 차원력 결과 (지급 전이면 default)
+    /// </summary>
+    public MetaRewardResult LastMetaReward => metaRewardResult;
 
     /// <summary>
     /// 게임 오버를 처리한다 (이미 끝났으면 무시)
@@ -110,6 +130,10 @@ public class GameOverManager
 
         GamePause.Pause(this);
 
+        // 결과를 먼저 확정하고 차원력을 바로 지급한다 (패배 연출 중 씬을 떠나도 지급되게)
+        LockStatistics();
+        GrantMetaReward();
+
         if (true == _victory)
         {
             SoundManager.Play(winSound);
@@ -120,8 +144,6 @@ public class GameOverManager
         // 게임 오버 연출 : 정지 + 모든 소리 즉시 종료 → 죽은 쪽 화면 어둡게 → 결과 화면
         SoundManager.StopAll();
         BgmDirector.StopImmediately();
-        // 결과를 먼저 확정해 연출 중 들어오는 기록을 막는다
-        LockStatistics();
         StartCoroutine(DefeatSequence());
     }
 
@@ -257,12 +279,34 @@ public class GameOverManager
         }
     }
 
+    /// <summary>
+    /// 이번 판 차원력을 계산해 지급한다 (한 번만)
+    /// </summary>
+    private void GrantMetaReward()
+    {
+        if (true == metaRewardGranted)
+        {
+            return;
+        }
+        metaRewardGranted = true;
+
+        metaRewardResult = MetaReward.Calculate(
+            MetaReward.CollectClearedWaves(spawners),
+            MetaReward.CollectKills(resultStats),
+            MetaReward.CollectLevel(),
+            isVictory,
+            metaRewardConfig);
+        MetaProgress.AddCurrency(metaRewardResult.Total);
+    }
+
+    /// <summary>
+    /// 결과 패널 표시만 한다 (통계 확정·차원력 지급은 EndGame 에서 끝남)
+    /// </summary>
     private void ShowResult()
     {
-        LockStatistics();
-
         if (null != gameOverUI)
         {
+            gameOverUI.SetMetaReward(metaRewardResult, MetaProgress.Currency);
             gameOverUI.Show(resultStats, isVictory);
         }
         else

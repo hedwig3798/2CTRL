@@ -2,6 +2,7 @@ key,ko,en
 # 공통 UI : 타이틀
 ui.title.start,게임 시작,Start Game
 ui.title.settings,설정,Settings
+ui.title.upgrade,차원 강화,Upgrades
 # 일시정지
 ui.pause.title,일시정지,Paused
 ui.pause.resume,계속하기,Resume
@@ -256,3 +257,24 @@ dimension_weapon.plague_mine.name,역병 지뢰,Plague Mine
 dimension_weapon.plague_mine.explain,화면 곳곳에 지뢰를 깔아 적을 천천히 쫓습니다. 폭발하면 적을 끌어당기고 독 장판을 남깁니다.,Scatters mines that slowly chase enemies. Explosions pull enemies in and leave a poison pool.
 dimension_weapon.blaze_boomerang.name,화염 부메랑,Blaze Boomerang
 dimension_weapon.blaze_boomerang.explain,두 플레이어가 화염 부메랑을 던집니다. 날아갔다 돌아오는 동안 주변을 계속 불태웁니다.,Both players hurl blazing boomerangs that scorch everything nearby on the way out and back.
+# 영구 강화 (차원력)
+meta.panel.title,차원 강화,Dimension Upgrades
+meta.currency,보유 차원력 : {0:N0},Dimension Power : {0:N0}
+meta.level,Lv {0}/{1},Lv {0}/{1}
+meta.next_effect,{0} -> {1},{0} -> {1}
+meta.value_add,+{0:0.##},+{0:0.##}
+meta.value_mul,+{0:0.#}%,+{0:0.#}%
+meta.price,{0:N0},{0:N0}
+meta.buy,구매,Buy
+meta.max,MAX,MAX
+meta.close,닫기,Close
+meta.result,차원력 : 웨이브 {0} / 처치 {1:N0} / 레벨 {2} / x{3:0.##} -> +{4:N0} (보유 {5:N0}),Dimension Power : Waves {0} / Kills {1:N0} / Level {2} / x{3:0.##} -> +{4:N0} (Total {5:N0})
+meta.upgrade.damage,공격력 강화,Damage Up
+meta.upgrade.attack_speed,공격 속도 강화,Attack Speed Up
+meta.upgrade.range,범위 강화,Range Up
+meta.upgrade.move_speed,이동 속도 강화,Move Speed Up
+meta.upgrade.hp,체력 강화,Max HP Up
+meta.upgrade.hp_regen,체력 재생 강화,HP Regen Up
+meta.upgrade.pickup_range,획득 범위 강화,Pickup Range Up
+meta.upgrade.duration,지속 시간 강화,Duration Up
+meta.upgrade.projectile_count,투사체 추가,Extra Projectile

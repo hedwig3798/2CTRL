@@ -16,6 +16,7 @@ using UnityEngine.UI;
 /// - 무기별 데미지는 무기 목록(leftWeaponList / rightWeaponList)이 연결되어 있으면 아이콘 + 수치 칸(GameOverWeaponRow)으로 표시
 ///   - 아이콘은 weaponRewards 중 통계 키와 맞는 보상(보상 이름 키 / 무기 프리팹 이름 / 프리팹 DescriptionHolder 이름 키)의 이미지
 ///   - 아이콘을 못 찾으면 "이름 : 수치" 로 대체. 목록이 연결되지 않았으면 예전처럼 통계 텍스트에 "이름 : 수치" 줄로 넣는다
+/// - 차원력 획득량은 GameOverManager 가 Show 전에 SetMetaReward 로 넘긴다 (metaRewardLabel 이 비었으면 표시 안 함)
 /// - 무기 이름은 통계 키(무기 이름 StringTable 키 또는 오브젝트 이름)를 번역해서 표시 (키가 없으면 그대로)
 /// </summary>
 public class GameOverUI
@@ -79,6 +80,15 @@ public class GameOverUI
     [SerializeField]
     private string weaponValueFormatKey = "gameover.weapon_value";
 
+    [Header("meta reward")]
+    [Tooltip("차원력 획득 텍스트 (비우면 표시 안 함)")]
+    [SerializeField]
+    private TMP_Text metaRewardLabel;
+
+    [Tooltip("{0} = 웨이브 기여, {1} = 처치 기여, {2} = 레벨 기여, {3} = 결과 배율, {4} = 지급량, {5} = 보유량")]
+    [SerializeField]
+    private string metaRewardFormatKey = "meta.result";
+
     [Header("weapon icons")]
     [Tooltip("왼쪽 화면 무기별 데미지 칸을 담을 부모 (비우면 텍스트로 표시)")]
     [SerializeField]
@@ -101,6 +111,9 @@ public class GameOverUI
     // 언어가 바뀌었을 때 다시 채우기 위한 마지막 표시 내용
     private StatisticsManager lastStats;
     private bool lastVictory;
+    private bool hasMetaReward;
+    private MetaRewardResult lastMetaReward;
+    private int lastMetaCurrency;
     private readonly List<KeyValuePair<string, float>> sortedWeapons = new List<KeyValuePair<string, float>>();
 
     // 통계 키 -> 아이콘 (처음 표시할 때 weaponRewards 로 만든다)
@@ -173,8 +186,47 @@ public class GameOverUI
         }
     }
 
+    /// <summary>
+    /// 결과 패널에 표시할 차원력 획득 결과와 지급 후 보유량 (Show 전에 호출. 표시 중이면 바로 갱신)
+    /// </summary>
+    public void SetMetaReward(MetaRewardResult _result, int _currency)
+    {
+        hasMetaReward = true;
+        lastMetaReward = _result;
+        lastMetaCurrency = _currency;
+        if (true == IsShown)
+        {
+            FillMetaReward();
+        }
+    }
+
+    private void FillMetaReward()
+    {
+        if (null == metaRewardLabel)
+        {
+            return;
+        }
+
+        if (false == hasMetaReward)
+        {
+            metaRewardLabel.text = string.Empty;
+            return;
+        }
+
+        // 항목은 기여값(소수)이 아닌 실제 수치(웨이브 수 · 처치 수 · 레벨)로 보여 준다
+        metaRewardLabel.text = StringTable.Format(metaRewardFormatKey,
+            lastMetaReward.ClearedWaves,
+            lastMetaReward.Kills,
+            lastMetaReward.Level,
+            lastMetaReward.Rate,
+            lastMetaReward.Total,
+            lastMetaCurrency);
+    }
+
     private void Fill(StatisticsManager _stats, bool _victory)
     {
+        FillMetaReward();
+
         string title = StringTable.Get(true == _victory ? victoryKey : titleKey);
 
         if (null != titleLabel)

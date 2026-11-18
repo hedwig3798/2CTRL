@@ -13,7 +13,7 @@ namespace Builders
     /// - 루트 StatisticsManager (기본값 유지)
     /// - 루트 GameOverManager (gameOverUI, statisticsManager 연결)
     /// - 루트 GameOverCanvas (Screen Space Overlay, sortingOrder 100 → LevelUpUI(0) 보다 위)
-    ///   └ GameOverUI ─ Panel(반투명 검정 전체 화면) ─ Title / LeftLabel / RightLabel
+    ///   └ GameOverUI ─ Panel(반투명 검정 전체 화면) ─ Title / LeftLabel / RightLabel / MetaRewardLabel
     /// - 비주얼(색·크기·레이아웃 다듬기)은 visual-designer 담당. 여기서는 플레이스홀더 값만 둔다.
     /// </summary>
     public static class GameOverBuilder
@@ -106,6 +106,15 @@ namespace Builders
             LocalizationBuilderUtil.BindChildLabel(restart, "gameover.restart");
             LocalizationBuilderUtil.BindChildLabel(toTitle, "gameover.to_title");
 
+            // 차원력 획득 한 줄 (카드와 버튼 사이). GameOverUI 가 meta.result 키로 채운다
+            TMP_Text metaReward = MakeLabel(panelGo.transform, panelGo.transform, "MetaRewardLabel", font, 32f, TextAlignmentOptions.Center,
+                new Vector2(0.07f, 0.145f), new Vector2(0.93f, 0.185f), string.Empty);
+            metaReward.enableAutoSizing = true;
+            metaReward.fontSizeMin = 18f;
+            metaReward.fontSizeMax = 32f;
+            metaReward.textWrappingMode = TextWrappingModes.NoWrap;
+            LocalizationBuilderUtil.Unbind(metaReward);
+
             // 에디터에서 패널은 꺼 둔다 (런타임 Awake 에서도 끈다)
             panelGo.SetActive(false);
 
@@ -120,6 +129,8 @@ namespace Builders
             uiSo.FindProperty("rightWeaponList").objectReferenceValue = rightList;
             uiSo.FindProperty("weaponRowTemplate").objectReferenceValue = rowTemplate;
             uiSo.FindProperty("weaponValueFormatKey").stringValue = "gameover.weapon_value";
+            uiSo.FindProperty("metaRewardLabel").objectReferenceValue = metaReward;
+            uiSo.FindProperty("metaRewardFormatKey").stringValue = "meta.result";
             SerializedProperty rewardsProp = uiSo.FindProperty("weaponRewards");
             rewardsProp.arraySize = weaponRewards.Length;
             for (int i = 0; i < weaponRewards.Length; i++)
@@ -137,6 +148,8 @@ namespace Builders
             var mgrSo = new SerializedObject(goMgr);
             mgrSo.FindProperty("statisticsManager").objectReferenceValue = stats;
             mgrSo.FindProperty("gameOverUI").objectReferenceValue = ui;
+            MetaRewardConfig metaConfig = PermanentUpgradeBuilder.LoadConfig();
+            mgrSo.FindProperty("metaRewardConfig").objectReferenceValue = metaConfig;
             mgrSo.ApplyModifiedPropertiesWithoutUndo();
 
             EditorSceneManager.MarkSceneDirty(scene);
@@ -145,6 +158,7 @@ namespace Builders
             sb.AppendLine("씬: " + SCENE_PATH);
             sb.AppendLine("StatisticsManager / GameOverManager / GameOverCanvas(order " + SORTING_ORDER + ")/GameOverUI/Panel/{Title,LeftLabel,RightLabel,WeaponList x2,WeaponRowTemplate,RestartButton,TitleButton}");
             sb.AppendLine("무기 보상(아이콘) " + weaponRewards.Length + "개 연결");
+            sb.AppendLine("MetaRewardLabel / metaRewardConfig: " + (null != metaConfig ? PermanentUpgradeBuilder.CONFIG_PATH : "없음"));
             return sb.ToString();
         }
 

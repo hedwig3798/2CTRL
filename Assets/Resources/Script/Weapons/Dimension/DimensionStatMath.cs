@@ -4,6 +4,7 @@ using UnityEngine;
 /// 차원 무기 수치 계산 (양쪽 플레이어 스텟 합산, 순수 함수)
 /// - 배율 = max(minMultiplier, 1 + ΣMul_L + ΣMul_R)
 /// - 최종값 = (무기 값 + ΣAdd_L + ΣAdd_R) × 배율
+/// - 영구 강화가 있으면 (무기 값 + ΣAdd_L + ΣAdd_R + 영구Add) × 배율 × (1 + 영구Mul) (영구 계층은 양쪽 공통이라 한 번만)
 /// </summary>
 public static class DimensionStatMath
 {
@@ -26,6 +27,16 @@ public static class DimensionStatMath
     public static float Apply(float _value, float _addLeft, float _addRight, float _mulLeft, float _mulRight, float _minMultiplier)
     {
         return (_value + _addLeft + _addRight) * CombinedMultiplier(_mulLeft, _mulRight, _minMultiplier);
+    }
+
+    /// <summary>
+    /// 영구 강화 포함: (_value + _addLeft + _addRight + _permAdd) × CombinedMultiplier × (1 + _permMul)
+    /// - _addLeft / _addRight / _mulLeft / _mulRight 는 레벨업 보상분만 (영구 계층 제외)
+    /// - 영구 계층은 양쪽 공통이므로 한 번만 더하고 한 번만 곱한다
+    /// </summary>
+    public static float Apply(float _value, float _addLeft, float _addRight, float _mulLeft, float _mulRight, float _minMultiplier, float _permAdd, float _permMul)
+    {
+        return Apply(_value + _permAdd, _addLeft, _addRight, _mulLeft, _mulRight, _minMultiplier) * (1f + _permMul);
     }
 
     /// <summary>

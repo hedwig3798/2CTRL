@@ -827,7 +827,8 @@ public class WeaponTestController
         player.ResetModifiers();
         _data.Apply(CreateRewardContext());
 
-        float add = player.GetAdd(_key);
+        // 영구 강화 계층은 ResetModifiers 로 지워지지 않으므로 레벨업분만 본다
+        float add = player.GetLevelUpAdd(_key);
         float multiply = player.GetMultiply(_key);
 
         string result = string.Empty;

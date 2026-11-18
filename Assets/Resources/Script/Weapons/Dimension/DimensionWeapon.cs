@@ -70,6 +70,9 @@ public abstract class DimensionWeapon
     private readonly float[] cachedAddRight = new float[ValueTypeCount];
     private readonly float[] cachedMulLeft = new float[ValueTypeCount];
     private readonly float[] cachedMulRight = new float[ValueTypeCount];
+    // 영구 강화 계층 (양쪽 공통이므로 한쪽 값만 쓴다)
+    private readonly float[] cachedPermAdd = new float[ValueTypeCount];
+    private readonly float[] cachedPermMul = new float[ValueTypeCount];
     private readonly bool[] cachedValid = new bool[ValueTypeCount];
     private int cachedFrame = -1;
     private bool cachedHasPlayer;
@@ -183,6 +186,7 @@ public abstract class DimensionWeapon
     /// _value 에 양쪽 플레이어 스텟을 합산 적용한다
     /// - statTags 에 _type 이 없거나 양쪽 플레이어가 모두 없으면 _value 그대로
     /// - 배율 하한은 있는 플레이어의 minMultiplier 중 큰 값
+    /// - 영구 강화 계층은 양쪽 공통이므로 한 번만 더하고 한 번만 곱한다 (왼쪽이 없으면 오른쪽 값)
     /// </summary>
     public float ApplyCombinedStat(float _value, ValueType _type)
     {
@@ -205,10 +209,14 @@ public abstract class DimensionWeapon
 
         if (false == cachedValid[i])
         {
-            cachedAddLeft[i] = null != leftStats ? leftStats.GetAdd(_type) : 0f;
-            cachedAddRight[i] = null != rightStats ? rightStats.GetAdd(_type) : 0f;
+            // 레벨업분만 (영구 Add 는 양쪽 공통이라 아래에서 한 번만 더한다)
+            cachedAddLeft[i] = null != leftStats ? leftStats.GetLevelUpAdd(_type) : 0f;
+            cachedAddRight[i] = null != rightStats ? rightStats.GetLevelUpAdd(_type) : 0f;
             cachedMulLeft[i] = null != leftStats ? leftStats.GetMultiply(_type) : 0f;
             cachedMulRight[i] = null != rightStats ? rightStats.GetMultiply(_type) : 0f;
+            PlayerStats permSource = null != leftStats ? leftStats : rightStats;
+            cachedPermAdd[i] = permSource.GetPermanentAdd(_type);
+            cachedPermMul[i] = permSource.GetPermanentMultiply(_type);
             cachedValid[i] = true;
         }
 
@@ -218,7 +226,9 @@ public abstract class DimensionWeapon
             cachedAddRight[i],
             cachedMulLeft[i],
             cachedMulRight[i],
-            cachedMinMultiplier);
+            cachedMinMultiplier,
+            cachedPermAdd[i],
+            cachedPermMul[i]);
     }
 
     /// <summary>

@@ -15,7 +15,9 @@ namespace Builders
     /// <summary>
     /// Assets/Scenes/TitleScene.unity 를 새로 만든다 (멱등, 매번 빈 씬으로 재생성)
     /// - Main Camera, EventSystem, Canvas(배경 / "2CTRL" 로고 / 버튼 목록) + TitleMenu
-    /// - 버튼은 당장 "게임 시작" 하나 (MenuButtons 세로 레이아웃에 추가하면 설정 등 확장 가능)
+    /// - 버튼: 게임 시작 / 차원 강화 / 설정 (MenuButtons 세로 레이아웃)
+    /// - 별도 캔버스: UpgradeCanvas(PermanentUpgradePanel, 꺼짐), SettingsCanvas(SettingsPanel)
+    /// - internal SettingsUIKit 을 쓰므로 script eval "return Builders.TitleSceneBuilder.Build();" 로 실행
     /// - Build Settings: TitleScene(0), DimensionSelectScene(1), GameScene(2) (DimensionSelectSceneBuilder.RegisterBuildScenes)
     /// - 확인용으로 .claude/tmp/titlescene.png 캡처
     /// </summary>
@@ -29,6 +31,14 @@ namespace Builders
         private const string CAPTURE_PATH = ".claude/tmp/titlescene.png";
         // TitleCanvas(0) 위
         private const int SETTINGS_SORTING_ORDER = 50;
+        // TitleCanvas 위, 설정 창 아래 (둘은 동시에 열리지 않는다)
+        private const int UPGRADE_SORTING_ORDER = 40;
+        // 차원 강화 창 크기 (9줄이 1080 안에 들어가도록)
+        private const float UPGRADE_WINDOW_WIDTH = 1240f;
+        private const float UPGRADE_ROW_HEIGHT = 72f;
+        private const float UPGRADE_ROW_SPACING = 6f;
+        private const int UPGRADE_ROW_COUNT = 9;
+        private const float UPGRADE_TEXT_SIZE = 30f;
 
         private static TMP_FontAsset font;
 
@@ -120,8 +130,10 @@ namespace Builders
 
             LocalizationBuilderUtil.Reload();
             Button startButton = CreateButton("StartButton", menuRt, string.Empty, 360f, 80f);
+            Button upgradeButton = CreateButton("UpgradeButton", menuRt, string.Empty, 360f, 80f);
             Button settingsButton = CreateButton("SettingsButton", menuRt, string.Empty, 360f, 80f);
             LocalizationBuilderUtil.BindChildLabel(startButton, "ui.title.start");
+            LocalizationBuilderUtil.BindChildLabel(upgradeButton, "ui.title.upgrade");
             LocalizationBuilderUtil.BindChildLabel(settingsButton, "ui.title.settings");
 
             // 설정 창 : ArtResourceBuilder 가 TitleCanvas 에 이미지를 뒤에 추가해도 가리지 않도록 별도 캔버스(위 순서)
@@ -137,6 +149,10 @@ namespace Builders
             SettingsPanel settingsPanel = SettingsPanelBuilder.InstantiateInto(settingsCanvasGo.transform);
             sb.AppendLine("설정 창: " + (null != settingsPanel ? SettingsPanelBuilder.PREFAB_PATH : "생성 실패"));
 
+            // 차원 강화 창 : 설정 창과 같은 방식의 별도 캔버스 (꺼진 상태)
+            PermanentUpgradePanel upgradePanel = BuildUpgradePanel(canvasGo.layer);
+            sb.AppendLine("차원 강화 창: " + (null != upgradePanel ? "UpgradeCanvas/PermanentUpgradePanel" : "생성 실패"));
+
             // 4. TitleMenu
             var menu = canvasGo.AddComponent<TitleMenu>();
             var so = new SerializedObject(menu);
@@ -144,6 +160,8 @@ namespace Builders
             so.FindProperty("gameSceneName").stringValue = "DimensionSelectScene";
             so.FindProperty("settingsButton").objectReferenceValue = settingsButton;
             so.FindProperty("settingsPanel").objectReferenceValue = settingsPanel;
+            so.FindProperty("upgradeButton").objectReferenceValue = upgradeButton;
+            so.FindProperty("upgradePanel").objectReferenceValue = upgradePanel;
             so.ApplyModifiedPropertiesWithoutUndo();
 
             EditorSceneManager.SaveScene(scene, SCENE_PATH);
@@ -156,6 +174,117 @@ namespace Builders
             string result = sb.ToString();
             Debug.Log(result);
             return result;
+        }
+
+        /// <summary>
+        /// UpgradeCanvas ─ PermanentUpgradePanel(꺼짐, 전체 화면 Dim) ─ Window ─ Title / CurrencyLabel / List(RowTemplate 꺼짐) / CloseButton
+        /// 줄: Icon / NameLabel / LevelLabel / EffectLabel / PriceLabel / BuyButton(meta.buy). 스타일은 SettingsUIKit (설정 창과 같음)
+        /// </summary>
+        private static PermanentUpgradePanel BuildUpgradePanel(int _layer)
+        {
+            var canvasGo = new GameObject("UpgradeCanvas", typeof(RectTransform), typeof(Canvas), typeof(CanvasScaler), typeof(GraphicRaycaster));
+            canvasGo.layer = _layer;
+            var canvas = canvasGo.GetComponent<Canvas>();
+            canvas.renderMode = RenderMode.ScreenSpaceOverlay;
+            canvas.sortingOrder = UPGRADE_SORTING_ORDER;
+            var scaler = canvasGo.GetComponent<CanvasScaler>();
+            scaler.uiScaleMode = CanvasScaler.ScaleMode.ScaleWithScreenSize;
+            scaler.referenceResolution = new Vector2(1920f, 1080f);
+            scaler.matchWidthOrHeight = 0.5f;
+
+            // 루트 = 전체 화면 Dim (뒤쪽 메뉴 클릭 차단)
+            Image dim = SettingsUIKit.MakeImage("PermanentUpgradePanel", canvasGo.transform, SettingsUIKit.DIM_COLOR, true);
+            SettingsUIKit.Stretch(dim.rectTransform);
+            GameObject root = dim.gameObject;
+
+            const float PAD = 24f, SPACING = 12f, TITLE_H = 60f, CURRENCY_H = 40f, CLOSE_H = 64f;
+            float inner = UPGRADE_WINDOW_WIDTH - PAD * 2f;
+            float listHeight = UPGRADE_ROW_COUNT * UPGRADE_ROW_HEIGHT + (UPGRADE_ROW_COUNT - 1) * UPGRADE_ROW_SPACING;
+            float windowHeight = PAD * 2f + TITLE_H + CURRENCY_H + listHeight + CLOSE_H + SPACING * 3f;
+
+            Image window = SettingsUIKit.MakeImage("Window", root.transform, SettingsUIKit.WINDOW_COLOR, true);
+            window.sprite = SettingsUIKit.BuiltinSprite("UISprite.psd");
+            window.type = Image.Type.Sliced;
+            SettingsUIKit.Slice(window, "PanelDark", Color.white);
+            SettingsUIKit.Center(window.rectTransform, new Vector2(UPGRADE_WINDOW_WIDTH, windowHeight), Vector2.zero);
+            VerticalLayoutGroup wvlg = SettingsUIKit.AddVertical(window.gameObject, SPACING, TextAnchor.UpperCenter);
+            wvlg.padding = new RectOffset((int)PAD, (int)PAD, (int)PAD, (int)PAD);
+
+            TextMeshProUGUI title = SettingsUIKit.MakeLabel("Title", window.transform, string.Empty, 48f, TextAlignmentOptions.Center);
+            SettingsUIKit.SetLayoutSize(title.gameObject, inner, TITLE_H);
+            LocalizationBuilderUtil.Bind(title, "meta.panel.title");
+
+            TextMeshProUGUI currency = SettingsUIKit.MakeLabel("CurrencyLabel", window.transform, string.Empty, UPGRADE_TEXT_SIZE, TextAlignmentOptions.Center);
+            currency.color = SettingsUIKit.ACCENT_COLOR;
+            SettingsUIKit.SetLayoutSize(currency.gameObject, inner, CURRENCY_H);
+
+            RectTransform list = SettingsUIKit.MakeRect("List", window.transform);
+            SettingsUIKit.SetLayoutSize(list.gameObject, inner, listHeight);
+            SettingsUIKit.AddVertical(list.gameObject, UPGRADE_ROW_SPACING, TextAnchor.UpperCenter);
+
+            PermanentUpgradeRow rowTemplate = BuildUpgradeRow(list, inner);
+
+            Button close = SettingsUIKit.MakeButton("CloseButton", window.transform, string.Empty, 240f, CLOSE_H, UPGRADE_TEXT_SIZE);
+            LocalizationBuilderUtil.BindChildLabel(close, "meta.close");
+            SettingsUIKit.StyleButton(close);
+
+            var panel = root.AddComponent<PermanentUpgradePanel>();
+            var so = new SerializedObject(panel);
+            so.FindProperty("registry").objectReferenceValue = PermanentUpgradeBuilder.LoadRegistry();
+            so.FindProperty("currencyLabel").objectReferenceValue = currency;
+            so.FindProperty("rowParent").objectReferenceValue = list;
+            so.FindProperty("rowTemplate").objectReferenceValue = rowTemplate;
+            so.FindProperty("closeButton").objectReferenceValue = close;
+            so.ApplyModifiedPropertiesWithoutUndo();
+
+            SettingsUIKit.SetLayerRecursive(canvasGo, _layer);
+            root.SetActive(false);
+            return panel;
+        }
+
+        private static PermanentUpgradeRow BuildUpgradeRow(Transform _parent, float _width)
+        {
+            Image bg = SettingsUIKit.MakeImage("RowTemplate", _parent, SettingsUIKit.CONTROL_BG_COLOR, false);
+            SettingsUIKit.Slice(bg, "Panel", Color.white);
+            SettingsUIKit.SetLayoutSize(bg.gameObject, _width, UPGRADE_ROW_HEIGHT);
+            HorizontalLayoutGroup hlg = SettingsUIKit.AddHorizontal(bg.gameObject, 12f, TextAnchor.MiddleLeft);
+            hlg.padding = new RectOffset(16, 16, 8, 8);
+
+            float h = UPGRADE_ROW_HEIGHT - 16f;
+            Image icon = SettingsUIKit.MakeImage("Icon", bg.transform, Color.white, false);
+            icon.preserveAspect = true;
+            SettingsUIKit.SetLayoutSize(icon.gameObject, h, h);
+
+            TextMeshProUGUI nameLabel = RowLabel("NameLabel", bg.transform, 330f, h, TextAlignmentOptions.MidlineLeft);
+            TextMeshProUGUI levelLabel = RowLabel("LevelLabel", bg.transform, 150f, h, TextAlignmentOptions.Center);
+            TextMeshProUGUI effectLabel = RowLabel("EffectLabel", bg.transform, 260f, h, TextAlignmentOptions.Center);
+            TextMeshProUGUI priceLabel = RowLabel("PriceLabel", bg.transform, 140f, h, TextAlignmentOptions.MidlineRight);
+            priceLabel.color = SettingsUIKit.ACCENT_COLOR;
+
+            Button buy = SettingsUIKit.MakeButton("BuyButton", bg.transform, string.Empty, 150f, h, UPGRADE_TEXT_SIZE);
+            LocalizationBuilderUtil.BindChildLabel(buy, "meta.buy");
+            SettingsUIKit.StyleButton(buy);
+
+            var row = bg.gameObject.AddComponent<PermanentUpgradeRow>();
+            var so = new SerializedObject(row);
+            so.FindProperty("icon").objectReferenceValue = icon;
+            so.FindProperty("nameLabel").objectReferenceValue = nameLabel;
+            so.FindProperty("levelLabel").objectReferenceValue = levelLabel;
+            so.FindProperty("effectLabel").objectReferenceValue = effectLabel;
+            so.FindProperty("priceLabel").objectReferenceValue = priceLabel;
+            so.FindProperty("buyButton").objectReferenceValue = buy;
+            so.ApplyModifiedPropertiesWithoutUndo();
+
+            bg.gameObject.SetActive(false);
+            return row;
+        }
+
+        private static TextMeshProUGUI RowLabel(string _name, Transform _parent, float _width, float _height, TextAlignmentOptions _align)
+        {
+            TextMeshProUGUI t = SettingsUIKit.MakeLabel(_name, _parent, string.Empty, UPGRADE_TEXT_SIZE, _align);
+            SettingsUIKit.SetLayoutSize(t.gameObject, _width, _height);
+            t.overflowMode = TextOverflowModes.Ellipsis;
+            return t;
         }
 
         /// <summary>
