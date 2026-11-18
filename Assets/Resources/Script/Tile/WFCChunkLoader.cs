@@ -30,6 +30,11 @@ public class WFCChunkLoader : MonoBehaviour
     [Header("tile scale")]
     public int tileScale = 1;
 
+    // 타일 그림을 칸보다 이 비율만큼 크게 그려 이웃 타일과 살짝 겹친다 (0.002 = 1 유닛 타일에서 0.002 유닛, 1080p 기준 약 0.14px)
+    // 타일마다 따로 그리는 사각형이라 경계가 화면 픽셀 중앙에 딱 걸리면 어느 쪽도 그 픽셀을 칠하지 않아
+    // 배경색 1px 줄(틈)이 생긴다. 살짝 겹치면 경계 픽셀을 항상 한쪽이 칠한다
+    [Min(0f)] public float seamOverlap = 0.002f;
+
     [Header("chunk")]
     // 청크 하나의 크기 (타일 개수)
     [Min(1)] public int chunkWidth = 16;
@@ -1026,7 +1031,8 @@ public class WFCChunkLoader : MonoBehaviour
 
         GameObject created = Instantiate(tileDatas[_tile], _parent).gameObject;
         created.transform.rotation = Quaternion.identity;
-        created.transform.localScale = new Vector3(tileScale, tileScale, tileScale);
+        float drawScale = tileScale * (1f + seamOverlap);
+        created.transform.localScale = new Vector3(drawScale, drawScale, tileScale);
         created.layer = gameObject.layer;
         return created;
     }
