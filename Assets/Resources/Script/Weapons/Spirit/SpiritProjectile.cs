@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using UnityEngine;
 
 /// <summary>
@@ -7,6 +8,7 @@ using UnityEngine;
 /// - 추적 : chaseSpeed 로 대상에게 다가가고, 닿아 있으면 (대상 콜라이더 표면까지 contactRadius 이하) 틱 간격마다 데미지
 ///   첫 접촉은 바로 타격한다. 총 hitCount(무기 hitCount. 살아 있는 동안 업그레이드로 늘어나면 증가분을 더한다) 번 타격하면 소멸한다
 /// - 대상이 죽거나 사거리 + leashMargin 밖으로 벗어나면 사거리 안의 다음 적을 추적하고, 없으면 대기로 돌아간다 (남은 타격 수 유지)
+/// - 다른 정령이 추적 중인 적은 대상으로 고르지 않는다 (정령 전체 공유). 보스(MidBoss, BossHitProxy)는 예외로 여러 정령이 함께 공격한다
 /// - 틱 간격은 공격 속도와 무관하다 (Capped 무기의 공격 속도는 정령 생성 간격)
 /// - 업그레이드 : 추적 속도 = weapon.GetParam(ChaseSpeed, chaseSpeed), 틱 간격 = weapon.GetParam(TickInterval, tickInterval)
 /// - 소멸은 직접 한다 (Lifetime 컴포넌트를 붙이지 않는다)
@@ -75,6 +77,23 @@ public class SpiritProjectile
     [Tooltip("왼쪽으로 움직일 때 flipX 를 켠다 (스프라이트가 오른쪽을 보는 기준)")]
     [SerializeField]
     private bool flipByDirection = true;
+
+    // 정령이 추적 중인 (보스가 아닌) 대상. 다른 정령은 이 대상을 고르지 않는다
+    private static readonly HashSet<Transform> claimedTargets = new HashSet<Transform>();
+
+    [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
+    private static void ResetStatics()
+    {
+        claimedTargets.Clear();
+    }
+
+    /// <summary>
+    /// 정령이 독점 추적 중인 대상인지 (테스트·디버그용)
+    /// </summary>
+    public static bool IsClaimed(Transform _target)
+    {
+        return null != _target && true == claimedTargets.Contains(_target);
+    }
 
     private SPIRIT_STATE state;
     private Transform target;
@@ -206,7 +225,7 @@ public class SpiritProjectile
         }
         nextScanTime = Time.time + scanInterval;
 
-        Transform found = FindNearest(weapon.transform.position, weapon.FinalRange);
+        Transform found = FindUnclaimed();
         if (null != found)
         {
             StartChase(found);
@@ -220,7 +239,8 @@ public class SpiritProjectile
     {
         if (false == IsTargetValid())
         {
-            Transform next = FindNearest(weapon.transform.position, weapon.FinalRange);
+            ReleaseTarget();
+            Transform next = FindUnclaimed();
             if (null == next)
             {
                 EnterIdle();
@@ -244,17 +264,59 @@ public class SpiritProjectile
 
     private void StartChase(Transform _target)
     {
+        ReleaseTarget();
+
         state = SPIRIT_STATE.Chase;
         target = _target;
         targetCollider = _target.GetComponent<Collider2D>();
+
+        if (false == IsBoss(_target))
+        {
+            claimedTargets.Add(_target);
+        }
     }
 
     private void EnterIdle()
     {
+        ReleaseTarget();
+
         state = SPIRIT_STATE.Idle;
         target = null;
         targetCollider = null;
         nextScanTime = Time.time + scanInterval;
+    }
+
+    /// <summary>
+    /// 사거리 안에서 다른 정령이 추적 중이지 않은 가장 가까운 적 (보스는 추적 중이어도 고른다)
+    /// </summary>
+    private Transform FindUnclaimed()
+    {
+        return FindNearest(weapon.transform.position, weapon.FinalRange, claimedTargets);
+    }
+
+    /// <summary>
+    /// 지금 대상의 독점 표시를 푼다 (이 정령이 표시한 경우만)
+    /// </summary>
+    private void ReleaseTarget()
+    {
+        if (true == ReferenceEquals(null, target))
+        {
+            return;
+        }
+
+        // 파괴된 대상은 보스 여부를 알 수 없으니 그냥 지운다 (보스는 처음부터 표시되지 않아 지워도 무해)
+        if (null == target || false == IsBoss(target))
+        {
+            claimedTargets.Remove(target);
+        }
+    }
+
+    /// <summary>
+    /// 여러 정령이 함께 공격할 수 있는 보스인지
+    /// </summary>
+    private static bool IsBoss(Transform _target)
+    {
+        return true == _target.TryGetComponent(out MidBoss _) || true == _target.TryGetComponent(out BossHitProxy _);
     }
 
     /// <summary>
@@ -316,6 +378,8 @@ public class SpiritProjectile
 
     private void ResetState()
     {
+        ReleaseTarget();
+
         state = SPIRIT_STATE.Idle;
         target = null;
         targetCollider = null;

@@ -188,6 +188,60 @@ public class ExtraWeaponPlayTests
         Assert.IsFalse(spirit.IsChasing);
         Assert.AreEqual(1000f, WeaponTestKit.Hp(far), 0.01f);
     }
+
+    private static int CountChasing()
+    {
+        int count = 0;
+        foreach (SpiritProjectile s in Object.FindObjectsByType<SpiritProjectile>(FindObjectsSortMode.None))
+        {
+            if (true == s.gameObject.activeInHierarchy && true == s.IsChasing)
+            {
+                ++count;
+            }
+        }
+        return count;
+    }
+
+    private static IEnumerator WaitTwoSpirits(Weapon _w)
+    {
+        yield return MonsterTestFactory.WaitUntil(() => WeaponTestKit.CountActive<SpiritProjectile>() >= 2, 3f);
+        _w.attackSpeed = 0.1f;
+    }
+
+    [UnityTest]
+    public IEnumerator Spirit_다른_정령이_추적_중인_적은_고르지_않는다()
+    {
+        GameObject a = MonsterTestFactory.CreateTarget(new Vector2(2f, 0f), 100000f);
+        Weapon w = WeaponTestKit.Make(WEAPON_TYPE.Capped, WeaponTestKit.Template<SpiritProjectile>(), WeaponTestKit.Marker(Vector2.zero), 8f, 10f, 4f, 2);
+        w.hitCount = 100;
+
+        yield return WaitTwoSpirits(w);
+        yield return MonsterTestFactory.Wait(0.5f);
+
+        Assert.AreEqual(2, WeaponTestKit.CountActive<SpiritProjectile>());
+        Assert.AreEqual(1, CountChasing(), "적이 하나면 한 정령만 추적");
+        Assert.IsTrue(SpiritProjectile.IsClaimed(a.transform));
+
+        // 두 번째 적이 나타나면 대기 중인 정령이 그 적을 맡는다
+        MonsterTestFactory.CreateTarget(new Vector2(-2f, 0f), 100000f);
+        yield return MonsterTestFactory.Wait(0.5f);
+        Assert.AreEqual(2, CountChasing(), "서로 다른 적을 추적");
+    }
+
+    [UnityTest]
+    public IEnumerator Spirit_보스는_여러_정령이_함께_추적한다()
+    {
+        GameObject boss = MonsterTestFactory.CreateTarget(new Vector2(2f, 0f), 100000f);
+        boss.AddComponent<MidBoss>();
+        Weapon w = WeaponTestKit.Make(WEAPON_TYPE.Capped, WeaponTestKit.Template<SpiritProjectile>(), WeaponTestKit.Marker(Vector2.zero), 8f, 10f, 4f, 2);
+        w.hitCount = 100;
+
+        yield return WaitTwoSpirits(w);
+        yield return MonsterTestFactory.Wait(0.5f);
+
+        Assert.AreEqual(2, CountChasing(), "보스는 독점하지 않는다");
+        Assert.IsFalse(SpiritProjectile.IsClaimed(boss.transform));
+    }
     #endregion
 
     #region 낙뢰
