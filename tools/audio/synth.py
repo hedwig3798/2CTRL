@@ -202,16 +202,24 @@ def trim_tail(x, threshold_db=-60.0):
     return x[:idx[-1] + 1] if len(idx) else x
 
 
-def finalize(x, peak_db=-1.0):
-    """DC 제거 → 꼬리 정리 → 페이드 → 피크 정규화"""
+def finalize(x, peak_db=-1.0, lufs=None):
+    """DC 제거 → 꼬리 정리 → 페이드 → 음량 맞춤 (lufs 가 없으면 피크 정규화)"""
     y = x - np.mean(x)
     y = highpass(y, 25, order=1)
     y = trim_tail(y)
     y = fade(y)
-    peak = np.max(np.abs(y))
-    if peak > 0:
-        y *= 10 ** (peak_db / 20) / peak
-    return y
+    return level(y, peak_db, lufs)
+
+
+def level(y, peak_db=-1.0, lufs=None):
+    """lufs 가 있으면 최대 순간 음량을 lufs 로 맞추되 true peak 가 peak_db 를 넘지 않게 한다 (plinkfx 방식)"""
+    tp = true_peak_db(y)
+    if tp <= -200:
+        return y
+    gain_db = peak_db - tp
+    if lufs is not None:
+        gain_db = min(gain_db, lufs - loudness_max_momentary(y))
+    return y * 10 ** (gain_db / 20)
 
 
 def write_wav(path, x):
@@ -231,10 +239,39 @@ def make_loop(x, loop_dur, xfade=0.08):
     return body
 
 
-def finalize_loop(x, peak_db=-1.0):
-    """루프용 마무리: 꼬리 정리·페이드 없이 DC 제거와 피크 정규화만 한다"""
-    y = x - np.mean(x)
-    peak = np.max(np.abs(y))
-    if peak > 0:
-        y *= 10 ** (peak_db / 20) / peak
-    return y
+def finalize_loop(x, peak_db=-1.0, lufs=None):
+    """루프용 마무리: 꼬리 정리·페이드 없이 DC 제거와 음량 맞춤만 한다"""
+    return level(x - np.mean(x), peak_db, lufs)
+
+
+# ---------- 음량 측정 (ITU-R BS.1770 K-가중, plinkfx 방식) ----------
+
+def _k_weight_sos(sr=SR):
+    """K-가중 필터 (고역 쉘프 +4 dB @1.5 kHz → 하이패스 38 Hz) 계수. pyloudnorm 의 설계식과 같다"""
+    G, Q, fc = 3.999843853973347, 0.7071752369554196, 1681.974450955533
+    K = np.tan(np.pi * fc / sr)
+    Vh, Vb = 10 ** (G / 20), (10 ** (G / 20)) ** 0.4996667741545416
+    a0 = 1 + K / Q + K * K
+    shelf = [(Vh + Vb * K / Q + K * K) / a0, 2 * (K * K - Vh) / a0, (Vh - Vb * K / Q + K * K) / a0,
+             1.0, 2 * (K * K - 1) / a0, (1 - K / Q + K * K) / a0]
+    Q2, fc2 = 0.5003270373238773, 38.13547087602444
+    K2 = np.tan(np.pi * fc2 / sr)
+    a02 = 1 + K2 / Q2 + K2 * K2
+    hp = [1.0, -2.0, 1.0, 1.0, 2 * (K2 * K2 - 1) / a02, (1 - K2 / Q2 + K2 * K2) / a02]
+    return np.array([shelf, hp])
+
+
+def loudness_max_momentary(x, sr=SR):
+    """최대 순간 음량 (LUFS, 400 ms 창, 10 ms 간격). 400 ms 보다 짧으면 0 을 붙여 잰다"""
+    y = signal.sosfilt(_k_weight_sos(sr), x)
+    win, hop = int(0.4 * sr), int(0.01 * sr)
+    if len(y) < win:
+        y = np.concatenate([y, np.zeros(win - len(y))])
+    p = np.convolve(y * y, np.ones(win) / win, mode='valid')[::hop]
+    return -0.691 + 10 * np.log10(max(float(np.max(p)), 1e-12))
+
+
+def true_peak_db(x):
+    """4배 오버샘플 피크 (dBTP)"""
+    up = signal.resample_poly(x, 4, 1)
+    return 20 * np.log10(max(float(np.max(np.abs(up))), 1e-12))

@@ -21,8 +21,8 @@ MonoBehaviour:
   volume: 1
   pitchMin: 0.92
   pitchMax: 1.08
-  minInterval: 0.045
-  maxVoices: 3
+  minInterval: 0.06
+  maxVoices: 2
   ignorePause: 0
   priority: 200
   loop: 0

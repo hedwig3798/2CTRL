@@ -39,6 +39,7 @@ namespace Builders
             }
         }
 
+        // 음량은 파일에 넣는다 (tools/audio/levels.py, 게임 안 LUFS 기준). 여기 volume 은 1 로 둔다
         private static bool TryGetSpec(SoundId _id, out EventSpec _spec)
         {
             switch (_id)
@@ -53,7 +54,7 @@ namespace Builders
                 case SoundId.PLR_DEATH:
                     _spec = new EventSpec(SoundGroup.Alert, 1f, 1f, 1f, 0.5f, 1, true, 10); return true;
                 case SoundId.EXP_PICKUP:
-                    _spec = new EventSpec(SoundGroup.Reward, 0.8f, 1f, 1f, 0.05f, 2, false, 40); return true;
+                    _spec = new EventSpec(SoundGroup.Reward, 1f, 0.98f, 1.02f, 0.07f, 2, false, 40); return true;
                 case SoundId.MON_DIE_S:
                     _spec = new EventSpec(SoundGroup.Monster, 1f, 0.93f, 1.07f, 0.06f, 3, false, 180); return true;
 
@@ -80,13 +81,13 @@ namespace Builders
                 case SoundId.LVL_BUFF:
                     _spec = new EventSpec(SoundGroup.Reward, 1f, 1f, 1f, 0.05f, 2, true, 40); return true;
                 case SoundId.LVL_DEBUFF:
-                    _spec = new EventSpec(SoundGroup.Reward, 0.7f, 1f, 1f, 0.05f, 2, true, 40); return true;
+                    _spec = new EventSpec(SoundGroup.Reward, 1f, 1f, 1f, 0.05f, 2, true, 40); return true;
                 case SoundId.RESULT_WIN:
                 case SoundId.RESULT_LOSE:
                     _spec = new EventSpec(SoundGroup.Reward, 1f, 1f, 1f, 1f, 1, true, 20); return true;
                 // WAVE_START / WAVE_RUSH / WAVE_FINAL : 웨이브 전환은 무음으로 하기로 함 (2026-11-10). 음원·이벤트를 만들지 않는다
                 case SoundId.PLR_LOW_HP:
-                    _spec = new EventSpec(SoundGroup.Alert, 0.8f, 1f, 1f, 0f, 1, false, 15, true); return true;
+                    _spec = new EventSpec(SoundGroup.Alert, 1f, 1f, 1f, 0f, 1, false, 15, true); return true;
                 case SoundId.WPN_SPINBLADE_TELL:
                     _spec = new EventSpec(SoundGroup.Weapon, 1f, 1f, 1f, 0.1f, 1, false, 128); return true;
                 case SoundId.WPN_MINE_BOOM:
@@ -98,7 +99,7 @@ namespace Builders
                 case SoundId.MON_DIE_L:
                     _spec = new EventSpec(SoundGroup.Monster, 1f, 0.93f, 1.07f, 0.08f, 2, false, 180); return true;
                 case SoundId.MON_BOMBER_TELL:
-                    _spec = new EventSpec(SoundGroup.Alert, 0.8f, 1f, 1f, 0.12f, 2, false, 30); return true;
+                    _spec = new EventSpec(SoundGroup.Alert, 1f, 1f, 1f, 0.12f, 2, false, 30); return true;
                 case SoundId.MON_BOMBER_BOOM:
                     _spec = new EventSpec(SoundGroup.Alert, 1f, 0.95f, 1.05f, 0.1f, 3, false, 30); return true;
                 case SoundId.MON_TELEPORT:
@@ -109,7 +110,7 @@ namespace Builders
             string n = _id.ToString();
             if (n.StartsWith("WPN_", StringComparison.Ordinal) && n.EndsWith("_LOOP", StringComparison.Ordinal))
             {
-                _spec = new EventSpec(SoundGroup.Weapon, 0.6f, 1f, 1f, 0f, 1, false, 128, true); return true;
+                _spec = new EventSpec(SoundGroup.Weapon, 1f, 1f, 1f, 0f, 1, false, 128, true); return true;
             }
             if (n.StartsWith("WPN_", StringComparison.Ordinal))
             {
@@ -121,7 +122,7 @@ namespace Builders
             }
             if (n.StartsWith("HIT_", StringComparison.Ordinal))
             {
-                _spec = new EventSpec(SoundGroup.Hit, 1f, 0.92f, 1.08f, 0.045f, 3, false, 200); return true;
+                _spec = new EventSpec(SoundGroup.Hit, 1f, 0.92f, 1.08f, 0.06f, 2, false, 200); return true;
             }
             _spec = default;
             return false;
@@ -197,6 +198,8 @@ namespace Builders
         private static readonly int[] STAR_UPGRADE_LEVELS = { 5, 10 };
         private const float CULL_VIEWPORT_MARGIN = 0.1f;
         private const float CAMERA_RETRY_INTERVAL = 1f;
+        // 경험치 콤보: 반음씩 최대 7 (완전5도). 12 면 콤보가 늘 이어져 3 kHz 대 고음이 계속 났다
+        private const float EXP_COMBO_MAX_SEMITONES = 7f;
 
         [MenuItem("Tools/Builders/Sound Data")]
         public static void BuildMenu()
@@ -346,6 +349,7 @@ namespace Builders
             so.FindProperty("cullViewportMargin").floatValue = CULL_VIEWPORT_MARGIN;
             so.FindProperty("cameraRetryInterval").floatValue = CAMERA_RETRY_INTERVAL;
             so.FindProperty("loopVoices").intValue = LOOP_VOICES;
+            so.FindProperty("expComboMaxSemitones").floatValue = EXP_COMBO_MAX_SEMITONES;
             SerializedProperty bgmProp = so.FindProperty("bgmScenes");
             bgmProp.arraySize = BGM_SCENES.Length;
             for (int i = 0; i < BGM_SCENES.Length; ++i)

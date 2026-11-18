@@ -14,12 +14,14 @@ MonoBehaviour:
   m_EditorClassIdentifier: Game.Runtime::SoundEvent
   id: 303
   clips:
-  - {fileID: 8300000, guid: 5a9444d0885b8b943be6ff700f2481ff, type: 3}
+  - {fileID: 8300000, guid: f921d63d3dd740b4fb7c299acc7a1f26, type: 3}
+  - {fileID: 8300000, guid: 2daf9c35bba71a64ba723952cc768d95, type: 3}
+  - {fileID: 8300000, guid: 1800231f9f8738b44bd1bb04290ba8fa, type: 3}
   group: 1
-  volume: 0.8
-  pitchMin: 1
-  pitchMax: 1
-  minInterval: 0.05
+  volume: 1
+  pitchMin: 0.98
+  pitchMax: 1.02
+  minInterval: 0.07
   maxVoices: 2
   ignorePause: 0
   priority: 40

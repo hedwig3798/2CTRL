@@ -123,10 +123,6 @@ MonoBehaviour:
     fire: 407
     hit: 500
     loop: 0
-  - weaponKey: Root
-    fire: 409
-    hit: 500
-    loop: 0
   - weaponKey: Laser
     fire: 410
     hit: 501
@@ -238,4 +234,4 @@ MonoBehaviour:
   loopVoices: 6
   expComboWindow: 0.4
   expComboStepSemitones: 1
-  expComboMaxSemitones: 12
+  expComboMaxSemitones: 7

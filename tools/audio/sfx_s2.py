@@ -9,6 +9,7 @@ import numpy as np
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 from synth import *  # noqa: E402,F401,F403
 from sfx_s1 import note  # noqa: E402
+from levels import file_target  # noqa: E402
 
 OUT = sys.argv[1] if len(sys.argv) > 1 else 'Assets/Audio/SFX'
 
@@ -146,7 +147,7 @@ def lvl_buff():
 
 def lvl_debuff():
     d = 0.25
-    fall = lowpass(square(sweep_exp(420, 140, d), 0.5), 1800) * env_adsr(d, 0.01, 0.05, 0.7, 0.12) * 0.6
+    fall = lowpass(tri(sweep_exp(420, 140, d)), 1500) * env_adsr(d, 0.01, 0.05, 0.7, 0.12) * 0.6
     return fall
 
 
@@ -294,13 +295,16 @@ def wpn_mine_boom():
 
 
 def wpn_saw_loop():
+    """톱날 회전음. 예전 1.1 kHz 사각파 + 2.2 kHz 사인 '삐-' 를 빼고 낮은 모터 웅웅 + 부드러운 갈림으로 바꿨다.
+    계속 울리는 루프라 2.5 kHz 위를 깎고, 톱니 떨림(24 Hz) 깊이도 얕게 했다. 모든 주기가 1초에 딱 맞는다"""
     d, xf = 1.0, 0.08
     total = d + xf
     t = t_axis(total)
-    am = 0.65 + 0.35 * np.sin(2 * np.pi * 24 * t)  # 톱니가 지나가는 떨림
-    whine = mix(square(const(1100, total), 0.3) * 0.25, sine(const(2200, total)) * 0.3)
-    grind = bandpass(noise(total, 75), 2000, 5000) * 0.4
-    return make_loop(lowpass(mix(whine, grind), 6000) * am, d, xf)
+    am = 0.85 + 0.15 * np.sin(2 * np.pi * 24 * t)
+    motor = lowpass(square(const(150, total), 0.5), 700) * 0.5
+    whir = sine(const(600, total)) * 0.12
+    grind = bandpass(noise(total, 75), 900, 2400) * 0.3
+    return make_loop(lowpass(mix(motor, whir, grind), 2500) * am, d, xf)
 
 
 def wpn_flame_loop():
@@ -402,7 +406,7 @@ def mon_die_l():
 
 def mon_bomber_tell():
     times = [0.0, 0.2, 0.34, 0.45, 0.53, 0.59]
-    return mix(*[at(lowpass(square(const(1400, 0.04), 0.5), 5000) * env_exp(0.04, 0.02) * 0.5, s) for s in times])
+    return mix(*[at(lowpass(square(const(1050, 0.05), 0.5), 2800) * env_exp(0.05, 0.022) * 0.5, s) for s in times])
 
 
 def mon_bomber_boom():
@@ -465,11 +469,11 @@ def main():
     for rel, fn in SOUNDS.items():
         path = os.path.join(OUT, rel + '.wav')
         os.makedirs(os.path.dirname(path), exist_ok=True)
-        write_wav(path, finalize(fn()))
+        write_wav(path, finalize(fn(), lufs=file_target(os.path.basename(rel))))
     for rel, fn in LOOPS.items():
         path = os.path.join(OUT, rel + '.wav')
         os.makedirs(os.path.dirname(path), exist_ok=True)
-        write_wav(path, finalize_loop(fn()))
+        write_wav(path, finalize_loop(fn(), lufs=file_target(os.path.basename(rel))))
     print(len(SOUNDS) + len(LOOPS), 'files')
 
 

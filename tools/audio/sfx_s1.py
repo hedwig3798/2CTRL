@@ -2,12 +2,14 @@
 usage: python -I tools/audio/sfx_s1.py <out_root>   (기본 Assets/Audio/SFX)
 같은 시드로 항상 같은 파일이 나온다."""
 import os
+import re
 import sys
 
 import numpy as np
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 from synth import *  # noqa: E402,F401,F403
+from levels import file_target  # noqa: E402
 
 OUT = sys.argv[1] if len(sys.argv) > 1 else 'Assets/Audio/SFX'
 
@@ -71,11 +73,15 @@ def plr_death():
     return echo(dry, 0.12, 0.35, 0.25, taps=3)
 
 
-def exp_pickup():
-    d = 0.06
-    f = const(note('G6'), d)
-    tone = sine(f) * 0.8 + sine(f * 2) * 0.12
-    return tone * env_exp(d, 0.018, attack=0.001)
+def exp_pickup(v):
+    """작고 둥근 '똑' (plinkfx pickup 참고). 초당 수십 번 나므로 고역을 깎고 짧게 끝낸다.
+    콤보로 최대 +7 반음까지 올라가므로 기본음은 A5 로 낮게 둔다. 변형마다 음높이·감쇠를 살짝 다르게 한다"""
+    d = 0.07
+    semis = (0.0, 0.3, -0.3)[v - 1]
+    f = const(note('A5') * 2 ** (semis / 12), d)
+    tone = sine(f) * 0.75 + tri(f * 2) * 0.12
+    body = lowpass(tone, 3200) * env_exp(d, (0.018, 0.016, 0.02)[v - 1], attack=0.002)
+    return body
 
 
 # ---------------- Weapon ----------------
@@ -154,7 +160,6 @@ SOUNDS = {
     'UI/LVL_UP': lvl_up,
     'Player/PLR_HIT': plr_hit,
     'Player/PLR_DEATH': plr_death,
-    'Player/EXP_PICKUP': exp_pickup,
     'Weapon/WPN_BOOMERANG': wpn_boomerang,
     'Weapon/WPN_LASER': wpn_laser,
     'Weapon/WPN_CHAIN': wpn_chain,
@@ -164,7 +169,13 @@ VARIANTS = {
     'Hit/HIT_METAL': hit_metal,
     'Hit/HIT_SHOCK': hit_shock,
     'Monster/MON_DIE_S': mon_die_s,
+    'Player/EXP_PICKUP': exp_pickup,
 }
+
+
+def sound_id(rel):
+    """'Hit/HIT_METAL_02.wav' -> 'HIT_METAL'"""
+    return re.sub(r'_\d{2}$', '', os.path.splitext(os.path.basename(rel))[0])
 
 
 def main():
@@ -177,7 +188,7 @@ def main():
     for rel, x in written:
         path = os.path.join(OUT, rel)
         os.makedirs(os.path.dirname(path), exist_ok=True)
-        write_wav(path, finalize(x))
+        write_wav(path, finalize(x, lufs=file_target(sound_id(rel))))
         print(path)
 
 

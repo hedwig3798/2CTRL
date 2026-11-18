@@ -241,7 +241,7 @@ public class SoundLibrary
     [Tooltip("콤보로 올릴 수 있는 최대 반음 수")]
     [Min(0f)]
     [SerializeField]
-    private float expComboMaxSemitones = 12f;
+    private float expComboMaxSemitones = 7f;
 
     // 지연 생성 캐시
     private Dictionary<int, SoundEvent> eventMap;
