@@ -82,6 +82,8 @@ MonoBehaviour:
         weight: 0.3
       - item: {fileID: 11400000, guid: e6fbca26381eb084ab3de55a55129874, type: 2}
         weight: 1
+      - item: {fileID: 11400000, guid: af43424eacf47844d9ebb88a476814c2, type: 2}
+        weight: 1
   - type: 3
     pool:
       entries:
@@ -90,5 +92,7 @@ MonoBehaviour:
       - item: {fileID: 11400000, guid: 3f5c5c4e5af9c5042a62e1dfe2901921, type: 2}
         weight: 1
       - item: {fileID: 11400000, guid: f7819a030bd55544bbb54fd16798f0c7, type: 2}
+        weight: 1
+      - item: {fileID: 11400000, guid: 5e6ab54708e2d3d4e995ce05168b11bf, type: 2}
         weight: 1
   spawner: {fileID: 0}

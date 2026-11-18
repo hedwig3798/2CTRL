@@ -15,6 +15,8 @@ public enum ValueType
     ProjectileCount,
     // 플레이어 초당 체력 회복량 (base 0, HealthSystem 이 사용. 0 미만은 0)
     HPRegen,
+    // 아이템(EXP 보석) 획득 범위 (base = ItemTrigger 원 반경, ItemTrigger 가 최종값을 반경으로 쓴다)
+    PickupRange,
 }
 
 /// <summary>
@@ -43,6 +45,8 @@ public static class ValueTypeExtensions
                 return "stat.projectile_count";
             case ValueType.HPRegen:
                 return "stat.hp_regen";
+            case ValueType.PickupRange:
+                return "stat.pickup_range";
             default:
                 return null;
         }

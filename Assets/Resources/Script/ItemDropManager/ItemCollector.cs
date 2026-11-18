@@ -41,8 +41,8 @@ public class ItemCollector
     }
 
     /// <summary>
-    /// EXP 아이템을 수집해 공용 ExpSystem 에 넣고 _owner 진영으로 OnExpGained 를 알린다 (최종 보스 진입 시 강제 흡수에도 쓴다)
-    /// 획득한 EXP 를 돌려준다 (이미 수집됐으면 0)
+    /// EXP 아이템을 수집해 (ExpSystem.ExpGainMultiplier 를 곱해) 공용 ExpSystem 에 넣고 _owner 진영으로 OnExpGained 를 알린다 (최종 보스 진입 시 강제 흡수에도 쓴다)
+    /// 배율을 곱한 획득 EXP 를 돌려준다 (이미 수집됐으면 0)
     /// </summary>
     public static float Absorb(ExpItem _item, PlayerStats _owner)
     {
@@ -64,6 +64,8 @@ public class ItemCollector
             return 0f;
         }
 
+        // 전체 EXP 획득 배율 적용 (통계 · 효과음 이벤트도 실제 획득량으로 알린다)
+        exp *= expSystem.ExpGainMultiplier;
         expSystem.GetExp(exp);
 
         if (null != _owner && true == EventManager.HasInstance)

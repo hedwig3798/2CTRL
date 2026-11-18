@@ -128,6 +128,51 @@ public class PassiveRewardTests
         Assert.AreEqual(0.2f, p.Get(ValueType.HPRegen), 1e-4f);
     }
 
+    [Test]
+    public void PickupRange_BaseFromItemTriggerRadius_ScaledByMultiplier()
+    {
+        PlayerStats p = MakePlayer();
+        GameObject child = new GameObject("ItemTrigger");
+        child.transform.SetParent(p.transform, false);
+        CircleCollider2D circle = child.AddComponent<CircleCollider2D>();
+        circle.radius = 1.43f;
+        ItemTrigger trigger = child.AddComponent<ItemTrigger>();
+
+        Assert.AreEqual(1.43f, trigger.BaseRadius, 1e-4f);
+        Assert.AreEqual(1.43f, p.Get(ValueType.PickupRange), 1e-4f);
+        p.AddModifier(ValueType.PickupRange, StatModifierMode.Multiply, 0.1f);
+        Assert.AreEqual(1.43f * 1.1f, p.Get(ValueType.PickupRange), 1e-4f);
+        p.AddModifier(ValueType.PickupRange, StatModifierMode.Multiply, -0.06f);
+        Assert.AreEqual(1.43f * 1.04f, p.Get(ValueType.PickupRange), 1e-4f);
+    }
+
+    [Test]
+    public void PickupRange_NerfStack_ClampedByMinMultiplier()
+    {
+        PlayerStats p = MakePlayer();
+        GameObject child = new GameObject("ItemTrigger");
+        child.transform.SetParent(p.transform, false);
+        child.AddComponent<CircleCollider2D>().radius = 2f;
+        child.AddComponent<ItemTrigger>();
+
+        for (int i = 0; i < 20; ++i)
+        {
+            p.AddModifier(ValueType.PickupRange, StatModifierMode.Multiply, -0.06f);
+        }
+        Assert.AreEqual(2f * p.MinMultiplier, p.Get(ValueType.PickupRange), 1e-4f);
+    }
+
+    [Test]
+    public void PickupRange_HasDisplayName()
+    {
+        Assert.AreEqual("stat.pickup_range", ValueType.PickupRange.ToStringKey());
+        StringTable.Reload();
+        Assert.IsTrue(StringTable.TryGet("stat.pickup_range", out string statName));
+        Assert.IsFalse(string.IsNullOrEmpty(statName));
+        Assert.IsTrue(StringTable.TryGet("reward.passive.pickup_range.name", out string rewardName));
+        Assert.IsFalse(string.IsNullOrEmpty(rewardName));
+    }
+
     private HealthSystem MakeHealth(float _max, float _curr)
     {
         GameObject go = Track(new GameObject("H"));
@@ -238,6 +283,8 @@ public class PassiveRewardTests
     [TestCase("PassiveNuff/HPRegenNuff", RewardPoolType.PassiveNerf, 1f, -0.3f)]
     [TestCase("PassiveNuff/MonsterIncreaseNuff", RewardPoolType.PassiveNerf, 1f, 0.03f)]
     [TestCase("PassiveNuff/DurationNuff", RewardPoolType.PassiveNerf, 1f, -0.06f)]
+    [TestCase("PassiveBuff/PickupRangeUpgrade", RewardPoolType.PassiveBuff, 1f, 0.1f)]
+    [TestCase("PassiveNuff/PickupRangeNuff", RewardPoolType.PassiveNerf, 1f, -0.06f)]
     public void Reward_RegisteredInPrefabPool(string _path, RewardPoolType _pool, float _weight, float _value)
     {
         RewardData data = AssetDatabase.LoadAssetAtPath<RewardData>($"Assets/prefab/Upgrade/{_path}.asset");

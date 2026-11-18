@@ -22,3 +22,4 @@
 - [sound.md](sound.md) — SoundManager(DDOL 자동생성)/SoundLibrary/CombatSoundBinder/UIButtonSound, Weapon.Fired, GetChannelVolume 규약
 - [hud.md](hud.md) — 인게임 HUD: WaveTimerUI/WeaponHUD/WeaponSlotUI, Spawner 남은 시간, PlayerStats 무기 이벤트
 - [dimension-weapon.md](dimension-weapon.md) — 차원 무기: StageSystem(화면공간·쿼드트리·StageDamage), DimensionWeapon 6종, 합성 카드/커서, PlayerStats 슬롯
+- [pickup-exp.md](pickup-exp.md) — EXP 획득 배율(1.5), PickupRange 스탯/보상, 타일 seamOverlap, 관련 테스트

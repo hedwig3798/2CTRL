@@ -200,6 +200,7 @@ public class WeaponTestController
         ValueType.MoveSpeed,
         ValueType.HP,
         ValueType.HPRegen,
+        ValueType.PickupRange,
     };
 
     // passives 와 같은 순서. 스택 / 사용 가능 여부 / 라벨용 1스택 변화량

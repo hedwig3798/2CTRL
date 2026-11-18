@@ -6,10 +6,10 @@ using UnityEngine;
 /// 플레이어 스텟 (Player 루트에 하나 배치)
 /// - ValueType 마다 base / ΣAdd / ΣMultiply 를 가지며, 최종값 = (base + ΣAdd) × 배율 (0 미만은 0)
 ///   배율 = max(minMultiplier, 1 + ΣMultiply) (상대에게 너프를 몰아 받아도 일정 이하로 떨어지지 않게)
-/// - base 는 MoveSpeed = ArrowMovemnt.speed, HP = HealthSystem.maxHP 에서 가져오고, 나머지(Damage / AttackSpeed / Range) 는 0
+/// - base 는 MoveSpeed = ArrowMovemnt.speed, HP = HealthSystem.maxHP, PickupRange = ItemTrigger 반경에서 가져오고, 나머지(Damage / AttackSpeed / Range) 는 0
 /// - 무기 스텟과는 별개이며, Weapon 이 (무기 스텟 + ΣAdd) × 배율 로 사용한다 (Damage / AttackSpeed / Range 의 배율은 모든 무기에 곱해진다)
 /// - 무기 보유 상한(maxWeaponCount, 시작 무기 포함)에 도달하면 AddWeapon 이 더 이상 무기를 주지 않는다
-/// - 스텟이 바뀌면 OnStatChanged 로 알리고, ArrowMovemnt / HealthSystem 이 구독해서 반영한다
+/// - 스텟이 바뀌면 OnStatChanged 로 알리고, ArrowMovemnt / HealthSystem / ItemTrigger 가 구독해서 반영한다
 /// - side 로 등록되어 Find 로 찾을 수 있다 (왼쪽 보상 → 왼쪽 플레이어)
 /// </summary>
 [DisallowMultipleComponent]
@@ -424,6 +424,12 @@ public class PlayerStats
         if (null != health)
         {
             baseValues[(int)ValueType.HP] = health.maxHP;
+        }
+
+        ItemTrigger pickup = GetComponentInChildren<ItemTrigger>(true);
+        if (null != pickup)
+        {
+            baseValues[(int)ValueType.PickupRange] = pickup.BaseRadius;
         }
     }
 

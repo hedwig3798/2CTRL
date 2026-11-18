@@ -7,7 +7,7 @@ using UnityEngine;
 namespace Builders
 {
     /// <summary>
-    /// 추가 패시브(몬스터 스폰율·체력, 투사체 수, 지속 시간, 체력 재생) 보상 에셋을 만들고 RewardManager 풀에 등록한다 (멱등)
+    /// 추가 패시브(몬스터 스폰율·체력, 투사체 수, 지속 시간, 체력 재생, 아이템 획득 범위) 보상 에셋을 만들고 RewardManager 풀에 등록한다 (멱등)
     /// - 몬스터 감소 = 버프(내 쪽 몬스터), 몬스터 증가 = 디버프(상대 쪽 몬스터). 스폰율(Count) 과 체력(HP) 을 함께 바꾼다
     /// - 투사체 수는 버프만 있다 (디버프 없음). 가중치가 낮다 (BalanceDataBuilder.SetPoolWeights 도 GetWeight 를 따른다)
     /// - 지속 시간은 무기 태그 Duration 이 있는 무기에만 적용되며, 최초 지속 시간 × Weapon.MinDurationRate 아래로 줄지 않는다
@@ -33,6 +33,9 @@ namespace Builders
         // 초당 체력 회복 (고정값, 기본 재생 0. 최종 재생은 0 미만으로 내려가지 않는다)
         public const float REGEN_BUFF = 0.5f;
         public const float REGEN_NERF = -0.3f;
+        // 아이템 획득 범위 (비율, ItemTrigger 반경에 곱해진다. 배율 하한은 PlayerStats.minMultiplier)
+        public const float PICKUP_BUFF = 0.10f;
+        public const float PICKUP_NERF = -0.06f;
         private const float DEFAULT_WEIGHT = 1f;
 
         private struct Spec
@@ -60,6 +63,10 @@ namespace Builders
                 explain = "reward.passive.regen_up", nameKey = "reward.passive.hp_regen.name", effect = ADD_EFFECT, weight = DEFAULT_WEIGHT },
             new Spec { path = NERF_DIR + "/HPRegenNuff.asset", pool = RewardPoolType.PassiveNerf, hasKey = true, key = ValueType.HPRegen, value = REGEN_NERF,
                 explain = "reward.passive.regen_down", nameKey = "", effect = ADD_EFFECT, weight = DEFAULT_WEIGHT },
+            new Spec { path = BUFF_DIR + "/PickupRangeUpgrade.asset", pool = RewardPoolType.PassiveBuff, hasKey = true, key = ValueType.PickupRange, value = PICKUP_BUFF,
+                explain = "reward.passive.buff_ga", nameKey = "reward.passive.pickup_range.name", effect = PERCENT_EFFECT, weight = DEFAULT_WEIGHT },
+            new Spec { path = NERF_DIR + "/PickupRangeNuff.asset", pool = RewardPoolType.PassiveNerf, hasKey = true, key = ValueType.PickupRange, value = PICKUP_NERF,
+                explain = "reward.passive.nerf_ga", nameKey = "", effect = PERCENT_EFFECT, weight = DEFAULT_WEIGHT },
             new Spec { path = NERF_DIR + "/MonsterIncreaseNuff.asset", pool = RewardPoolType.PassiveNerf, value = MONSTER_NERF,
                 explain = "reward.passive.monster_up", nameKey = "", effect = MONSTER_EFFECT, weight = DEFAULT_WEIGHT },
             new Spec { path = NERF_DIR + "/DurationNuff.asset", pool = RewardPoolType.PassiveNerf, hasKey = true, key = ValueType.Duration, value = DURATION_NERF,

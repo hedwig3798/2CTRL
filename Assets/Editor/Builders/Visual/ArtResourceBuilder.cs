@@ -881,6 +881,8 @@ namespace Builders.Visual
             ("DurationUpgrade", "DurationUp"), ("ProjectileUpgrade", "ProjectileUp"), ("HPRegenUpgrade", "HPRegenUp"),
             ("MonsterDecrease", "MonsterDown"), ("DurationNuff", "DurationDown"), ("HPRegenNuff", "HPRegenDown"),
             ("MonsterIncreaseNuff", "MonsterUp"),
+            // 아이템 획득 범위 (tools/art/pickup_icons.py)
+            ("PickupRangeUpgrade", "PickupRangeUp"), ("PickupRangeNuff", "PickupRangeDown"),
         };
 
         private static void BuildIcons()

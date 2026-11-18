@@ -51,6 +51,7 @@ stat.range,범위,Range
 stat.duration,지속 시간,Duration
 stat.projectile_count,투사체 수,Projectile Count
 stat.hp_regen,체력 재생,HP Regen
+stat.pickup_range,획득 범위,Pickup Range
 # 차원
 dimension.forest.name,숲,Forest
 dimension.factory.name,공장,Factory
@@ -67,6 +68,7 @@ reward.passive.monster.name,몬스터 감소,Fewer Monsters
 reward.passive.count_up,{0}가 {1:0}개 증가합니다.,{0} increases by {1:0}.
 reward.passive.monster_down,몬스터 스폰율과 체력이 {1:0.#%;0.#%} 감소합니다.,Monster spawn rate and HP decrease by {1:0.#%;0.#%}.
 reward.passive.hp_regen.name,체력 재생,HP Regen
+reward.passive.pickup_range.name,획득 범위,Pickup Range
 reward.passive.regen_up,{0}이 초당 {1:0.#} 증가합니다.,{0} increases by {1:0.#}/s.
 reward.passive.regen_down,{0}이 초당 {1:0.#;0.#} 감소합니다.,{0} decreases by {1:0.#;0.#}/s.
 reward.passive.monster_up,몬스터 스폰율과 체력이 {1:0.#%} 증가합니다.,Monster spawn rate and HP increase by {1:0.#%}.

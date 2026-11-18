@@ -258,7 +258,7 @@ public class FinalBossPlayTests
         Assert.IsFalse(enemy.activeSelf, "enemy deactivated");
         Assert.AreEqual(0, deathCount, "no OnEnemyDeath");
         Assert.IsFalse(gemGo.activeSelf, "gem absorbed");
-        Assert.AreEqual(7f, expGained, 1e-3f, "exp event from absorbed gem");
+        Assert.AreEqual(7f * expGo.GetComponent<ExpSystem>().ExpGainMultiplier, expGained, 1e-3f, "exp event from absorbed gem (× 획득 배율)");
         Assert.IsFalse(follow.enabled, "Follow disabled");
         Assert.AreEqual(1, startCount, "OnFinalBossStart once");
 
