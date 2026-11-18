@@ -77,6 +77,7 @@ namespace Builders.Visual
 
             BuildPlayers();
             BuildMonsters();
+            BuildBosses();
             BuildTiles();
             BuildWeapons();
             BuildExtraWeapons();
@@ -114,7 +115,7 @@ namespace Builders.Visual
                 ti.wrapMode = path.EndsWith("_Chain_Line.png") || path.EndsWith("_StormOrb_Link.png") ? TextureWrapMode.Repeat : TextureWrapMode.Clamp;
 
                 string file = System.IO.Path.GetFileNameWithoutExtension(path);
-                bool strip = path.Contains("/Player/") || path.Contains("/Monster/");
+                bool strip = path.Contains("/Player/") || path.Contains("/Monster/") || path.Contains("/Boss/");
                 bool tiles = path.Contains("/TileMap/");
 
                 if (strip || tiles)
@@ -160,7 +161,7 @@ namespace Builders.Visual
             }
         }
 
-        // 32x32 그리드로 자른다. 이름은 _names 가 있으면 그것, 없으면 file_0, file_1 ...
+        // 32x32 그리드로 자른다 (Boss/ 는 이미지 높이 크기의 정사각 칸). 이름은 _names 가 있으면 그것, 없으면 file_0, file_1 ...
         // 같은 이름의 기존 스프라이트 ID 를 유지해서 다시 실행해도 참조가 끊기지 않는다
         private static void SliceGrid(TextureImporter _ti, string _file, string[] _names)
         {
@@ -170,8 +171,9 @@ namespace Builders.Visual
             provider.InitSpriteEditorDataProvider();
 
             var tex = AssetDatabase.LoadAssetAtPath<Texture2D>(_ti.assetPath);
-            int cols = tex.width / 32;
-            int rows = tex.height / 32;
+            int cell = _ti.assetPath.Contains("/Boss/") ? tex.height : 32;
+            int cols = tex.width / cell;
+            int rows = tex.height / cell;
             int count = null != _names ? _names.Length : cols * rows;
 
             var existing = provider.GetSpriteRects().ToDictionary(r => r.name, r => r.spriteID);
@@ -184,7 +186,7 @@ namespace Builders.Visual
                 var rect = new SpriteRect
                 {
                     name = name,
-                    rect = new Rect(c * 32, tex.height - (r + 1) * 32, 32, 32),
+                    rect = new Rect(c * cell, tex.height - (r + 1) * cell, cell, cell),
                     alignment = SpriteAlignment.Center,
                     pivot = new Vector2(0.5f, 0.5f),
                     spriteID = existing.TryGetValue(name, out GUID id) ? id : GUID.Generate(),
@@ -221,7 +223,8 @@ namespace Builders.Visual
 
         private static AnimationClip Clip(string _strip)
         {
-            string src = ART + "/" + (_strip.Contains("_Player_") ? "Player/" : "Monster/") + _strip + ".png";
+            string folder = _strip.Contains("_Player_") ? "Player/" : (_strip.Contains("_Boss_") ? "Boss/" : "Monster/");
+            string src = ART + "/" + folder + _strip + ".png";
             Sprite[] frames = Frames(src);
             string path = ANIM + "/" + _strip + ".anim";
 
@@ -390,6 +393,8 @@ namespace Builders.Visual
 
         private static AnimationClip monsterBaseClip;
 
+        private static AnimatorController monsterBaseController;
+
         private static AnimatorOverrideController MonsterOverride(AnimatorController _base, string _strip)
         {
             if (false == monsterOverrides.TryGetValue(_strip, out AnimatorOverrideController aoc))
@@ -405,6 +410,7 @@ namespace Builders.Visual
             monsterOverrides.Clear();
             monsterBaseClip = Clip("D1_Monster_Slime_Walk");
             AnimatorController ctrl = Controller(ANIM + "/MonsterBase.controller", ("Walk", monsterBaseClip));
+            monsterBaseController = ctrl;
 
             foreach (var (prefab, strip) in MONSTER_DEFAULT)
             {
@@ -447,6 +453,77 @@ namespace Builders.Visual
                 so.ApplyModifiedPropertiesWithoutUndo();
             }
             log.AppendLine("monsters ok");
+        }
+
+        #endregion
+
+        #region Boss
+
+        // 보스 전용 아트 (tools/art/bosses.py). 프리팹은 MidBossBuilder / FinalBossBuilder 가 만든다
+        private const string BOSS_DIR = MONSTER_DIR + "/Boss";
+        private const string FINAL_BOSS_STRIP = "Final_Boss_SquidRed";
+        // FinalBossVisual 과 같은 지름 (유닛)
+        private const float FINAL_BOSS_DIAMETER = 4f;
+
+        private static readonly (string prefab, string strip)[] MID_BOSSES =
+        {
+            ("ForestBoss10", "D1_Boss_GiantBamboo"), ("ForestBoss20", "D1_Boss_GiantBamboo2"),
+            ("FactoryBoss10", "D2_Boss_DemonCyclop"), ("FactoryBoss20", "D2_Boss_GiantFlam"),
+            ("StormBoss10", "D3_Boss_GiantSpirit"), ("StormBoss20", "D3_Boss_TenguBlue"),
+        };
+
+        private static void BuildBosses()
+        {
+            foreach (var (prefab, strip) in MID_BOSSES)
+            {
+                string path = BOSS_DIR + "/" + prefab + "/" + prefab + ".prefab";
+                if (null == AssetDatabase.LoadAssetAtPath<GameObject>(path))
+                {
+                    log.AppendLine("missing boss " + path);
+                    continue;
+                }
+                AnimatorOverrideController aoc = MonsterOverride(monsterBaseController, strip);
+                EditPrefab(path, root =>
+                {
+                    Transform visual = root.transform.Find("visual");
+                    // 일반 몬스터와 같은 픽셀 밀도: 루트 배율(MidBossBuilder BOSS_SCALE)을 visual 에서 되돌린다. 판정은 루트 기준이라 그대로
+                    float rootScale = Mathf.Max(0.01f, root.transform.localScale.x);
+                    visual.localScale = Vector3.one * (MONSTER_VISUAL_SCALE / rootScale);
+                    var anim = visual.GetComponent<Animator>();
+                    if (null == anim)
+                    {
+                        anim = visual.gameObject.AddComponent<Animator>();
+                    }
+                    anim.runtimeAnimatorController = aoc;
+                    var sr = visual.GetComponent<SpriteRenderer>();
+                    sr.sprite = Frames(ART + "/Boss/" + strip + "_Walk.png")[0];
+                    sr.color = Color.white;
+                });
+            }
+
+            string finalPath = BOSS_DIR + "/FinalBoss/FinalBoss.prefab";
+            if (null == AssetDatabase.LoadAssetAtPath<GameObject>(finalPath))
+            {
+                log.AppendLine("missing boss " + finalPath);
+                return;
+            }
+            AnimatorOverrideController finalAoc = MonsterOverride(monsterBaseController, FINAL_BOSS_STRIP);
+            EditPrefab(finalPath, root =>
+            {
+                Transform visual = root.transform.Find("Visual");
+                var sr = visual.GetComponent<SpriteRenderer>();
+                sr.sprite = Frames(ART + "/Boss/" + FINAL_BOSS_STRIP + "_Walk.png")[0];
+                sr.color = Color.white;
+                var anim = visual.GetComponent<Animator>();
+                if (null == anim)
+                {
+                    anim = visual.gameObject.AddComponent<Animator>();
+                }
+                anim.runtimeAnimatorController = finalAoc;
+                float size = Mathf.Max(sr.sprite.bounds.size.x, sr.sprite.bounds.size.y);
+                visual.localScale = Vector3.one * (FINAL_BOSS_DIAMETER / Mathf.Max(0.01f, size));
+            });
+            log.AppendLine("bosses ok");
         }
 
         #endregion
@@ -736,7 +813,8 @@ namespace Builders.Visual
             {
                 Transform v = root.transform.Find("visual");
                 StyleSprite(v.GetComponent<SpriteRenderer>(), "D3_Weapon_Tornado_Body", 1);
-                SetScaleAt(v, 0f, 0f, 1.6f, 1.6f);
+                // 64px 그림(2 유닛) x 0.8 = 1.6 유닛
+                SetScaleAt(v, 0f, 0f, 0.8f, 0.8f);
             });
 
             // 낙뢰: 표식(지름 1 = markerUnitRadius 0.5) + 번개 라인은 체인 번개와 같은 텍스처 반복

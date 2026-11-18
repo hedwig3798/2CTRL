@@ -60,3 +60,52 @@
 9. 일시정지 메뉴, 사운드는 범위에서 제외.
 10. `TitleSceneBuilder` / `DimensionSelectSceneBuilder` 등 기존 씬 빌더를 다시 돌리면 이번 아트가 덮어써진다 → 그 뒤 `ArtResourceBuilder.Build()` 를 다시 실행해야 한다.
 11. 에디터 Game 뷰가 Free Aspect(약 1.23:1)라 캡처가 찌그러져 보였다. 실제 비율 확인은 16:9 로 맞춰서 해 볼 것.
+
+---
+
+# 추가 작업: 보스·공장 바닥·무기 아트 팩 원본화 (2026-11-18)
+
+목표: 코드로 그린 그림·AI 생성 그림·과한 재색칠을 Ninja Adventure 원본 스프라이트로 바꾼다. 게임 로직·판정은 그대로.
+
+## 보스 (`tools/art/bosses.py` → `Art/Boss/`)
+| 보스 | 원본 (`Actor/Boss`) |
+|---|---|
+| ForestBoss10 뿌리 거인 | GiantBamboo/Walk |
+| ForestBoss20 도약하는 고목 | GiantBamboo2/Walk |
+| FactoryBoss10 톱날 기계 | DemonCyclop/Walk |
+| FactoryBoss20 폭주 기관 | GiantFlam/Idle |
+| StormBoss10 폭풍의 눈 | GiantSpirit/Idle |
+| StormBoss20 판정의 고리 | TenguBlue/Walk |
+| 최종 보스 | SquidRed/Idle |
+
+- 이전에는 일반 몬스터 그림을 3배로 키우고 색을 덮었다. 이제 색 보정 없음.
+- 중간 보스 visual 스케일 = `MONSTER_VISUAL_SCALE / 루트 배율` → 일반 몬스터와 같은 픽셀 밀도. 판정(루트)은 그대로.
+- `MidBossBuilder` / `FinalBossBuilder` 를 다시 돌리면 아트가 덮이므로 `ArtResourceBuilder.Build()` 재실행.
+
+## 공장(D2) 바닥 (`tools/art/tiles.py`)
+- `Interior/TilesetInteriorFloor.png` 의 회녹색 판재 블록. A = 리벳 판재, B = 테두리 패널. 재색칠 없음.
+- 원본에 안쪽 모서리 그림이 없어 안쪽 모서리는 패널 가운데 칸으로 채운다 (가중치가 낮아 드물게 끊긴 테두리가 보인다).
+
+## 무기
+| 이미지 | 이전 | 이후 (팩 원본) |
+|---|---|---|
+| 덩굴 / 뿌리 장판 | AI 생성 | Particle/Grass, Leaf 합성 |
+| 회오리 | AI 생성 | Slash/SpriteSheetCircular 호 2개 (64px, 스케일 0.8) |
+| 독장판 | 코드 원 | Smoke 구름 합성 + 초록 |
+| 레이저 | 코드 그라디언트 | IceSpike 세로 단면 반복 |
+| 지뢰 | 코드 그림 | Items/Projectile/Bomb |
+| 회전 칼날 | 코드 칼 | BigKunai 세 개 |
+| 전격 구체 / 연결선 | 코드 그림 | Magic/Circle/SpriteSheetSpark2 / Particle/Spark |
+| 정령·톱날·드론탄·폭발탄·분열 버스트 | 재색칠 | 원본 색 그대로 (Spirit, Shuriken, EnergyBall, CanonBall, Explosion) |
+| 체인 번개 라인 | 코드 (파란색) | 같은 모양, Thunder 원본 팔레트 |
+
+- 아이콘은 기존 무기·패시브와 겹치지 않게: 톱날=Guard, 낙뢰=Rain, 회전 칼날=MagicWeapon, 전격 구체=OrbWater.
+- `tools/art/gen/` 의 AI 생성 원본은 더 이상 쓰지 않는다.
+
+## 확인한 것
+- 플레이: GameScene 에서 숲·공장 바닥, 중간 보스 강제 소환(뿌리 거인·톱날 기계) 화면 확인.
+- WeaponTest 씬에서 바꾼 무기 14종 화면 확인 (회전 칼날은 테스트 씬에서 발사되지 않아 투사체를 수동 활성화해 확인).
+
+## 남은 코드 그림
+- 회전 칼날 잔상(Trail), 몬스터 위험 지대(HazardZone 원), 체인 번개 라인 모양.
+- 최종 보스·10/20분 보스 등장은 실제 플레이 시간으로는 확인하지 못했다 (디버그 소환만).

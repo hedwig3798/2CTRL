@@ -49,52 +49,11 @@ def is_green(h):
     return 0.12 < h < 0.45
 
 
-PANEL = (58, 66, 82)
-
-
-# 공장/사이버: 풀(A) → 강철 패널 색, 흙(B) → 부서진 바닥 아래 녹슨 흙
-def factory(h, s, v):
-    if is_green(h):
-        k = v / 0.75
-        return tuple(min(1, c / 255 * k) for c in PANEL)
-    return hsv(0.06, 0.30 + s * 0.2, 0.18 + v * 0.32)
-
-
 # 폭풍: 풀(A) → 짙은 보라 암반, 흙(B) → 빗물 웅덩이
 def storm(h, s, v):
     if is_green(h):
         return hsv(0.70, 0.30, v * 0.48)
     return hsv(0.60, 0.45, 0.20 + v * 0.30)
-
-
-def factory_a(variant, rng):
-    """32px 강철 패널. variant: 0 기본, 1 환풍구, 2 경고 줄무늬, 3 청록 조명"""
-    t = Image.new('RGBA', (32, 32), PANEL + (255,))
-    px = t.load()
-    dark, light, rivet = (36, 40, 52, 255), (78, 88, 106, 255), (104, 114, 132, 255)
-    for i in range(32):
-        px[i, 31] = dark
-        px[31, i] = dark
-        px[i, 0] = light
-        px[0, i] = light
-    for x, y in [(3, 3), (28, 3), (3, 28), (28, 28)]:
-        px[x, y] = rivet
-        px[x + 1, y + 1] = dark
-    if variant == 1:
-        for y in range(10, 22, 3):
-            for x in range(8, 24):
-                px[x, y] = dark
-                px[x, y + 1] = (46, 52, 66, 255)
-    elif variant == 2:
-        for y in range(12, 20):
-            for x in range(4, 28):
-                px[x, y] = (230, 186, 60, 255) if ((x + y) // 3) % 2 == 0 else (40, 38, 44, 255)
-    elif variant == 3:
-        for x in range(6, 26):
-            px[x, 15] = (90, 220, 240, 255)
-            px[x, 16] = (60, 170, 200, 255)
-        px[5, 15] = px[26, 15] = (50, 120, 150, 255)
-    return t
 
 
 def storm_a(variant, rng, base):
@@ -137,9 +96,15 @@ def storm_a(variant, rng, base):
     return t
 
 
+# 공장: Interior/TilesetInteriorFloor 의 회녹색 판재 블록 (11,6) 부터. 색 보정 없이 원본 그대로
+# A = 리벳 판재 2x2 반복, B = 테두리 패널(3x3 블록). 안쪽 모서리 그림이 없어 패널 가운데 칸으로 채운다
+INTERIOR = os.path.join(os.path.dirname(SRC), 'Interior', 'TilesetInteriorFloor.png')
+PLATE_P = dict(P, iBR=(1, 1), iBL=(1, 1), iTR=(1, 1), iTL=(1, 1))
+PLATE_B_FILLS = [(1, 1), (0, 4), (3, 5)]
+
 DIMS = {
     'D1': dict(origin=(0, 7), fn=None, a_tile=None),
-    'D2': dict(origin=(0, 7), fn=factory, a_tile='factory'),
+    'D2': dict(src=INTERIOR, origin=(11, 6), fn=None, a_tile='plate', pieces=PLATE_P, b_fills=PLATE_B_FILLS),
     'D3': dict(origin=(0, 7), fn=storm, a_tile='storm'),
 }
 
@@ -149,11 +114,22 @@ def piece(block, cr):
     return block.crop((c * 16, r * 16, c * 16 + 16, r * 16 + 16))
 
 
+def plate_a(variant, block):
+    """32px 리벳 판재 (블록 (9,2)~(10,3) 2x2). variant 2 만 작은 패널 2x2 (금·문양 칸은 바탕색이 달라 얼룩져 보여 뺐다)"""
+    t = Image.new('RGBA', (32, 32))
+    for q, cr in enumerate([(9, 2), (10, 2), (9, 3), (10, 3)]):
+        t.paste(piece(block, (3, 3) if variant == 2 else cr), ((q % 2) * 16, (q // 2) * 16))
+    return t
+
+
 def build(dim, cfg):
     ox, oy = cfg['origin']
-    block = sheet.crop((ox * 16, oy * 16, ox * 16 + 11 * 16, oy * 16 + 7 * 16))
+    src = Image.open(cfg['src']).convert('RGBA') if 'src' in cfg else sheet
+    block = src.crop((ox * 16, oy * 16, ox * 16 + 11 * 16, oy * 16 + 7 * 16))
     if cfg['fn']:
         block = recolor(block, cfg['fn'])
+    pieces = cfg.get('pieces', P)
+    b_fills = cfg.get('b_fills', B_FILLS)
     rng = random.Random(dim)
     # A 채움 32px 타일 (A 칸 4개가 모두 같은 타일의 1/4 을 쓴다)
     a_base = Image.new('RGBA', (32, 32))
@@ -161,8 +137,8 @@ def build(dim, cfg):
         a_base.paste(piece(block, (0, 5)), ((q % 2) * 16, (q // 2) * 16))
     a_tiles = []
     for v in range(4):
-        if cfg['a_tile'] == 'factory':
-            a_tiles.append(factory_a(v, rng))
+        if cfg['a_tile'] == 'plate':
+            a_tiles.append(plate_a(v, block))
         elif cfg['a_tile'] == 'storm':
             a_tiles.append(storm_a(v, rng, a_base))
         else:
@@ -179,9 +155,9 @@ def build(dim, cfg):
                     continue
                 cr = (0, 5) if name == 'A0' or name[0] != 'A' else rng.choice(A_FILLS)
             elif kind == 'b':
-                cr = (1, 1) if name == 'B0' or q != 3 else B_FILLS[1 + (i % 2)]
+                cr = (1, 1) if name == 'B0' or q != 3 else b_fills[1 + (i % 2)]
             else:
-                cr = P[kind]
+                cr = pieces[kind]
             t.paste(piece(block, cr), pos)
         tiles.append(t)
     cols = 8

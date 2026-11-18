@@ -97,6 +97,15 @@ def blob(size, fill, light, dark, seed, bubbles=True):
     return outline(img)
 
 
+def poison_area():
+    """독 장판: Smoke 원본 작은 구름 7개를 고리 + 가운데로 겹치고 초록으로 물들인다 (32x32)"""
+    puff = bbox_crop(cell(load('FX/Smoke/Smoke/SpriteSheet.png'), 1, 32))
+    img = Image.new('RGBA', (32, 32))
+    for dx, dy in ((0, -8), (7, -4), (7, 4), (0, 8), (-7, 4), (-7, -4), (0, 0)):
+        img.paste(puff, (16 + dx - puff.width // 2, 16 + dy - puff.height // 2), puff)
+    return tint(img, (120, 220, 90))
+
+
 # ---------------- 무기 ----------------
 def weapons():
     shur = cell(load('FX/Projectile/BigShuriken.png'), 0, 23)
@@ -105,8 +114,9 @@ def weapons():
     rock = cell(load('FX/Projectile/SpriteSheetRock.png'), 0, 16)
     save(fit32(rock), 'weapon', 'D1_Weapon_SplitShot_Projectile')
     save(fit32(rock), 'weapon', 'D1_Weapon_SplitShot_Fragment')
-    smoke = cell(load('FX/Smoke/Smoke/SpriteSheet.png'), 2, 32)
-    save(fit32(tint(smoke, (255, 200, 120)), upscale=False), 'weapon', 'D1_Weapon_SplitShot_Burst')
+    # 분열 순간: 폭발 시트의 작은 앞 프레임 원본
+    burst = cell(load('FX/Elemental/Explosion/SpriteSheet.png'), 2, 40)
+    save(fit32(burst, upscale=False), 'weapon', 'D1_Weapon_SplitShot_Burst')
 
     slash = load('FX/Attack/SlashCurved/SpriteSheet.png')
     s = bbox_crop(cell(slash, 1, 32))
@@ -114,36 +124,27 @@ def weapons():
     # 가로로 긴 쓸기: 세로 초승달을 90도 돌린다
     save(fit32(s.rotate(90, expand=True)), 'weapon', 'D1_Weapon_Sweep_Arc')
 
-    save(blob(32, (120, 200, 70, 255), (190, 240, 120, 255), (70, 130, 50, 255), 1), 'weapon', 'D1_Weapon_PoisonZone_Area')
+    save(poison_area(), 'weapon', 'D1_Weapon_PoisonZone_Area')
 
-    # 레이저: x 방향으로 늘어나므로 y 방향 그라디언트
+    # 레이저: x 방향으로 늘어나므로 IceSpike 첫 프레임의 세로 단면(10px)을 3배로 세워 가로로 반복
+    ice = load('FX/Projectile/IceSpike.png')
+    column = [ice.getpixel((6, y)) for y in range(10)]
     beam = Image.new('RGBA', (32, 32))
     px = beam.load()
-    rows = [(0, 0), (20, 60), (40, 140), (90, 210), (170, 245), (230, 255), (255, 255), (255, 255)]
-    for y in range(32):
-        d = abs(15.5 - y) / 16
-        idx = min(7, int((1 - d) * 8))
-        c, a = rows[idx]
-        col = (int(60 + c * 0.75), int(200 + c * 0.2), 255, a)
+    for y in range(30):
         for x in range(32):
-            px[x, y] = col
+            px[x, y + 1] = column[y // 3]
     save(beam, 'weapon', 'D2_Weapon_Laser_Beam')
 
     dungeon = load('Backgrounds/Tilesets/TilesetDungeon.png')
     drone = dungeon.crop((3 * 16, 3 * 16, 4 * 16, 4 * 16))
     save(fit32(drone), 'weapon', 'D2_Weapon_Drone_Body')
     energy = cell(load('FX/Projectile/EnergyBall.png'), 0, 16)
-    save(fit32(tint(energy, (90, 230, 255))), 'weapon', 'D2_Weapon_Drone_Bullet')
+    save(fit32(energy), 'weapon', 'D2_Weapon_Drone_Bullet')
     save(fit32(energy), 'weapon', 'Common_Weapon_Bullet')
 
-    # 지뢰: 16px 직접 그림
-    mine = Image.new('RGBA', (16, 16))
-    d = ImageDraw.Draw(mine)
-    d.ellipse([2, 4, 13, 12], fill=(70, 76, 90, 255))
-    d.ellipse([3, 4, 12, 10], fill=(100, 108, 124, 255))
-    d.rectangle([7, 5, 8, 6], fill=(255, 70, 60, 255))
-    d.point([(7, 5)], fill=(255, 200, 190, 255))
-    save(fit32(outline(mine)), 'weapon', 'D2_Weapon_Mine_Body')
+    # 지뢰: 아이템 폭탄 원본
+    save(fit32(load('Items/Projectile/Bomb.png')), 'weapon', 'D2_Weapon_Mine_Body')
 
     exp = load('FX/Elemental/Explosion/SpriteSheet.png')
     save(fit32(cell(exp, 3, 40), upscale=False), 'weapon', 'Common_FX_Explosion')
@@ -151,19 +152,20 @@ def weapons():
     ring = cell(load('FX/Magic/Circle/SpriteSheetWhite.png'), 3, 32)
     save(fit32(ring, upscale=False), 'weapon', 'D3_Weapon_Shockwave_Ring')
 
-    ball = cell(load('FX/Projectile/BigEnergyBall.png'), 0, 24)
-    save(fit32(tint(ball, (200, 120, 255)), upscale=False), 'weapon', 'D3_Weapon_Explosive_Projectile')
+    # 폭발탄: 대포알 원본
+    save(fit32(cell(load('FX/Projectile/CanonBall.png'), 0, 16)), 'weapon', 'D3_Weapon_Explosive_Projectile')
 
-    # 체인 번개 라인 (LineRenderer Tile 용 32x8)
+    # 체인 번개 라인 (LineRenderer Tile 용 32x8). 팩에 가로 번개가 없어 지그재그 모양만 두고 색은 Thunder 원본 팔레트
+    core, mid, edge = (255, 255, 255, 255), (255, 225, 141, 255), (255, 173, 93, 255)
     line = Image.new('RGBA', (32, 8))
     lp = line.load()
     ys = [4, 3, 2, 3, 5, 6, 5, 4, 3, 2, 2, 3, 4, 5, 6, 6, 5, 4, 3, 3, 4, 5, 4, 3, 2, 3, 4, 5, 5, 4, 4, 4]
     for x, y in enumerate(ys):
-        lp[x, y] = (255, 255, 255, 255)
+        lp[x, y] = core
         if y + 1 < 8:
-            lp[x, y + 1] = (150, 220, 255, 220)
+            lp[x, y + 1] = mid
         if y - 1 >= 0:
-            lp[x, y - 1] = (120, 190, 255, 140)
+            lp[x, y - 1] = edge
     line.save(os.path.join(OUT, 'weapon', 'D3_Weapon_Chain_Line.png'))
     spark = load('FX/Magic/Spark/SpriteSheet.png')
     save(fit32(cell(spark, 2, 30), upscale=False), 'weapon', 'D3_Weapon_Chain_Spark')

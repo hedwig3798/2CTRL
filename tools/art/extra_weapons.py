@@ -1,11 +1,10 @@
-"""차원별 추가 무기 7종 이미지 (Ninja Adventure 원본 + 로컬 이미지 생성 결과)
-usage: extra_weapons.py <pack_root> <gen_dir> <out_dir>
-- gen_dir: 이미지 생성 원본 (마젠타 배경). Vine_Segment.png, Root_Area.png, Tornado_Body.png
+"""차원별 추가 무기 7종 이미지 (Ninja Adventure 원본만 사용)
+usage: extra_weapons.py <pack_root> <out_dir>
 - out_dir: Assets/Resources/Textuer/Art (weapon/ → Weapon, icon/ → Icon)"""
 import sys, os
 from PIL import Image
 
-ROOT, GEN, OUT = sys.argv[1:4]
+ROOT, OUT = sys.argv[1:3]
 WEAPON = os.path.join(OUT, 'Weapon')
 ICON = os.path.join(OUT, 'Icon')
 OUTLINE = (20, 16, 28, 255)
@@ -39,21 +38,6 @@ def fit(img, size=32, upscale=True):
     return c
 
 
-def tint(img, rgb, keep=0.35):
-    """밝기는 유지하고 색을 rgb 쪽으로"""
-    out = img.copy()
-    px = out.load()
-    for y in range(out.height):
-        for x in range(out.width):
-            r, g, b, a = px[x, y]
-            if a == 0:
-                continue
-            l = (r + g + b) / 765
-            px[x, y] = (int(rgb[0] * l * (1 - keep) + r * keep), int(rgb[1] * l * (1 - keep) + g * keep),
-                        int(rgb[2] * l * (1 - keep) + b * keep), a)
-    return out
-
-
 def outline(img):
     out = img.copy()
     src = img.load()
@@ -70,33 +54,14 @@ def outline(img):
     return out
 
 
-def from_gen(name, size=32, colors=16):
-    """마젠타 배경 생성 이미지 → 투명 배경 size 픽셀 아트"""
-    img = Image.open(os.path.join(GEN, name + '.png')).convert('RGB')
-    w, h = img.size
-    rgba = Image.new('RGBA', (w, h))
-    src = img.load()
-    px = rgba.load()
-    for y in range(h):
-        for x in range(w):
-            r, g, b = src[x, y]
-            # 마젠타(r,b 높고 g 낮음) 는 배경
-            if r > 150 and b > 100 and g < 110 and r - g > 90 and b - g > 50:
-                continue
-            px[x, y] = (r, g, b, 255)
-    rgba = bbox_crop(rgba)
-    k = max(rgba.width, rgba.height) / (size - 2)
-    small = rgba.resize((max(1, round(rgba.width / k)), max(1, round(rgba.height / k))), Image.BOX)
-    # 반투명 가장자리 정리 후 색 수 줄이기
-    sp = small.load()
-    for y in range(small.height):
-        for x in range(small.width):
-            r, g, b, a = sp[x, y]
-            sp[x, y] = (r, g, b, 255 if a >= 140 else 0)
-    alpha = small.getchannel('A')
-    q = small.convert('RGB').quantize(colors, method=Image.Quantize.MEDIANCUT).convert('RGBA')
-    q.putalpha(alpha)
-    return fit(q, size, upscale=False)
+def thicket(frames, seed_order):
+    """풀 덤불 장판 (32x32): Particle 원본 프레임을 고리 6개 + 가운데 1개로 겹친다"""
+    img = Image.new('RGBA', (32, 32))
+    spots = ((0, -9), (8, -4), (8, 5), (0, 9), (-8, 5), (-8, -4), (0, 0))
+    for k, (dx, dy) in enumerate(spots):
+        f = frames[seed_order[k % len(seed_order)]]
+        img.paste(f, (16 + dx - f.width // 2, 16 + dy - f.height // 2), f)
+    return img
 
 
 def save(img, folder, name):
@@ -116,24 +81,31 @@ def icon(base_rel, overlay=None, overlay_size=16):
 
 def main():
     # ---- 숲 ----
-    vine = from_gen('Vine_Segment')
-    save(vine, WEAPON, 'D1_Weapon_Vine_Segment')
+    grass = load('FX/Particle/Grass.png')
+    blades = [bbox_crop(cell(grass, i, 12)) for i in range(6)]
+    save(thicket(blades, [1, 5, 3, 1, 5, 3, 4]), WEAPON, 'D1_Weapon_Vine_Segment')
     thorn = cell(load('FX/Projectile/PlantSpike.png'), 3, 24)
     save(fit(thorn, upscale=False), WEAPON, 'D1_Weapon_Vine_Thorn')
-    spirit = tint(cell(load('FX/Magic/Spirit/SpriteSheet.png'), 2, 32), (140, 255, 150), keep=0.25)
+    spirit = cell(load('FX/Magic/Spirit/SpriteSheet.png'), 2, 32)
     save(fit(outline(bbox_crop(spirit)), upscale=False), WEAPON, 'D1_Weapon_Spirit_Body')
-    root = from_gen('Root_Area')
-    save(root, WEAPON, 'D1_Weapon_Root_Area')
+    # 뿌리 장판 (현재 미사용): 덩굴과 같은 방식, 나뭇잎 원본
+    leaf = load('FX/Particle/Leaf.png')
+    leaves = [bbox_crop(cell(leaf, i, 12)) for i in range(6)]
+    save(thicket(leaves, [0, 2, 4, 1, 3, 5, 2]), WEAPON, 'D1_Weapon_Root_Area')
 
     # ---- 공장 ----
-    saw = tint(cell(load('FX/Projectile/BigShuriken.png'), 0, 23), (200, 210, 225), keep=0.4)
+    saw = cell(load('FX/Projectile/Shuriken.png'), 1, 16)
     save(fit(saw), WEAPON, 'D2_Weapon_Saw_Blade')
     flame = cell(load('FX/Elemental/Flam/SpriteSheet.png'), 2, 40)
     save(fit(flame, upscale=False), WEAPON, 'D2_Weapon_Flame_Fire')
 
     # ---- 폭풍 ----
-    tornado = from_gen('Tornado_Body')
-    save(tornado, WEAPON, 'D3_Weapon_Tornado_Body')
+    # 회오리: 원형 베기 시트의 C 자 호(x 128~188) 원본과 그 180도 회전본을 겹쳐 소용돌이 (64x64, 빌더가 0.8 배로 써서 1.6 유닛)
+    arc = load('FX/Slash/SpriteSheetCircular.png').crop((128, 0, 189, 55))
+    whirl = Image.new('RGBA', (64, 64))
+    whirl.paste(arc, (2, 4), arc)
+    whirl = Image.alpha_composite(whirl.rotate(180), whirl)
+    save(whirl, WEAPON, 'D3_Weapon_Tornado_Body')
     bolt = cell(load('FX/Elemental/Thunder/SpriteSheet.png'), 4, 20)
     save(fit(bolt), WEAPON, 'D3_Weapon_Lightning_Bolt')
     marker = cell(load('FX/Magic/Circle/SpriteSheetSpark.png'), 2, 32)
@@ -143,10 +115,11 @@ def main():
     save(load('Ui/Skill Icon/Spell/Camouflage.png'), ICON, 'Common_Icon_Vine')
     save(icon('Ui/Skill Icon/Job & Action/Plant.png'), ICON, 'Common_Icon_Spirit')
     save(load('Ui/Skill Icon/Job & Action/Harvest.png'), ICON, 'Common_Icon_Root')
-    save(icon('Ui/Skill Icon/Spell/Counter.png', saw, 18), ICON, 'Common_Icon_Saw')
+    # 아이콘은 다른 무기·패시브와 겹치지 않는 원본으로 (Shuriken=부메랑, BookThunder=체인)
+    save(load('Ui/Skill Icon/Items & Weapon/Guard.png'), ICON, 'Common_Icon_Saw')
     save(load('Ui/Skill Icon/Spell/BookFire.png'), ICON, 'Common_Icon_Flame')
     save(load('Ui/Skill Icon/Spell/Mist.png'), ICON, 'Common_Icon_Tornado')
-    save(icon('Ui/Skill Icon/Meteo/Rain.png', bolt, 16), ICON, 'Common_Icon_Lightning')
+    save(load('Ui/Skill Icon/Meteo/Rain.png'), ICON, 'Common_Icon_Lightning')
 
 
 if __name__ == '__main__':

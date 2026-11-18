@@ -136,7 +136,8 @@ namespace Builders.Visual
                 if (null != v)
                 {
                     var vsr = v.GetComponent<SpriteRenderer>();
-                    vsr.color = new Color(0.85f, 0.2f, 0.5f, 1f);
+                    // 보스 전용 아트(ArtResourceBuilder)는 원본 색 그대로 쓴다
+                    vsr.color = Color.white;
                     float size = Mathf.Max(vsr.sprite.bounds.size.x, vsr.sprite.bounds.size.y);
                     float scale = (2.0f * 2f) / Mathf.Max(0.01f, size);
                     v.localScale = new Vector3(scale, scale, 1f);
