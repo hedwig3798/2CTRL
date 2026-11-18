@@ -65,6 +65,7 @@ MonoBehaviour:
   - {fileID: 8295927868319394219, guid: eb7a6d916eb47d4499ff099cd2cbd27c, type: 3}
   - {fileID: 2815255815192546128, guid: 7bef7e21e9f7bec44a7200d4fd5cbf87, type: 3}
   tileScale: 1
+  seamOverlap: 0.002
   chunkWidth: 16
   chunkHeight: 16
   targetCamera: {fileID: 0}
