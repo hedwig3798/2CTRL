@@ -20,12 +20,12 @@ MonoBehaviour:
     - param: 0
       mode: 1
       value: 0.2
-  - title: upgrade.blade_length_plus_20pct
-    description: upgrade.blade_length_plus_20pct
+  - title: upgrade.blade_length_plus_10pct
+    description: upgrade.blade_length_plus_10pct
     modifiers:
     - param: 114
       mode: 1
-      value: 0.2
+      value: 0.1
   - title: upgrade.atk_speed_plus_15pct
     description: upgrade.attack_speed_plus_15pct
     modifiers:
@@ -50,12 +50,12 @@ MonoBehaviour:
     - param: 0
       mode: 1
       value: 0.2
-  - title: upgrade.blade_length_plus_20pct
-    description: upgrade.blade_length_plus_20pct
+  - title: upgrade.blade_length_plus_10pct
+    description: upgrade.blade_length_plus_10pct
     modifiers:
     - param: 114
       mode: 1
-      value: 0.2
+      value: 0.1
   - title: upgrade.atk_speed_plus_15pct
     description: upgrade.attack_speed_plus_15pct
     modifiers:

@@ -481,12 +481,12 @@ namespace Builders
             t["Sweep"] = new[]
             {
                 Dmg(),
-                S("칼날 길이 +20%", "칼날 길이 +20%", M(WeaponParam.Reach, MUL, 0.2f)),
+                S("칼날 길이 +10%", "칼날 길이 +10%", M(WeaponParam.Reach, MUL, 0.1f)),
                 As(),
                 S("넉백 +25%", "넉백 +25%", M(WeaponParam.Knockback, MUL, 0.25f)),
                 S("★ 양방향", "반대 방향으로도 동시에 휘두른다", M(WeaponParam.FireCount, ADD, 1f)),
                 Dmg(),
-                S("칼날 길이 +20%", "칼날 길이 +20%", M(WeaponParam.Reach, MUL, 0.2f)),
+                S("칼날 길이 +10%", "칼날 길이 +10%", M(WeaponParam.Reach, MUL, 0.1f)),
                 As(), Dmg(),
                 Flag(WeaponParam.FlagSlashWave, "검기", "휘두를 때 조준 방향으로 데미지 60% 관통 검기 발사"),
             };

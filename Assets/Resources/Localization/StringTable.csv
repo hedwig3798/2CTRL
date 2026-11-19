@@ -180,7 +180,7 @@ upgrade.fragment_distance_plus_30pct,조각 거리 +30%,Fragment Distance +30%
 upgrade.fragment_travel_distance_plus_30pct,조각 비행 거리 +30%,Fragment Travel Distance +30%
 upgrade.star_reminus_split,★ 재분열,★ Re-split
 upgrade.fragments_split_once_more_into_3_where_they_first_hit_an_enemy,조각이 처음 맞힌 적 자리에서 3개로 1회 재분열,Fragments split once more into 3 where they first hit an enemy
-upgrade.blade_length_plus_20pct,칼날 길이 +20%,Blade Length +20%
+upgrade.blade_length_plus_10pct,칼날 길이 +10%,Blade Length +10%
 upgrade.star_both_ways,★ 양방향,★ Both Ways
 upgrade.also_swings_in_the_opposite_direction_at_the_same_time,반대 방향으로도 동시에 휘두른다,Also swings in the opposite direction at the same time
 upgrade.star_sword_wave,★ 검기,★ Sword Wave
