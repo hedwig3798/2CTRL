@@ -32,3 +32,10 @@
 
 - 웨이브 시간 API(IsStarted/RemainingTime 등) 추가: [hud.md](hud.md)
 - (2026-11-06) 디버그: `Spawner.DebugSkipWave()`(`#if UNITY_EDITOR || DEVELOPMENT_BUILD`). 그 조건에서 Wave() 대기는 WaitForSeconds 대신 `Time.time < currentWaveStartTime+currentWaveTime` 루프(yield null) + 스킵 플래그. 릴리스 빌드는 기존 WaitForSeconds.
+
+## 특수 드랍 아이템 (자석·무적, 2026-11-19, 프리팹 미작성)
+- `ItemDropManager/PowerUpItem.cs`: enum `POWER_UP_TYPE{Magnet,Invincible}`. 필드 type/invincibleDuration(5)/magnetPullSpeed(20)/magnetPullAcceleration(40)/owner. `Collect()`(최초 true, owner 비활성), `Layer`. 프리팹은 보석과 같은 구성(tag item+Spawnable+SlingshotMovement+BlackBoardHandler) 전제.
+- `DropManager`: `specialItems`(Spawnable[]), `specialDropChance`=0.001(종류 합산, 균등 선택). `DropItem`(일반 처치) 끝에 `TryDropSpecialItem`; 보스 `DropExp` 제외. 프리팹별 별도 풀(`specialItemPools`), `CreateObject(prefab,pool)`로 시그니처 변경. static `RollSpecialItem(chance,count,roll,pick)`->인덱스/-1 (테스트용). 드랍 레이어=DropManager 레이어.
+- `ItemCollector.ApplyPowerUp`: Magnet -> static `PullGems(layer,target,speed,accel)`: `ExpItem.CollectActive` 중 같은 레이어 보석에 `SlingshotMovement.Pull` (즉시 흡수 X, 도착 시 기존 트리거 Absorb). Invincible -> 플레이어 하위 `InvincibleBuff.Activate(duration)` (없으면 경고).
+- `SlingshotMovement.Pull(target,maxSpeed,accel)`: 속도/가속은 원래 값과 큰 쪽, 한 프레임 이동량을 남은 거리로 제한. Initialize 때 pull 값 리셋.
+- (2026-11-19 통합 완료) `DropManager` specialItems 는 null 제외 압축 후 사용. 빌더 `Editor/Builders/SpecialDropBuilder.cs`(Tools/Builders/SpecialDrop, 멱등): magnetItem/invincibleItem 프리팹(expGem 기반+PowerUpItem), DropManager.prefab specialItems·확률 0.001, Player.prefab damaePipeline 에 InvincibleBuff(blinkRenderers=visual). 실행 후 ArtResourceBuilder.Build() 재실행 필요(아이콘 덮어씀). 테스트: EditMode/SpecialDropEditTests.cs(21), PlayMode/SpecialDropPlayTests.cs(20; PlayMode 동기 실행은 도메인 리로드로 끊김 -> --async_tests + test status).

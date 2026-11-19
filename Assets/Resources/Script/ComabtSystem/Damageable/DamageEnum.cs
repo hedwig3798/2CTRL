@@ -13,6 +13,7 @@ public class PipelineAttribute : Attribute
 
 public enum DAMAGE_PIPELINE
 {
+    [Pipeline(typeof(InvincibleBuff))]
     INVINCIBLE = 0,     // 무적
 
     DODGE,          // 회피 판정

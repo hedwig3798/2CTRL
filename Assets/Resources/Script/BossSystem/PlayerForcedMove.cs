@@ -5,6 +5,7 @@ using UnityEngine;
 /// - ArrowMovemnt 와 같은 오브젝트에서 transform 을 직접 옮긴다. 입력 이동과 같은 프레임에 더해져 충돌 없이 합산된다
 /// - 여러 번 밀면 각각 따로 진행되어 합쳐진다. 일시정지(timeScale 0) 중에는 움직이지 않는다
 /// - 프리팹에 없으면 For 가 런타임에 붙인다
+/// - 플레이어가 무적(InvincibleBuff.IsActive) 이면 새 강제 이동을 무시한다 (데미지 파이프라인을 거치지 않으므로 여기서 막는다)
 /// </summary>
 [DisallowMultipleComponent]
 public class PlayerForcedMove
@@ -15,6 +16,9 @@ public class PlayerForcedMove
     private readonly Vector2[] velocities = new Vector2[MaxPushes];
     private readonly float[] remainTimes = new float[MaxPushes];
     private int activeCount;
+
+    // 같은 플레이어의 무적 버프 (Awake 에서 한 번 찾는다, 없으면 null)
+    private InvincibleBuff invincibleBuff;
 
     /// <summary>
     /// 진행 중인 강제 이동이 있는지
@@ -56,6 +60,12 @@ public class PlayerForcedMove
             return;
         }
 
+        // 무적 중에는 밀리지 않는다
+        if (null != invincibleBuff && true == invincibleBuff.IsActive)
+        {
+            return;
+        }
+
         if (_duration <= 0f)
         {
             transform.position += new Vector3(_delta.x, _delta.y, 0f);
@@ -80,6 +90,24 @@ public class PlayerForcedMove
     public void Stop()
     {
         activeCount = 0;
+    }
+
+    private void Awake()
+    {
+        invincibleBuff = GetComponentInChildren<InvincibleBuff>(true);
+        if (null == invincibleBuff)
+        {
+            PlayerStats stats = GetComponentInParent<PlayerStats>();
+            if (null != stats)
+            {
+                invincibleBuff = stats.GetComponentInChildren<InvincibleBuff>(true);
+            }
+        }
+
+        if (null == invincibleBuff)
+        {
+            Debug.LogWarning($"[PlayerForcedMove] {name} 에서 InvincibleBuff 를 찾지 못해 무적 중에도 밀립니다.");
+        }
     }
 
     private void OnDisable()

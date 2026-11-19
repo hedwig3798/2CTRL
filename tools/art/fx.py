@@ -185,6 +185,9 @@ def items():
         c = Image.new('RGBA', (16, 16))
         c.paste(gem, ((16 - gem.width) // 2, (16 - gem.height) // 2), gem)
         save(c, 'item', f'Common_Item_ExpGem_{name}')
+    # 특수 드랍 아이콘 (24px 스킬 아이콘 원본 그대로): 자석=Hook, 무적=DefenseUpgrade
+    save(load('Ui/Skill Icon/Items & Weapon/Hook.png'), 'item', 'Common_Item_Magnet')
+    save(load('Ui/Skill Icon/Spell/DefenseUpgrade.png'), 'item', 'Common_Item_Invincible')
 
 
 # ---------------- 아이콘 ----------------

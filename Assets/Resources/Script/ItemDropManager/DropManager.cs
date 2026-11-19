@@ -6,6 +6,7 @@ using UnityEngine.Pool;
 /// - 아이템의 expRate = 죽은 몬스터의 MonsterData.expValue (MonsterData 가 없으면 defaultExpRate)
 ///   expValue 는 Spawner 가 스폰할 때 BlackBoard 에 넣고 HealthSystem 이 저장해 둔 값을 읽는다 (죽을 때 계층 탐색을 하지 않음)
 /// - 꺼낸 아이템은 BlackBoard 에 expRate 를 넣은 뒤 Initialize 한다 (Get → expRate 기록 → Initialize)
+/// - 일반 처치(DropItem) 때 specialDropChance 확률로 특수 아이템(specialItems 중 균등 선택) 을 하나 더 떨어뜨린다 (보스 DropExp 에는 없음)
 /// </summary>
 public class DropManager
     : MonoBehaviour
@@ -22,7 +23,19 @@ public class DropManager
     [SerializeField]
     private float scatterRadius = 3f;
 
+    [Tooltip("특수 아이템 프리팹 (PowerUpItem). 나오면 이 중 하나를 균등하게 고른다")]
+    [SerializeField]
+    private Spawnable[] specialItems;
+
+    [Tooltip("일반 처치 때 특수 아이템이 나올 확률 (종류 합산, 0.001 = 0.1%)")]
+    [Range(0f, 1f)]
+    [SerializeField]
+    private float specialDropChance = 0.001f;
+
     private IObjectPool<Spawnable> dropItemPool;
+
+    // specialItems 중 비어 있지 않은 프리팹별 풀 (null 항목은 빼고 압축해 실제 확률을 유지한다)
+    private IObjectPool<Spawnable>[] specialItemPools;
 
     // dropItem 의 ExpItem.BaseExp (DropExp 에서 보석 하나의 배율을 계산할 때 사용, 없으면 1)
     private float itemBaseExp = 1f;
@@ -46,6 +59,59 @@ public class DropManager
         if (null != item.blackBoardHandler)
         {
             item.blackBoardHandler.GetBlackBoard().SetFloat(DATA_TYPE.expRate, GetExpRate(_deadObject));
+            item.blackBoardHandler.Initialize();
+        }
+
+        TryDropSpecialItem(_deadObject.transform.position);
+    }
+
+    /// <summary>
+    /// 특수 아이템 판정. _roll(0~1) 이 _chance 미만이면 _pick(0~1) 으로 0 ~ _count-1 중 하나를 균등하게 고른 인덱스, 아니면 -1
+    /// _chance 가 1 이상이면 항상 나온다. _count 가 0 이하면 -1
+    /// </summary>
+    public static int RollSpecialItem(float _chance, int _count, float _roll, float _pick)
+    {
+        if (_count <= 0 || _chance <= 0f)
+        {
+            return -1;
+        }
+
+        if (_chance < 1f && _roll >= _chance)
+        {
+            return -1;
+        }
+
+        int index = Mathf.FloorToInt(Mathf.Clamp01(_pick) * _count);
+        return Mathf.Clamp(index, 0, _count - 1);
+    }
+
+    /// <summary>
+    /// specialDropChance 확률로 _position 에 특수 아이템 하나를 떨어뜨린다
+    /// </summary>
+    private void TryDropSpecialItem(Vector3 _position)
+    {
+        if (null == specialItemPools || 0 == specialItemPools.Length)
+        {
+            return;
+        }
+
+        int index = RollSpecialItem(specialDropChance, specialItemPools.Length, Random.value, Random.value);
+        if (index < 0)
+        {
+            return;
+        }
+
+        Spawnable item = specialItemPools[index].Get();
+        if (null == item)
+        {
+            return;
+        }
+
+        LayerUtils.SetLayer(item.gameObject, gameObject.layer);
+        item.transform.position = new Vector3(_position.x, _position.y, item.transform.position.z);
+
+        if (null != item.blackBoardHandler)
+        {
             item.blackBoardHandler.Initialize();
         }
     }
@@ -132,7 +198,7 @@ public class DropManager
 
         dropItemPool = new ObjectPool<Spawnable>
         (
-            createFunc: () => CreateObject(dropItem)
+            createFunc: () => CreateObject(dropItem, dropItemPool)
             , OnSpawn
             , OnRelease
             , OnDespawn
@@ -140,12 +206,62 @@ public class DropManager
             , 100
             , 200
         );
+
+        CreateSpecialItemPools();
     }
 
-    private Spawnable CreateObject(Spawnable _object)
+    private void CreateSpecialItemPools()
+    {
+        if (null == specialItems || 0 == specialItems.Length)
+        {
+            return;
+        }
+
+        int validCount = 0;
+        for (int i = 0; i < specialItems.Length; ++i)
+        {
+            if (null == specialItems[i])
+            {
+                Debug.LogWarning($"[DropManager] specialItems[{i}] 가 비어 있어 제외합니다.");
+                continue;
+            }
+            ++validCount;
+        }
+
+        if (0 == validCount)
+        {
+            return;
+        }
+
+        specialItemPools = new IObjectPool<Spawnable>[validCount];
+        int index = 0;
+        for (int i = 0; i < specialItems.Length; ++i)
+        {
+            Spawnable prefab = specialItems[i];
+            if (null == prefab)
+            {
+                continue;
+            }
+
+            int poolIndex = index;
+            ++index;
+            specialItemPools[poolIndex] = new ObjectPool<Spawnable>
+            (
+                createFunc: () => CreateObject(prefab, specialItemPools[poolIndex])
+                , OnSpawn
+                , OnRelease
+                , OnDespawn
+                , true
+                , 4
+                , 16
+            );
+        }
+    }
+
+    private Spawnable CreateObject(Spawnable _object, IObjectPool<Spawnable> _pool)
     {
         Spawnable sa = Instantiate(_object);
-        sa.SetPool(dropItemPool);
+        sa.SetPool(_pool);
 
         LayerUtils.SetLayer(sa.gameObject, gameObject.layer);
 

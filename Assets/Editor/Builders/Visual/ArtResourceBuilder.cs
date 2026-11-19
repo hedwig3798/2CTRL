@@ -1372,7 +1372,65 @@ namespace Builders.Visual
                 // 초록 슬라임과 헷갈리지 않게 노란 보석
                 visual.GetComponent<SpriteRenderer>().sprite = Single("Item/Common_Item_ExpGem_Yellow");
             });
+            BuildSpecialDrop("Assets/prefab/Item/magnetItem.prefab", "Item/Common_Item_Magnet", "Special_Magnet_Pulse");
+            BuildSpecialDrop("Assets/prefab/Item/invincibleItem.prefab", "Item/Common_Item_Invincible", "Special_Invincible_Pulse");
+            // 무적 깜빡임: 0.1s/alpha 0.25 는 너무 거칠어 부드럽게
+            EditPrefab("Assets/prefab/Player/Player.prefab", root =>
+            {
+                foreach (MonoBehaviour mb in root.GetComponentsInChildren<MonoBehaviour>(true))
+                {
+                    if (null != mb && "InvincibleBuff" == mb.GetType().Name)
+                    {
+                        var so = new SerializedObject(mb);
+                        so.FindProperty("blinkInterval").floatValue = 0.15f;
+                        so.FindProperty("hiddenAlphaRate").floatValue = 0.45f;
+                        so.ApplyModifiedProperties();
+                    }
+                }
+            });
             log.AppendLine("items ok");
+        }
+
+        // 자석·무적 특수 드랍: 24px 아이콘, 보석(0.2 월드)보다 큰 0.45 월드 + 느린 크기 펄스
+        private const float SPECIAL_DROP_WORLD_SCALE = 0.6f;
+
+        private static void BuildSpecialDrop(string _prefab, string _sprite, string _clipName)
+        {
+            EnsureFolder(ANIM + "/Item");
+            string clipPath = ANIM + "/Item/" + _clipName + ".anim";
+            string ctrlPath = ANIM + "/Item/" + _clipName + ".controller";
+            AssetDatabase.DeleteAsset(clipPath);
+            var clip = new AnimationClip { name = _clipName, wrapMode = WrapMode.Loop, frameRate = 30f };
+            AnimationUtility.SetAnimationClipSettings(clip, new AnimationClipSettings { loopTime = true });
+            float baseScale = 1f;
+            EditPrefab(_prefab, root =>
+            {
+                Transform visual = root.transform.Find("visual");
+                float parent = null != visual.parent ? visual.parent.lossyScale.x : 1f;
+                baseScale = SPECIAL_DROP_WORLD_SCALE / Mathf.Max(0.01f, parent);
+                visual.localScale = Vector3.one * baseScale;
+                var sr = visual.GetComponent<SpriteRenderer>();
+                sr.sprite = Single(_sprite);
+                sr.color = Color.white;
+            });
+            foreach (string axis in new[] { "x", "y" })
+            {
+                clip.SetCurve("", typeof(Transform), "m_LocalScale." + axis, new AnimationCurve(
+                    new Keyframe(0f, baseScale * 0.9f), new Keyframe(0.5f, baseScale * 1.12f), new Keyframe(1f, baseScale * 0.9f)));
+            }
+            AssetDatabase.CreateAsset(clip, clipPath);
+            AssetDatabase.DeleteAsset(ctrlPath);
+            AnimatorController ctrl = Controller(ctrlPath, ("Pulse", clip));
+            EditPrefab(_prefab, root =>
+            {
+                Transform visual = root.transform.Find("visual");
+                var anim = visual.GetComponent<Animator>();
+                if (null == anim)
+                {
+                    anim = visual.gameObject.AddComponent<Animator>();
+                }
+                anim.runtimeAnimatorController = ctrl;
+            });
         }
 
         // RewardData / 업그레이드 테이블 이름 → 아이콘

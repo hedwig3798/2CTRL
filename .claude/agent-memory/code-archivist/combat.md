@@ -53,3 +53,6 @@
 - StormOrb (`Weapons/StormOrb`): 폭풍 전용, Persistent, OrbitSpeedRate, FlagStormOrbLink.
 - 빌더: ExtraWeaponBuilder 9종, WeaponTagBuilder NoAttackSpeed, `ArtResourceBuilder.BuildSpinBladeStormOrb`(tools/art/spin_storm.py).
 - 차원 무기 수: 숲 7 / 공장 6 / 폭풍 6 ([dimension.md](dimension.md)).
+
+## InvincibleBuff (2026-11-19)
+- `ComabtSystem/Damageable/InvincibleBuff.cs`: IDamageable, DAMAGE_PIPELINE.INVINCIBLE에 `[Pipeline(typeof(InvincibleBuff))]` 연결(DamagePipeline과 같은 오브젝트 필요). `Activate(sec)`(재습득 시 갱신, 누적 X), `Deactivate`, `IsActive/RemainTime`, static `TickRemain`. 활성 중 ProcessDamage가 damage=0, knockbackForce=0. blinkRenderers(직렬화 지정만) alpha 깜빡임(blinkInterval 0.15, hiddenAlphaRate 0.45), deltaTime 0 이면 표시 고정. DamagePipeline/HealthSystem 부재 시 경고, 같은 오브젝트 HealthSystem.OnDeath 구독·무적 중 isDead 확인해 종료. Activate 시 PlayerForcedMove.Stop(). HealthSystem.IsInvincible과 별개. 사용: ItemCollector(자석/무적 참조: spawn-item.md).

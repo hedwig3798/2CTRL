@@ -45,3 +45,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::DropManager
   dropItem: {fileID: 0}
+  defaultExpRate: 1
+  scatterRadius: 3
+  specialItems:
+  - {fileID: 6198291596918297168, guid: 80057390287245c46ad38e954c4a1fed, type: 3}
+  - {fileID: 3782664327375078515, guid: 5ca40115301f7024aa9585e0eadf3099, type: 3}
+  specialDropChance: 0.001

@@ -22,3 +22,6 @@
 ## 테스트
 - PlayMode/PickupRangeAndExpPlayTests.cs, EditMode/TileSeamTests.cs 신규, PassiveRewardTests 에 PickupRange 케이스.
 - 물리 트리거 테스트는 실제 레이어(LPlayer/LItem) 필수 (Default x Default 충돌 꺼짐).
+
+## 특수 아이템 연계 (2026-11-19)
+- 자석은 같은 진영 보석을 SlingshotMovement.Pull로 끌어와 기존 Absorb(EXP 배율 1.5 등)로 흡수. 상세는 spawn-item.md "특수 드랍 아이템".

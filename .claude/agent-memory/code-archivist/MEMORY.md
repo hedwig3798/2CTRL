@@ -2,7 +2,7 @@
 - [combat.md](combat.md) — Projectile/Weapon/DamagePipeline/IDamageable, Weapons 파생
 - [boss.md](boss.md) — 중간 보스 BossSystem, 키워드 5종, 보스 관련 공유 파일 변경(HealthSystem/Spawner/LevelUpUI 등)
 - [move.md](move.md) — MoveSystem 이동 컴포넌트
-- [spawn-item.md](spawn-item.md) — Spawner, 풀, 드롭, ExpSystem, Tile(WFC)
+- [spawn-item.md](spawn-item.md) — Spawner, 풀, 드롭, ExpSystem, Tile(WFC), 특수 드랍 PowerUpItem(자석·무적)
 - [reward-ui.md](reward-ui.md) — RewardEffect/Manager, PlayerStats, Description, UI
 - [effect.md](effect.md) — EffectSystem
 - [init-event.md](init-event.md) — Initializable/BlackBoard, EventManager, Utils
@@ -22,5 +22,5 @@
 - [sound.md](sound.md) — SoundManager(DDOL 자동생성)/SoundLibrary/CombatSoundBinder/UIButtonSound, Weapon.Fired, GetChannelVolume 규약
 - [hud.md](hud.md) — 인게임 HUD: WaveTimerUI/WeaponHUD/WeaponSlotUI, Spawner 남은 시간, PlayerStats 무기 이벤트
 - [dimension-weapon.md](dimension-weapon.md) — 차원 무기: StageSystem(화면공간·쿼드트리·StageDamage), DimensionWeapon 6종, 합성 카드/커서, PlayerStats 슬롯
-- [pickup-exp.md](pickup-exp.md) — EXP 획득 배율(1.5), PickupRange 스탯/보상, 타일 seamOverlap, 관련 테스트
+- [pickup-exp.md](pickup-exp.md) — EXP 획득 배율(1.5), PickupRange 스탯/보상, 타일 seamOverlap, 관련 테스트; 특수 드랍(자석·무적)은 spawn-item.md
 - [meta-upgrade.md](meta-upgrade.md) — 영구 강화(차원력): MetaSystem/, PlayerStats 영구 계층, 결과 보상, 타이틀 패널

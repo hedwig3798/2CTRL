@@ -65,3 +65,4 @@
 - 시각 컴포넌트(BossSystem/Final/): FinalBossIntroUI(등장 연출 UI), FinalBossDefeatFX(처치 연출), FinalBossLineGlow(레이저 선 글로우), FinalBossPulse. 빌더 Editor/Builders/FinalBossBuilder.cs, Builders/Visual/FinalBossVisual.cs.
 - 에셋: Resources/Data/Monster/Boss/FinalBossData.asset(bossBgm=BGM_RUSH), FinalBossTelegraphStyle.asset(sortingOrder 12). 프리팹 Assets/prefab/Monster/Boss/FinalBoss/(FinalBoss, FinalBossMeteor, FinalBossMeteorShadow).
 - 테스트: Tests/EditMode/FinalBossEditTests, Tests/PlayMode/FinalBossPlayTests.
+- (2026-11-19) PlayerForcedMove: Awake 에서 InvincibleBuff 캐시(못 찾으면 경고), 무적 중 Push 무시. InvincibleBuff.Activate 시 같은 플레이어 PlayerForcedMove.Stop() 호출.
