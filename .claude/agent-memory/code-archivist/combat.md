@@ -7,7 +7,7 @@
 ## 공격 (Attackable/)
 - `Weapon`(MonoBehaviour): WEAPON_TYPE {Repeat(쿨타임마다 fireCount 발사), Persistent(fireCount개 유지)}. 풀에서 Projectile 발사. 무기 스텟 + 주인 PlayerStats = Final* 값.
 - `Projectile`(abstract, MonoBehaviour, `Projectile/Projectile.cs`): 필드 blackBoardHandler, weapon, damageMassage, formationIndex/Count. public: SetPool, MarkReturningToPool, SetFormation(i,n), GetBlackBoard, InitializeBlackBoard, Launch(Weapon), LaunchAt(Weapon,start,point,rate). 확장점: `abstract OnLaunch()`, `virtual OnLaunchAt()`, OnEnable/OnDisable. 헬퍼: ApplyDamage, ApplyAreaDamage, SendDamage, AimAtNearest, FindNearest, FindAll, IsAlive.
-- 파생: `OneHitProjectile`(+Initializable), `AuraProjectile`(+struct AuraTarget), Weapons/ 아래: Drone, Explosive(+Init), LaserBeam(+Init), Mine, PoisonZone(+PoisonZoneLandMovement), Shockwave, SplitShot, Sweep(+SweepMovement).
+- 파생: `OneHitProjectile`(+Initializable), `AuraProjectile`(+struct AuraTarget), Weapons/ 아래: Drone, Explosive(+Init), LaserBeam(+Init), Mine, PoisonZone(+PoisonZoneLandMovement), Shockwave, SplitShot, Sweep(+SweepMovement; 읽기전용 Origin/MidAngle/SweepAngle/Reach/Progress(이징 0..1) 추가, 로직 불변, SweepTrailVisual이 사용).
 - `TargetFinder`(static): 타겟 탐색. `ContactDamage`(+Initializable): 접촉 데미지.
 의존: BlackBoard, MoveSystem, SpawnSystem(풀), StatSystem.
 
@@ -42,6 +42,7 @@
 
 ## 추가 무기 후속 (2026-11-03)
 - `Projectile.RefreshDamage()`(protected): weapon.FinalDamage × 발사 배율(LaunchAt damageRate)과 knockback 재기록. 오래 사는 발사체(Saw 튕김, Tornado 영구, Spirit)가 타격 직전 호출.
+- (2026-11-19) `PoisonZoneProjectile.hitEndRate`: 수명 진행도가 이 값 이상이면 타격·둔화 중단(기본 1, 독 프리팹 0.85). 독 ScaleOverLifetime 은 끝에서 줄지 않음. `PoisonZoneVisual`(Weapons/PoisonZone/, 비주얼 전용): 비행 중 `thrown` 병, 착지 후 `puffs/puffN` 7개 순차 확장, 0.85부터 페이드. 상세 effect.md.
 - `PoisonZoneProjectile.SlowRate`(protected virtual) 훅. Root 는 `rootSlowRate` 0.4 로 override.
 - Saw: 카메라 탐색 실패 캐시(cameraRetryInterval 1초). Tornado: brainCacheLimit 256. Spirit: UpgradeVersion 변경 시 hitCount 증가분을 remainingHits 에 더함.
 

@@ -1,0 +1,573 @@
+fileFormatVersion: 2
+guid: a20efbbd0e2a8e34ea64bb3e2d5c88d3
+TextureImporter:
+  internalIDToNameTable:
+  - first:
+      213: -8157066985077109994
+    second: D1_Weapon_Vine_Thicket_0
+  - first:
+      213: -4508149742760251160
+    second: D1_Weapon_Vine_Thicket_1
+  - first:
+      213: 7574571995199624584
+    second: D1_Weapon_Vine_Thicket_2
+  - first:
+      213: 3868005163962483748
+    second: D1_Weapon_Vine_Thicket_3
+  - first:
+      213: -6275323589779429946
+    second: D1_Weapon_Vine_Thicket_4
+  - first:
+      213: -3000058845880963390
+    second: D1_Weapon_Vine_Thicket_5
+  - first:
+      213: 2055941356284634553
+    second: D1_Weapon_Vine_Thicket_6
+  - first:
+      213: -5200398912892072735
+    second: D1_Weapon_Vine_Thicket_7
+  - first:
+      213: 5313512174002009536
+    second: D1_Weapon_Vine_Thicket_8
+  - first:
+      213: 4855723103029341379
+    second: D1_Weapon_Vine_Thicket_9
+  - first:
+      213: 2510136226568092284
+    second: D1_Weapon_Vine_Thicket_10
+  - first:
+      213: -5464402802596307710
+    second: D1_Weapon_Vine_Thicket_11
+  - first:
+      213: 7095955536525804662
+    second: D1_Weapon_Vine_Thicket_12
+  - first:
+      213: 6943853144830319325
+    second: D1_Weapon_Vine_Thicket_13
+  - first:
+      213: 4456877966797779698
+    second: D1_Weapon_Vine_Thicket_14
+  - first:
+      213: -776038077319292535
+    second: D1_Weapon_Vine_Thicket_15
+  - first:
+      213: 8022125843886409155
+    second: D1_Weapon_Vine_Thicket_16
+  - first:
+      213: 4199923818720764373
+    second: D1_Weapon_Vine_Thicket_17
+  - first:
+      213: 3095446586265157165
+    second: D1_Weapon_Vine_Thicket_18
+  - first:
+      213: -8846330339322706555
+    second: D1_Weapon_Vine_Thicket_19
+  - first:
+      213: -8496158162296849634
+    second: D1_Weapon_Vine_Thicket_20
+  - first:
+      213: 1812681368552662942
+    second: D1_Weapon_Vine_Thicket_21
+  - first:
+      213: 9181353801341635358
+    second: D1_Weapon_Vine_Thicket_22
+  - first:
+      213: 8018111254884791845
+    second: D1_Weapon_Vine_Thicket_23
+  - first:
+      213: 4948355937428659218
+    second: D1_Weapon_Vine_Thicket_24
+  - first:
+      213: -1366918253152791863
+    second: D1_Weapon_Vine_Thicket_25
+  - first:
+      213: 5896641122787806792
+    second: D1_Weapon_Vine_Thicket_26
+  - first:
+      213: -4521964986306376588
+    second: D1_Weapon_Vine_Thicket_27
+  - first:
+      213: 7201147168781017850
+    second: D1_Weapon_Vine_Thicket_28
+  - first:
+      213: 1888381767744695758
+    second: D1_Weapon_Vine_Thicket_29
+  - first:
+      213: -4580116684813432733
+    second: D1_Weapon_Vine_Thicket_30
+  - first:
+      213: 5850972398034557197
+    second: D1_Weapon_Vine_Thicket_31
+  - first:
+      213: -7494226330818977381
+    second: D1_Weapon_Vine_Thicket_32
+  - first:
+      213: 5502902518368010632
+    second: D1_Weapon_Vine_Thicket_33
+  - first:
+      213: 1998579545107850129
+    second: D1_Weapon_Vine_Thicket_34
+  - first:
+      213: 5200444788709187710
+    second: D1_Weapon_Vine_Thicket_35
+  - first:
+      213: -1439469211530148983
+    second: D1_Weapon_Vine_Thicket_36
+  - first:
+      213: -2525148382941756831
+    second: D1_Weapon_Vine_Thicket_37
+  - first:
+      213: 7759744166003170098
+    second: D1_Weapon_Vine_Thicket_38
+  - first:
+      213: 6532046200099090818
+    second: D1_Weapon_Vine_Thicket_39
+  - first:
+      213: -6034145069676863835
+    second: D1_Weapon_Vine_Thicket_40
+  - first:
+      213: -6661682650524755042
+    second: D1_Weapon_Vine_Thicket_41
+  - first:
+      213: 8530202452960044249
+    second: D1_Weapon_Vine_Thicket_42
+  - first:
+      213: 5077137294720084218
+    second: D1_Weapon_Vine_Thicket_43
+  externalObjects: {}
+  serializedVersion: 13
+  mipmaps:
+    mipMapMode: 0
+    enableMipMap: 0
+    sRGBTexture: 1
+    linearTexture: 0
+    fadeOut: 0
+    borderMipMap: 0
+    mipMapsPreserveCoverage: 0
+    alphaTestReferenceValue: 0.5
+    mipMapFadeDistanceStart: 1
+    mipMapFadeDistanceEnd: 3
+  bumpmap:
+    convertToNormalMap: 0
+    externalNormalMap: 0
+    heightScale: 0.25
+    normalMapFilter: 0
+    flipGreenChannel: 0
+  isReadable: 0
+  streamingMipmaps: 0
+  streamingMipmapsPriority: 0
+  vTOnly: 0
+  ignoreMipmapLimit: 0
+  grayScaleToAlpha: 0
+  generateCubemap: 6
+  cubemapConvolution: 0
+  seamlessCubemap: 0
+  textureFormat: 1
+  maxTextureSize: 2048
+  textureSettings:
+    serializedVersion: 2
+    filterMode: 0
+    aniso: 1
+    mipBias: 0
+    wrapU: 1
+    wrapV: 1
+    wrapW: 1
+  nPOTScale: 0
+  lightmap: 0
+  compressionQuality: 50
+  spriteMode: 2
+  spriteExtrude: 1
+  spriteMeshType: 1
+  alignment: 0
+  spritePivot: {x: 0.5, y: 0.5}
+  spritePixelsToUnits: 32
+  spriteBorder: {x: 0, y: 0, z: 0, w: 0}
+  spriteGenerateFallbackPhysicsShape: 1
+  alphaUsage: 1
+  alphaIsTransparency: 1
+  spriteTessellationMethod: 0
+  spriteTessellationDetail: -1
+  spriteGeometrySubdivision: -1
+  textureType: 8
+  textureShape: 1
+  singleChannelComponent: 0
+  flipbookRows: 1
+  flipbookColumns: 1
+  maxTextureSizeSet: 0
+  compressionQualitySet: 0
+  textureFormatSet: 0
+  ignorePngGamma: 0
+  applyGammaDecoding: 0
+  swizzle: 50462976
+  cookieLightType: 0
+  platformSettings:
+  - serializedVersion: 4
+    buildTarget: DefaultTexturePlatform
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 0
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  - serializedVersion: 4
+    buildTarget: Standalone
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  spriteSheet:
+    serializedVersion: 2
+    sprites:
+    - serializedVersion: 2
+      name: D1_Weapon_Vine_Thicket_0
+      rect:
+        serializedVersion: 2
+        x: 0
+        y: 0
+        width: 32
+        height: 32
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 61b89698bc64cce80800000000000000
+      internalID: -8157066985077109994
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: D1_Weapon_Vine_Thicket_1
+      rect:
+        serializedVersion: 2
+        x: 32
+        y: 0
+        width: 32
+        height: 32
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 8e0b184b1b5df61c0800000000000000
+      internalID: -4508149742760251160
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: D1_Weapon_Vine_Thicket_2
+      rect:
+        serializedVersion: 2
+        x: 64
+        y: 0
+        width: 32
+        height: 32
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 885de7b09194e1960800000000000000
+      internalID: 7574571995199624584
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: D1_Weapon_Vine_Thicket_3
+      rect:
+        serializedVersion: 2
+        x: 96
+        y: 0
+        width: 32
+        height: 32
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 4244c5bf33aeda530800000000000000
+      internalID: 3868005163962483748
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: D1_Weapon_Vine_Thicket_4
+      rect:
+        serializedVersion: 2
+        x: 128
+        y: 0
+        width: 32
+        height: 32
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 6c56194717299e8a0800000000000000
+      internalID: -6275323589779429946
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: D1_Weapon_Vine_Thicket_5
+      rect:
+        serializedVersion: 2
+        x: 160
+        y: 0
+        width: 32
+        height: 32
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 2ce2ff9ef56ad56d0800000000000000
+      internalID: -3000058845880963390
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: D1_Weapon_Vine_Thicket_6
+      rect:
+        serializedVersion: 2
+        x: 192
+        y: 0
+        width: 32
+        height: 32
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 9b5616c45cb288c10800000000000000
+      internalID: 2055941356284634553
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: D1_Weapon_Vine_Thicket_7
+      rect:
+        serializedVersion: 2
+        x: 224
+        y: 0
+        width: 32
+        height: 32
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 1ec8dbaddb874d7b0800000000000000
+      internalID: -5200398912892072735
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: D1_Weapon_Vine_Thicket_8
+      rect:
+        serializedVersion: 2
+        x: 256
+        y: 0
+        width: 32
+        height: 32
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 0c57a198b236db940800000000000000
+      internalID: 5313512174002009536
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: D1_Weapon_Vine_Thicket_9
+      rect:
+        serializedVersion: 2
+        x: 288
+        y: 0
+        width: 32
+        height: 32
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 3cca8bb7f6ef26340800000000000000
+      internalID: 4855723103029341379
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: D1_Weapon_Vine_Thicket_10
+      rect:
+        serializedVersion: 2
+        x: 320
+        y: 0
+        width: 32
+        height: 32
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: c7a3e6a499bc5d220800000000000000
+      internalID: 2510136226568092284
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: D1_Weapon_Vine_Thicket_11
+      rect:
+        serializedVersion: 2
+        x: 352
+        y: 0
+        width: 32
+        height: 32
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 20d19994a9a8a24b0800000000000000
+      internalID: -5464402802596307710
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: D1_Weapon_Vine_Thicket_12
+      rect:
+        serializedVersion: 2
+        x: 384
+        y: 0
+        width: 32
+        height: 32
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 6744698e6f5e97260800000000000000
+      internalID: 7095955536525804662
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: D1_Weapon_Vine_Thicket_13
+      rect:
+        serializedVersion: 2
+        x: 416
+        y: 0
+        width: 32
+        height: 32
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: dda171625a58d5060800000000000000
+      internalID: 6943853144830319325
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    outline: []
+    customData: 
+    physicsShape: []
+    bones: []
+    spriteID: a952aff6ae2b0dd4a89335a15e56671f
+    internalID: 0
+    vertices: []
+    indices: 
+    edges: []
+    weights: []
+    secondaryTextures: []
+    spriteCustomMetadata:
+      entries: []
+    nameFileIdTable:
+      D1_Weapon_Vine_Thicket_0: -8157066985077109994
+      D1_Weapon_Vine_Thicket_1: -4508149742760251160
+      D1_Weapon_Vine_Thicket_10: 2510136226568092284
+      D1_Weapon_Vine_Thicket_11: -5464402802596307710
+      D1_Weapon_Vine_Thicket_12: 7095955536525804662
+      D1_Weapon_Vine_Thicket_13: 6943853144830319325
+      D1_Weapon_Vine_Thicket_2: 7574571995199624584
+      D1_Weapon_Vine_Thicket_3: 3868005163962483748
+      D1_Weapon_Vine_Thicket_4: -6275323589779429946
+      D1_Weapon_Vine_Thicket_5: -3000058845880963390
+      D1_Weapon_Vine_Thicket_6: 2055941356284634553
+      D1_Weapon_Vine_Thicket_7: -5200398912892072735
+      D1_Weapon_Vine_Thicket_8: 5313512174002009536
+      D1_Weapon_Vine_Thicket_9: 4855723103029341379
+  mipmapLimitGroupName: 
+  pSDRemoveMatte: 0
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 

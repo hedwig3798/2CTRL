@@ -81,6 +81,7 @@ namespace Builders.Visual
             BuildTiles();
             BuildWeapons();
             BuildExtraWeapons();
+            BuildAnimatedFx();
             BuildItems();
             BuildIcons();
             TMP_FontAsset font = BuildFont();
@@ -115,7 +116,7 @@ namespace Builders.Visual
                 ti.wrapMode = path.EndsWith("_Chain_Line.png") || path.EndsWith("_StormOrb_Link.png") ? TextureWrapMode.Repeat : TextureWrapMode.Clamp;
 
                 string file = System.IO.Path.GetFileNameWithoutExtension(path);
-                bool strip = path.Contains("/Player/") || path.Contains("/Monster/") || path.Contains("/Boss/");
+                bool strip = path.Contains("/Player/") || path.Contains("/Monster/") || path.Contains("/Boss/") || path.Contains("/FX/");
                 bool tiles = path.Contains("/TileMap/");
 
                 if (strip || tiles)
@@ -161,7 +162,7 @@ namespace Builders.Visual
             }
         }
 
-        // 32x32 그리드로 자른다 (Boss/ 는 이미지 높이 크기의 정사각 칸). 이름은 _names 가 있으면 그것, 없으면 file_0, file_1 ...
+        // 32x32 그리드로 자른다 (Boss/, FX/ 는 이미지 높이 크기의 정사각 칸). 이름은 _names 가 있으면 그것, 없으면 file_0, file_1 ...
         // 같은 이름의 기존 스프라이트 ID 를 유지해서 다시 실행해도 참조가 끊기지 않는다
         private static void SliceGrid(TextureImporter _ti, string _file, string[] _names)
         {
@@ -171,7 +172,7 @@ namespace Builders.Visual
             provider.InitSpriteEditorDataProvider();
 
             var tex = AssetDatabase.LoadAssetAtPath<Texture2D>(_ti.assetPath);
-            int cell = _ti.assetPath.Contains("/Boss/") ? tex.height : 32;
+            int cell = _ti.assetPath.Contains("/Boss/") || _ti.assetPath.Contains("/FX/") ? tex.height : 32;
             int cols = tex.width / cell;
             int rows = tex.height / cell;
             int count = null != _names ? _names.Length : cols * rows;
@@ -928,6 +929,438 @@ namespace Builders.Visual
             log.AppendLine("spinblade/stormorb ok");
         }
 
+        // 프레임 애니메이션 이펙트 (FX/ 스트립, tools/art/fx_anim.py). BuildWeapons / BuildExtraWeapons 가 넣은 한 장짜리 그림을 덮어쓴다
+        private static void BuildAnimatedFx()
+        {
+            const string W = "Assets/prefab/weapon/";
+            Sprite[] explosion = Frames(ART + "/FX/Common_FX_Explosion_Anim.png");
+            Sprite[] marker = Frames(ART + "/FX/D3_Weapon_Lightning_Marker_Anim.png");
+            Sprite[] puff = Frames(ART + "/FX/D1_Weapon_PoisonZone_Puff.png");
+            if (explosion.Length < 9 || marker.Length < 6 || puff.Length < 4)
+            {
+                log.AppendLine("missing fx strips " + explosion.Length + "/" + marker.Length + "/" + puff.Length);
+                return;
+            }
+
+            // 폭발: 9 프레임을 수명에 맞춰 한 번. 크기는 처음부터 반지름 그대로 (40px 칸 x 0.8 = 지름 1 = unitRadius 0.5), 끝에서만 흐려진다
+            foreach (string path in new[] { W + "Explosive/ExplosiveExplosionEffect.prefab", W + "Mine/MineExplosion.prefab", MONSTER_DIR + "/Bomber/BomberExplosion.prefab" })
+            {
+                EditPrefab(path, root =>
+                {
+                    Lifetime life = root.GetComponent<Lifetime>();
+                    if (null != life && life.lifetime < 0.45f)
+                    {
+                        SetProp(life, "lifetime", 0.45f);
+                    }
+                    Transform core = root.transform.Find("core");
+                    if (null != core)
+                    {
+                        core.gameObject.SetActive(false);
+                    }
+
+                    Transform v = root.transform.Find("visual");
+                    var sr = null != v ? v.GetComponent<SpriteRenderer>() : null;
+                    if (null == sr)
+                    {
+                        log.AppendLine("missing visual " + path);
+                        return;
+                    }
+                    sr.sprite = explosion[0];
+                    sr.color = Color.white;
+                    v.localScale = new Vector3(0.8f, 0.8f, 1f);
+                    var scale = v.GetComponent<ScaleOverLifetime>();
+                    if (null != scale)
+                    {
+                        SetProp(scale, "curve", AnimationCurve.Constant(0f, 1f, 1f));
+                    }
+                    var fade = v.GetComponent<FadeOverLifetime>();
+                    if (null != fade)
+                    {
+                        SetProp(fade, "alphaCurve", new AnimationCurve(new Keyframe(0f, 1f), new Keyframe(0.7f, 1f), new Keyframe(1f, 0f)));
+                    }
+                    var anim = GetOrAdd<SpriteFrameAnimator>(v.gameObject);
+                    SetProp(anim, "target", sr);
+                    SetProp(anim, "frames", explosion);
+                    SetProp(anim, "mode", (int)SpriteFrameAnimator.PlayMode.LifetimeSync);
+                });
+            }
+
+            // 낙뢰 예고: 마법진이 두 번 깜빡인 뒤 퍼지고 별로 모이는 순간 낙뢰 (표식 시간 markDelay 에 맞춘다)
+            EditPrefab(W + "Lightning/LightningProjectile.prefab", root =>
+            {
+                var lightning = root.GetComponent<LightningProjectile>();
+                Transform m = root.transform.Find("Marker");
+                var sr = null != m ? m.GetComponent<SpriteRenderer>() : null;
+                if (null == lightning || null == sr)
+                {
+                    log.AppendLine("missing lightning marker");
+                    return;
+                }
+                // 실행 중에는 LightningProjectile 이 markDelay 로 다시 맞춘다
+                float delay = new SerializedObject(lightning).FindProperty("markDelay").floatValue;
+                sr.sprite = marker[0];
+                sr.color = Color.white;
+                // 고리가 칸의 약 80% 라 낙뢰 반경에 맞게 키운다
+                SetScaleAt(m, 0f, 0f, 1.2f, 1.2f);
+                var anim = GetOrAdd<SpriteFrameAnimator>(m.gameObject);
+                SetProp(anim, "target", sr);
+                SetProp(anim, "frames", new Object[] { marker[0], marker[1], marker[2], marker[1], marker[2], marker[3], marker[4], marker[5] });
+                SetProp(anim, "mode", (int)SpriteFrameAnimator.PlayMode.OnceOverDuration);
+                SetProp(anim, "duration", Mathf.Max(0.05f, delay));
+            });
+
+            // 독 장판: 날아가는 병 -> 착지하면 구름 7 개가 차례로 피어오름 -> 수명 85% 부터 흐려지며 판정 끔
+            EditPrefab(W + "PoisonZone/PoisonZoneProjectile.prefab", root =>
+            {
+                Transform old = root.transform.Find("visual");
+                var oldSr = null != old ? old.GetComponent<SpriteRenderer>() : null;
+                if (null != oldSr)
+                {
+                    oldSr.enabled = false;
+                }
+
+                Transform puffRoot = root.transform.Find("puffs");
+                if (null == puffRoot)
+                {
+                    puffRoot = new GameObject("puffs").transform;
+                    puffRoot.SetParent(root.transform, false);
+                }
+                puffRoot.gameObject.layer = root.layer;
+                // 판정 반지름 = 로컬 0.5. 가운데 하나 + 고리 6 개 (구름 그림은 칸의 약 80%)
+                var layout = new (float x, float y, float s)[]
+                {
+                    (0f, 0f, 0.6f), (0f, 0.27f, 0.45f), (0.24f, -0.14f, 0.45f), (-0.24f, -0.14f, 0.45f),
+                    (0.24f, 0.14f, 0.42f), (0f, -0.27f, 0.42f), (-0.24f, 0.14f, 0.42f),
+                };
+                var renderers = new Object[layout.Length];
+                for (int i = 0; i < layout.Length; ++i)
+                {
+                    string n = "puff" + i;
+                    Transform t = puffRoot.Find(n);
+                    if (null == t)
+                    {
+                        t = new GameObject(n, typeof(SpriteRenderer)).transform;
+                        t.SetParent(puffRoot, false);
+                    }
+                    t.gameObject.layer = root.layer;
+                    SetScaleAt(t, layout[i].x, layout[i].y, layout[i].s, layout[i].s);
+                    var sr = t.GetComponent<SpriteRenderer>();
+                    // 새로 만든 렌더러는 Lit 재질이 붙는다. 기존 visual 과 같은 재질로 (조명 없는 씬에서도 보이게)
+                    if (null != oldSr)
+                    {
+                        sr.sharedMaterial = oldSr.sharedMaterial;
+                    }
+                    sr.sprite = puff[0];
+                    sr.color = new Color(1f, 1f, 1f, 0.85f);
+                    sr.flipX = 1 == i % 2;
+                    sr.sortingLayerName = "BG";
+                    sr.sortingOrder = 10;
+                    renderers[i] = sr;
+                }
+
+                Transform thrown = root.transform.Find("thrown");
+                if (null == thrown)
+                {
+                    thrown = new GameObject("thrown", typeof(SpriteRenderer)).transform;
+                    thrown.SetParent(root.transform, false);
+                }
+                thrown.gameObject.layer = root.layer;
+                var tsr = thrown.GetComponent<SpriteRenderer>();
+                StyleSprite(tsr, "D1_Weapon_PoisonZone_Flask", 3);
+                if (null != oldSr)
+                {
+                    tsr.sharedMaterial = oldSr.sharedMaterial;
+                }
+                tsr.enabled = false;
+
+                var visual = GetOrAdd<PoisonZoneVisual>(root);
+                SetProp(visual, "thrown", tsr);
+                SetProp(visual, "puffs", renderers);
+                SetProp(visual, "puffFrames", new Object[] { puff[0], puff[1], puff[2], puff[3] });
+                SetProp(visual, "fadeStartRate", 0.85f);
+                SetProp(root.GetComponent<PoisonZoneProjectile>(), "hitEndRate", 0.85f);
+
+                // 크기는 착지 뒤 그대로 (사라질 때 줄지 않고 흐려진다). 시작 부분 곡선은 이전과 같다
+                var scale = root.GetComponent<ScaleOverLifetime>();
+                SetProp(scale, "curve", new AnimationCurve(new Keyframe(0f, 0.25f), new Keyframe(0.08f, 1.08f), new Keyframe(0.13f, 1f), new Keyframe(1f, 1f)));
+            });
+            BuildSweepTornadoFx(W);
+            BuildFlameFx(W);
+            BuildSpiritVineFx(W);
+            log.AppendLine("animated fx ok");
+        }
+
+        // 정령: 숲 초록 Spirit2 4 방향 x 4 프레임 걷기 (SpiritVisual) / 덩굴: 풀잎 덤불 등장 7 -> 흔들림 4 -> 퇴장 3 프레임 (LifetimePhaseAnimator)
+        private static void BuildSpiritVineFx(string W)
+        {
+            Sprite[] walk = Frames(ART + "/FX/D1_Weapon_Spirit_Walk.png");
+            Sprite[] thicket = Frames(ART + "/FX/D1_Weapon_Vine_Thicket.png");
+            if (walk.Length < 16 || thicket.Length < 14)
+            {
+                log.AppendLine("missing spirit/vine strips " + walk.Length + "/" + thicket.Length);
+                return;
+            }
+
+            EditPrefab(W + "Spirit/SpiritProjectile.prefab", root =>
+            {
+                var sr = root.GetComponent<SpriteRenderer>();
+                var spirit = root.GetComponent<SpiritProjectile>();
+                if (null == sr || null == spirit)
+                {
+                    log.AppendLine("missing spirit renderer");
+                    return;
+                }
+                // 32px 칸(1 유닛) x 루트 0.92
+                sr.sprite = walk[0];
+                sr.color = Color.white;
+                sr.flipX = false;
+                SetProp(spirit, "flipByDirection", false);
+                var visual = GetOrAdd<SpiritVisual>(root);
+                SetProp(visual, "target", sr);
+                SetProp(visual, "frames", walk);
+            });
+
+            EditPrefab(W + "Vine/VineProjectile.prefab", root =>
+            {
+                Transform v = root.transform.Find("visual");
+                var sr = null != v ? v.GetComponent<SpriteRenderer>() : null;
+                if (null == sr)
+                {
+                    log.AppendLine("missing vine visual");
+                    return;
+                }
+                sr.sprite = thicket[6];
+                var anim = GetOrAdd<LifetimePhaseAnimator>(v.gameObject);
+                SetProp(anim, "target", sr);
+                SetProp(anim, "introFrames", thicket.Take(7).ToArray());
+                SetProp(anim, "loopFrames", thicket.Skip(7).Take(4).ToArray());
+                SetProp(anim, "outroFrames", thicket.Skip(11).Take(3).ToArray());
+            });
+        }
+
+        // 화염 방사: 고정 불꽃 그림 3 장 대신 불덩이 20 개를 뿜는다 (FlameJetVisual, Flam 8 프레임)
+        private static void BuildFlameFx(string W)
+        {
+            Sprite[] puff = Frames(ART + "/FX/D2_Weapon_Flame_Puff.png");
+            if (puff.Length < 8)
+            {
+                log.AppendLine("missing flame strip " + puff.Length);
+                return;
+            }
+
+            EditPrefab(W + "Flame/FlameProjectile.prefab", root =>
+            {
+                Transform visual = root.transform.Find("visual");
+                Transform first = null != visual ? visual.Find("flame") : null;
+                var firstSr = null != first ? first.GetComponent<SpriteRenderer>() : null;
+                if (null == firstSr)
+                {
+                    log.AppendLine("missing flame visual");
+                    return;
+                }
+                foreach (string n in new[] { "flame", "flame2", "flame3" })
+                {
+                    Transform t = visual.Find(n);
+                    if (null != t)
+                    {
+                        t.GetComponent<SpriteRenderer>().enabled = false;
+                    }
+                }
+
+                const int COUNT = 20;
+                var renderers = new Object[COUNT];
+                for (int i = 0; i < COUNT; ++i)
+                {
+                    string n = "puff" + i;
+                    Transform t = visual.Find(n);
+                    if (null == t)
+                    {
+                        t = new GameObject(n, typeof(SpriteRenderer)).transform;
+                        t.SetParent(visual, false);
+                    }
+                    t.gameObject.layer = root.layer;
+                    var sr = t.GetComponent<SpriteRenderer>();
+                    StyleSprite(sr, "D2_Weapon_Flame_Fire", 2);
+                    sr.sprite = puff[0];
+                    sr.sharedMaterial = firstSr.sharedMaterial;
+                    sr.enabled = false;
+                    renderers[i] = sr;
+                }
+
+                var jet = GetOrAdd<FlameJetVisual>(root);
+                SetProp(jet, "puffs", renderers);
+                SetProp(jet, "frames", puff);
+                float baseRange = new SerializedObject(root.GetComponent<FlameProjectile>()).FindProperty("visualBaseRange").floatValue;
+                SetProp(jet, "endDistance", baseRange);
+            });
+        }
+
+        // 휘두르기: 칼날 그림 대신 베기 궤적 6 프레임
+        private static void BuildSweepTornadoFx(string W)
+        {
+            Sprite[] trail = Frames(ART + "/FX/D1_Weapon_Sweep_Trail.png");
+            if (trail.Length < 6)
+            {
+                log.AppendLine("missing sweep strip " + trail.Length);
+                return;
+            }
+
+            EditPrefab(W + "Sweep/SweepProjectile.prefab", root =>
+            {
+                Transform old = root.transform.Find("visual");
+                var oldSr = null != old ? old.GetComponent<SpriteRenderer>() : null;
+                if (null == oldSr)
+                {
+                    log.AppendLine("missing sweep visual");
+                    return;
+                }
+                // 칼날 막대 그림은 끈다 (판정은 루트 콜라이더 그대로)
+                oldSr.enabled = false;
+
+                Transform t = root.transform.Find("trail");
+                if (null == t)
+                {
+                    t = new GameObject("trail", typeof(SpriteRenderer)).transform;
+                    t.SetParent(root.transform, false);
+                }
+                t.gameObject.layer = root.layer;
+                var sr = t.GetComponent<SpriteRenderer>();
+                StyleSprite(sr, "D1_Weapon_Sweep_Arc", 0);
+                sr.sprite = trail[0];
+                sr.sharedMaterial = oldSr.sharedMaterial;
+
+                var visual = GetOrAdd<SweepTrailVisual>(root);
+                SetProp(visual, "trail", sr);
+                SetProp(visual, "frames", trail);
+                // 68px 칸 속 궤적 바깥 반지름 약 34px = 34 / 32 유닛
+                SetProp(visual, "unitRadius", 34f / PPU);
+            });
+
+            // ★ 검기: 늘린 한 장 그림 대신 초승달 6 프레임을 수명에 맞춰 (나타남 -> 두 번 일렁임 -> 흩어짐)
+            // 38px 칸(1.19 유닛) x 1.18 = 높이 약 1.4 (콜라이더 0.35 x 1.4 와 같은 높이)
+            Sprite[] wave = Frames(ART + "/FX/D1_Weapon_Sweep_SlashWave.png");
+            if (wave.Length < 6)
+            {
+                log.AppendLine("missing slash wave strip " + wave.Length);
+                return;
+            }
+            EditPrefab(W + "Sweep/SweepSlash.prefab", root =>
+            {
+                Transform v = root.transform.Find("visual");
+                var sr = null != v ? v.GetComponent<SpriteRenderer>() : null;
+                if (null == sr)
+                {
+                    log.AppendLine("missing slash wave visual");
+                    return;
+                }
+                sr.sprite = wave[0];
+                sr.color = Color.white;
+                SetScaleAt(v, 0f, 0f, 1.18f, 1.18f);
+                var anim = GetOrAdd<SpriteFrameAnimator>(v.gameObject);
+                SetProp(anim, "target", sr);
+                SetProp(anim, "frames", new Object[] { wave[0], wave[1], wave[2], wave[1], wave[2], wave[1], wave[2], wave[3], wave[4], wave[5] });
+                SetProp(anim, "mode", (int)SpriteFrameAnimator.PlayMode.LifetimeSync);
+            });
+
+            BuildVortexFx(W);
+        }
+
+        // 폭풍 소용돌이 (무기 id Tornado): 바닥 소용돌이 8 프레임 반복 + 빨려드는 잎 + 타격 때 번개 (TornadoVortexVisual)
+        // 예전 회오리 그림(visual)은 끄고 dust 는 지운다. visual 은 TornadoProjectile.scaleTarget 이라 오브젝트는 남긴다
+        private static void BuildVortexFx(string W)
+        {
+            Sprite[] floor = Frames(ART + "/FX/D3_Weapon_Vortex_Floor.png");
+            Sprite[] debris = Frames(ART + "/FX/D3_Weapon_Vortex_Debris.png");
+            Sprite[] zap = Frames(ART + "/FX/D3_Weapon_Vortex_Zap.png");
+            if (floor.Length < 8 || debris.Length < 6 || zap.Length < 7)
+            {
+                log.AppendLine("missing vortex strips " + floor.Length + "/" + debris.Length + "/" + zap.Length);
+                return;
+            }
+
+            EditPrefab(W + "Tornado/TornadoProjectile.prefab", root =>
+            {
+                Transform v = root.transform.Find("visual");
+                var vsr = null != v ? v.GetComponent<SpriteRenderer>() : null;
+                if (null == vsr)
+                {
+                    log.AppendLine("missing tornado visual");
+                    return;
+                }
+                Material mat = vsr.sharedMaterial;
+                vsr.enabled = false;
+                // 예전 회오리 연출 컴포넌트 (SpriteFrameAnimator, 지워진 SpinOverTime 포함) 제거
+                foreach (var c in v.GetComponents<MonoBehaviour>())
+                {
+                    if (null == c || c is SpriteFrameAnimator || "SpinOverTime" == c.GetType().Name)
+                    {
+                        Object.DestroyImmediate(c, true);
+                    }
+                }
+                GameObjectUtility.RemoveMonoBehavioursWithMissingScript(v.gameObject);
+                Transform oldDust = root.transform.Find("dust");
+                if (null != oldDust)
+                {
+                    Object.DestroyImmediate(oldDust.gameObject, true);
+                }
+
+                SpriteRenderer Child(string _name, string _layer, int _order)
+                {
+                    Transform t = root.transform.Find(_name);
+                    if (null == t)
+                    {
+                        t = new GameObject(_name, typeof(SpriteRenderer)).transform;
+                        t.SetParent(root.transform, false);
+                    }
+                    t.gameObject.layer = root.layer;
+                    var sr = t.GetComponent<SpriteRenderer>();
+                    sr.sharedMaterial = mat;
+                    sr.color = Color.white;
+                    sr.sortingLayerName = _layer;
+                    sr.sortingOrder = _order;
+                    return sr;
+                }
+
+                // 바닥: 몬스터 아래 (BG). 32px = 지름 1 유닛
+                var fsr = Child("floor", "BG", 9);
+                fsr.sprite = floor[0];
+                fsr.color = new Color(1f, 1f, 1f, 0.65f);
+                var fanim = GetOrAdd<SpriteFrameAnimator>(fsr.gameObject);
+                SetProp(fanim, "target", fsr);
+                SetProp(fanim, "frames", floor);
+                SetProp(fanim, "mode", (int)SpriteFrameAnimator.PlayMode.Loop);
+                SetProp(fanim, "fps", 10f);
+
+                const int COUNT = 10;
+                var leaves = new Object[COUNT];
+                for (int i = 0; i < COUNT; ++i)
+                {
+                    var lsr = Child("debris" + i, "attack", 1);
+                    lsr.sprite = debris[0];
+                    leaves[i] = lsr;
+                }
+
+                var zsr = Child("zap", "attack", 3);
+                zsr.sprite = zap[0];
+                zsr.enabled = false;
+
+                var visual = GetOrAdd<TornadoVortexVisual>(root);
+                SetProp(visual, "floor", fsr);
+                SetProp(visual, "floorUnitDiameter", 1f);
+                SetProp(visual, "debris", leaves);
+                SetProp(visual, "debrisFrames", debris);
+                SetProp(visual, "zap", zsr);
+                SetProp(visual, "zapFrames", zap);
+            });
+        }
+
+        // GetComponent 의 에디터 가짜 null 때문에 ?? 를 쓰지 않는다
+        private static T GetOrAdd<T>(GameObject _go) where T : Component
+        {
+            T c = _go.GetComponent<T>();
+            return null != c ? c : _go.AddComponent<T>();
+        }
+
         private static void BuildItems()
         {
             EditPrefab("Assets/prefab/Item/expGem.prefab", root =>
@@ -1398,6 +1831,25 @@ namespace Builders.Visual
                 case bool b: p.boolValue = b; break;
                 case Color c: p.colorValue = c; break;
                 case Object o: p.objectReferenceValue = o; break;
+                case float f: p.floatValue = f; break;
+                case int n:
+                    if (SerializedPropertyType.Enum == p.propertyType)
+                    {
+                        p.enumValueIndex = n;
+                    }
+                    else
+                    {
+                        p.intValue = n;
+                    }
+                    break;
+                case AnimationCurve curve: p.animationCurveValue = curve; break;
+                case Object[] array:
+                    p.arraySize = array.Length;
+                    for (int i = 0; i < array.Length; ++i)
+                    {
+                        p.GetArrayElementAtIndex(i).objectReferenceValue = array[i];
+                    }
+                    break;
             }
             so.ApplyModifiedPropertiesWithoutUndo();
         }

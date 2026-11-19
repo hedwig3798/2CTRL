@@ -111,8 +111,8 @@ reward.weapon.storm_orb.name,전격 구체,Storm Orb
 reward.weapon.storm_orb.explain,주위를 공전하며 닿은 적을 타격하는 전기 구체 2개를 얻습니다.,Gain 2 electric orbs that circle you and strike any enemy they touch.
 reward.weapon.sweep.name,휘두르기,Sweep
 reward.weapon.sweep.explain,가까운 적을 향해 칼날을 크게 휘둘러 닿은 모든 적을 타격하고 밀쳐내는 근접 무기를 얻습니다.,"Gain a melee weapon that swings a wide blade toward nearby enemies, hitting and knocking back all it touches."
-reward.weapon.tornado.name,회오리,Tornado
-reward.weapon.tornado.explain,주변을 떠도는 회오리를 만들어 적을 끌어당기고 지속적으로 타격합니다.,Creates a wandering tornado that pulls enemies in and hits them continuously.
+reward.weapon.tornado.name,소용돌이,Vortex
+reward.weapon.tornado.explain,주변을 떠도는 폭풍 소용돌이를 만들어 적을 끌어당기고 지속적으로 타격합니다.,Creates a wandering storm vortex that pulls enemies in and hits them continuously.
 reward.weapon.vine.name,덩굴,Thorn Vine
 reward.weapon.vine.explain,"지나간 자리에 가시 덩굴을 남겨, 덩굴 위의 적들에게 지속적으로 피해를 줍니다.",Leaves thorny vines along your path that continuously damage enemies standing on them.
 # 무기 업그레이드 단계 (빌더가 한국어 원문으로 키를 역조회. 번역문에 중괄호 금지)
@@ -216,8 +216,8 @@ upgrade.fan_angle_plus_30,부채꼴 각도 +30°,Fan Angle +30°
 upgrade.spray_time_plus_0_3s,분사 시간 +0.3초,Spray Time +0.3s
 upgrade.star_burn,★ 화상,★ Burn
 upgrade.burn,화상,Burn
-upgrade.star_tornadoes_plus_1_2_total,★ 회오리 +1 (2개),★ Tornadoes +1 (2 total)
-upgrade.tornadoes_plus_1_2_total,회오리 +1 (2개),Tornadoes +1 (2 total)
+upgrade.star_tornadoes_plus_1_2_total,★ 소용돌이 +1 (2개),★ Vortexes +1 (2 total)
+upgrade.tornadoes_plus_1_2_total,소용돌이 +1 (2개),Vortexes +1 (2 total)
 upgrade.pull_plus_30pct,끌어당김 +30%,Pull +30%
 upgrade.star_permanent,★ 영구,★ Permanent
 upgrade.permanent,영구,Permanent

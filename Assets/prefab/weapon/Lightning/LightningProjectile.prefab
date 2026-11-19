@@ -159,6 +159,7 @@ GameObject:
   m_Component:
   - component: {fileID: 6177012079978592302}
   - component: {fileID: 4975044276055146946}
+  - component: {fileID: 489576372021661515}
   m_Layer: 0
   m_Name: Marker
   m_TagString: Untagged
@@ -176,7 +177,7 @@ Transform:
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_LocalScale: {x: 1.2, y: 1.2, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 4830752073647733261}
@@ -230,8 +231,8 @@ SpriteRenderer:
   m_SortingLayer: 4
   m_SortingOrder: 0
   m_MaskInteraction: 0
-  m_Sprite: {fileID: 21300000, guid: bbd183bcab3e0364093ed72af4f9508d, type: 3}
-  m_Color: {r: 1, g: 1, b: 1, a: 0.85}
+  m_Sprite: {fileID: 3001962349912617527, guid: e0831005fe4ad594d85b83bff010aef4, type: 3}
+  m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
   m_FlipY: 0
   m_DrawMode: 0
@@ -241,6 +242,32 @@ SpriteRenderer:
   m_WasSpriteAssigned: 1
   m_SpriteSortPoint: 0
   m_BlendShapeWeights: []
+--- !u!114 &489576372021661515
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2414644907650702767}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 47c08a73d71bd8f4b8905a929b26de91, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Game.Runtime::SpriteFrameAnimator
+  target: {fileID: 4975044276055146946}
+  frames:
+  - {fileID: 3001962349912617527, guid: e0831005fe4ad594d85b83bff010aef4, type: 3}
+  - {fileID: 4841917229559878504, guid: e0831005fe4ad594d85b83bff010aef4, type: 3}
+  - {fileID: 3395277079563690228, guid: e0831005fe4ad594d85b83bff010aef4, type: 3}
+  - {fileID: 4841917229559878504, guid: e0831005fe4ad594d85b83bff010aef4, type: 3}
+  - {fileID: 3395277079563690228, guid: e0831005fe4ad594d85b83bff010aef4, type: 3}
+  - {fileID: -3650767546739338923, guid: e0831005fe4ad594d85b83bff010aef4, type: 3}
+  - {fileID: -8803258394700395384, guid: e0831005fe4ad594d85b83bff010aef4, type: 3}
+  - {fileID: -1443653868393152122, guid: e0831005fe4ad594d85b83bff010aef4, type: 3}
+  mode: 1
+  lifetime: {fileID: 0}
+  duration: 0.5
+  fps: 10
 --- !u!1 &3452214705762329010
 GameObject:
   m_ObjectHideFlags: 0

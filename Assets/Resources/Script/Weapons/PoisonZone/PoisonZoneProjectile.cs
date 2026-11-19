@@ -30,6 +30,9 @@ public class PoisonZoneProjectile
     public float minHitRadius = 0.2f;
     [Tooltip("비워두면 같은 오브젝트의 PoisonZoneLandMovement. 없으면 발사 즉시 착지한 것으로 본다")]
     public PoisonZoneLandMovement landMovement;
+    [Tooltip("수명 진행률(0 ~ 1)이 이 값 이상이면 타격·둔화하지 않는다 (흐려지며 사라지는 동안). 1 이면 끝까지 타격")]
+    [Range(0f, 1f)]
+    public float hitEndRate = 1f;
 
     [Header("slow (★)")]
     [Tooltip("FlagSlowZone 이 켜졌을 때 장판 위 적의 이동 속도 감소 비율 (0.3 = -30%)")]
@@ -45,6 +48,7 @@ public class PoisonZoneProjectile
 
     private bool landed;
     private float nextTickTime;
+    private Lifetime lifetime;
 
     /// <summary>
     /// 현재 크기에 맞춘 판정 반지름
@@ -80,6 +84,7 @@ public class PoisonZoneProjectile
         {
             landMovement = GetComponent<PoisonZoneLandMovement>();
         }
+        lifetime = GetComponent<Lifetime>();
     }
 
     protected override bool OnLaunch()
@@ -149,6 +154,11 @@ public class PoisonZoneProjectile
         OnLandedUpdate();
 
         if (Time.time < nextTickTime)
+        {
+            return;
+        }
+
+        if (hitEndRate < 1f && null != lifetime && 1f - lifetime.RemainRate >= hitEndRate)
         {
             return;
         }

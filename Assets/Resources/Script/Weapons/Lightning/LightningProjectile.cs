@@ -414,6 +414,11 @@ public class LightningProjectile
         {
             GameObject marker = GetMarker(i);
             marker.transform.localScale = markerBaseScale * scale;
+            // 표식 애니메이션이 있으면 낙뢰 시점(markDelay)에 맞춰 끝나게 한다
+            if (marker.TryGetComponent(out SpriteFrameAnimator anim))
+            {
+                anim.duration = Mathf.Max(0.01f, markDelay);
+            }
             marker.SetActive(true);
         }
         UpdateMarkers();

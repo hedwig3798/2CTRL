@@ -59,7 +59,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 3835cd9e9a6d4324945ae772f447d065, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Lifetime
-  lifetime: 0.3
+  lifetime: 0.45
 --- !u!1 &8977718217001951168
 GameObject:
   m_ObjectHideFlags: 0
@@ -72,6 +72,7 @@ GameObject:
   - component: {fileID: 404934208134396880}
   - component: {fileID: 8352423635097170945}
   - component: {fileID: 8856341945213560932}
+  - component: {fileID: 5501006306681020959}
   m_Layer: 0
   m_Name: visual
   m_TagString: Untagged
@@ -89,7 +90,7 @@ Transform:
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_LocalScale: {x: 0.8, y: 0.8, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 3375722832647475584}
@@ -143,8 +144,8 @@ SpriteRenderer:
   m_SortingLayer: 4
   m_SortingOrder: 1
   m_MaskInteraction: 0
-  m_Sprite: {fileID: 21300000, guid: 87a944a35ba6999438a27356126cb5a2, type: 3}
-  m_Color: {r: 1, g: 1, b: 1, a: 0.95}
+  m_Sprite: {fileID: -831579296526021455, guid: 34d4bd211cba45a468cb3e7e12b71ca2, type: 3}
+  m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
   m_FlipY: 0
   m_DrawMode: 0
@@ -173,9 +174,9 @@ MonoBehaviour:
     m_Curve:
     - serializedVersion: 3
       time: 0
-      value: 0.35
-      inSlope: 2.2
-      outSlope: 2.2
+      value: 1
+      inSlope: 0
+      outSlope: 0
       tangentMode: 0
       weightedMode: 0
       inWeight: 0
@@ -222,10 +223,19 @@ MonoBehaviour:
       inWeight: 0
       outWeight: 0
     - serializedVersion: 3
+      time: 0.7
+      value: 1
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0
+      outWeight: 0
+    - serializedVersion: 3
       time: 1
       value: 0
-      inSlope: -2
-      outSlope: -2
+      inSlope: 0
+      outSlope: 0
       tangentMode: 0
       weightedMode: 0
       inWeight: 0
@@ -233,3 +243,30 @@ MonoBehaviour:
     m_PreInfinity: 2
     m_PostInfinity: 2
     m_RotationOrder: 4
+--- !u!114 &5501006306681020959
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8977718217001951168}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 47c08a73d71bd8f4b8905a929b26de91, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Game.Runtime::SpriteFrameAnimator
+  target: {fileID: 404934208134396880}
+  frames:
+  - {fileID: -831579296526021455, guid: 34d4bd211cba45a468cb3e7e12b71ca2, type: 3}
+  - {fileID: -1910886253287504706, guid: 34d4bd211cba45a468cb3e7e12b71ca2, type: 3}
+  - {fileID: -6857757443051205230, guid: 34d4bd211cba45a468cb3e7e12b71ca2, type: 3}
+  - {fileID: -917161481971288050, guid: 34d4bd211cba45a468cb3e7e12b71ca2, type: 3}
+  - {fileID: 7497164769314129524, guid: 34d4bd211cba45a468cb3e7e12b71ca2, type: 3}
+  - {fileID: 1270447643009947337, guid: 34d4bd211cba45a468cb3e7e12b71ca2, type: 3}
+  - {fileID: -4966890598093305449, guid: 34d4bd211cba45a468cb3e7e12b71ca2, type: 3}
+  - {fileID: -5884666480822127413, guid: 34d4bd211cba45a468cb3e7e12b71ca2, type: 3}
+  - {fileID: 1109383705448229635, guid: 34d4bd211cba45a468cb3e7e12b71ca2, type: 3}
+  mode: 0
+  lifetime: {fileID: 0}
+  duration: 0.5
+  fps: 10

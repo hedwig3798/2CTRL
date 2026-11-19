@@ -1,2 +1,23 @@
 # effect (EffectSystem)
 - `PooledEffect`(MonoBehaviour) + static `EffectPool` (PooledEffect.cs:60), `FadeOverLifetime`, `ScaleOverLifetime`(+Initializable), `DissolveEffectContorller`(오타, +Initializable). 모두 2026 신규 또는 수정 중(미커밋).
+- (2026-11-19) `SpriteFrameAnimator` (EffectSystem/SpriteFrameAnimator.cs): 풀링 이펙트용 프레임 재생. 모드 LifetimeSync(수명에 맞춰 전체 프레임) / OnceOverDuration(duration 동안 1회) / Loop.
+  - LifetimeSync 사용: ExplosiveExplosionEffect, MineExplosion, BomberExplosion (수명 0.45, 스케일 커브 평탄, Bomber `core` 자식 비활성).
+  - OnceOverDuration 사용: Lightning Marker (duration = markDelay).
+  - Loop 사용: Tornado `floor`(10fps, 8프레임).
+- Tornado(표시명 폭풍 소용돌이/Vortex): `Weapons/Tornado/TornadoVortexVisual.cs` [DefaultExecutionOrder(100)], LateUpdate. 기존 `visual` SR 은 비활성(scaleTarget 이라 오브젝트 유지), `dust` 자식·SpinOverTime(파일 삭제) 제거.
+  - `floor`(BG order 9, 알파 0.65, SpriteFrameAnimator Loop): 지름=CurrentPullRadius*2, fadeTime 0.3 로 커지며 등장, RemainTime<0.3 이면 페이드아웃.
+  - `debris0..9`(attack order 1): 당김 반경 가장자리에서 중심으로 0.9s 나선, 반경 x(1-t²), 220도 회전.
+  - `zap`(attack order 3): LastTickTime 이 바뀔 때마다 번개 7프레임을 0.22s 재생.
+  - TornadoProjectile 읽기 전용: `RemainTime`(영구면 무한), `LastTickTime`(타격 적용 시 기록, ResetState 에서 -1).
+  - 아이콘은 Common_Icon_Tornado(Spell/Mist) 유지.
+- Flame 분사: `Weapons/Flame/FlameJetVisual.cs` [DefaultExecutionOrder(100)], 시각 전용. FlameProjectile 활성 동안 초당 45개(spawnRate) 퍼프 방출, 수명 0.4s. 자식 렌더러 `visual/puff0..19` 20개 풀(빈 것 없으면 가장 오래된 것 재사용). 퍼프는 visualRoot 로컬 공간에서 startDistance 0.3 -> endDistance(=FlameProjectile.visualBaseRange, 최대 20% 랜덤 감소)로 ease-out 비행, 방향은 CurrentFanAngle x0.85 안 랜덤(최대 140도). 스케일 0.45->1.5, 8프레임 1회 재생, 알파 0.65에서 페이드, 월드 기준 항상 upright. 기존 `flame/flame2/flame3` 렌더러는 비활성. 빌더 `ArtResourceBuilder.BuildFlameFx()`(BuildAnimatedFx에서 호출). 에셋 `FX/D2_Weapon_Flame_Puff`(8프레임 30px)는 `tools/art/fx_anim.py`가 FX/Elemental/Flam 에서 생성. 주의: `unity recompile` 직후 빌더 `script eval`은 도메인 리로드로 빈 결과/무변경일 수 있음 -> 재실행.
+- Sweep 궤적: `Weapons/Sweep/SweepTrailVisual.cs` [DefaultExecutionOrder(100)]. Awake에서 자식 `trail` SpriteRenderer를 늘어난 칼날 루트에서 분리, LateUpdate마다 Origin 위치/MidAngle+90 회전/스케일 Reach/(34/32)/시계 방향이면 X 반전, Progress로 6프레임 재생, 투사체 활성과 연동. 기존 blade `visual` SR은 비활성. 빌더: `ArtResourceBuilder.BuildSweepTornadoFx()`(Sweep 전용, 끝에 `BuildVortexFx()` 호출; BuildAnimatedFx에서 호출). BuildVortexFx 는 visual 의 옛 SpriteFrameAnimator/SpinOverTime/missing script 제거 후 floor/debris/zap 구성.
+- Sweep ★ 검기: `ArtResourceBuilder.BuildSweepTornadoFx`가 `Sweep/SweepSlash.prefab`도 수정. `visual` 균일 스케일 1.18(높이 약 1.4, 콜라이더 0.35x1.4와 일치) + SpriteFrameAnimator(LifetimeSync, 프레임 [0,1,2,1,2,1,2,3,4,5]), 수명 0.8은 런타임 SweepProjectile.slashLifetime이 지정. 최대 강화 시 Sweep 사거리(Reach MUL +20%x2 + 범위) 약 4.6유닛이라 궤적은 그 반경으로 그림.
+- fx_anim.py 추가 출력: FX/D1_Weapon_Sweep_Trail(6프레임, 초승달 180도를 `squeeze_arc(cell,180,120)` 극좌표 워프로 실제 타격 호 120도(SweepMovement.arcAngle)에 맞춰 압축 후 `hollow(cell,22)`로 안쪽 22px 제거, 바깥 띠만 남김; 반경 34px=Reach), FX/D1_Weapon_Sweep_SlashWave(FX/Slash/SpriteSheetArc 6프레임 38px, 각 프레임 90도 반시계 회전해 볼록면이 +x), FX/D3_Weapon_Vortex_Floor(QuickSand 8x32px, 폭풍 파랑 재색), FX/D3_Weapon_Vortex_Debris(Leaf 6프레임 12px 셀), FX/D3_Weapon_Vortex_Zap(Thunder 7프레임 28px, 검은 3번 프레임 제외).
+- (2026-11-19) `LifetimePhaseAnimator` (EffectSystem/LifetimePhaseAnimator.cs): Lifetime 기준 3단계 프레임 재생. introFrames 1회(introDuration 0.35s), loopFrames(loopFps 4, 시작 오프셋 랜덤), outroFrames 1회(남은 수명 <= outroDuration 0.3s). 겹치면 outro 우선. 옵션 randomFlip(OnEnable).
+  - Vine 프리팹 `visual` 자식에 사용: D1_Weapon_Vine_Thicket 14프레임 = intro 0-6(풀잎 하나씩 돋음)/loop 7-10(1px 흔들림)/outro 11-13(풀잎 성기어짐). Vine 루트 ScaleOverLifetime 은 기본 선형 0->1 유지(조각 크기·판정 반경이 수명 동안 0에서 커짐, 기존 동작).
+- Spirit 비주얼: `Weapons/Spirit/SpiritVisual.cs` [DefaultExecutionOrder(100)], LateUpdate. 프레임당 위치 변화로 4방향(하/상/좌/우) 선택(속도 >= minTurnSpeed 0.3 일 때만 갱신), 해당 방향 4프레임 8fps 재생(프레임 인덱스 = dir*4+frame), flipX 강제 false. 루트 SpriteRenderer 는 D1_Weapon_Spirit_Walk 사용, SpiritProjectile.flipByDirection=false.
+- 빌더 `ArtResourceBuilder.BuildSpiritVineFx(W)`: BuildAnimatedFx 에서 BuildFlameFx 뒤 호출. fx_anim.py 출력: FX/D1_Weapon_Spirit_Walk(Actor/Monster/Spirit2 를 숲 초록으로 재색, 붉은 외곽선->짙은 초록, 32px 16프레임 2배; 파란 Spirit 은 D3 적 Wraith 라 아군은 색 구분), FX/D1_Weapon_Vine_Thicket(Particle/Grass 풀잎으로 32px 14프레임).
+- 아트: tools/art/fx_anim.py `<pack_root> <art_dir>` -> FX/Common_FX_Explosion_Anim, FX/D3_Weapon_Lightning_Marker_Anim, FX/D1_Weapon_PoisonZone_Puff, Weapon/D1_Weapon_PoisonZone_Flask.
+- 빌더 `ArtResourceBuilder.BuildAnimatedFx()`(BuildExtraWeapons 뒤 실행): Art/FX/ 파일을 이미지 높이 기준 스트립 슬라이스. GetOrAdd 헬퍼 신설, SetProp 가 float/int·enum/AnimationCurve/Object[] 지원.
+- 주의: 빌더가 새로 만든 SpriteRenderer 는 Lit 머티리얼이라 2D 라이트 없으면 안 보임 -> 기존 렌더러의 머티리얼을 복사할 것.

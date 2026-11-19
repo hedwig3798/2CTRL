@@ -45,6 +45,31 @@ public class SweepMovement
     private float elapsed;
     private float bladeLength;
 
+    // 연출(SweepTrailVisual)용 현재 상태
+    private Vector3 currentOrigin;
+    private float currentProgress;
+
+    /// <summary>
+    /// 휘두르는 중심 (보통 플레이어 위치)
+    /// </summary>
+    public Vector3 Origin => currentOrigin;
+    /// <summary>
+    /// 휘두르는 범위의 가운데 각도 (도) = 조준 방향
+    /// </summary>
+    public float MidAngle => startAngle + sweepAngle * 0.5f;
+    /// <summary>
+    /// 휘두르는 각도 (도). 양수 = 반시계
+    /// </summary>
+    public float SweepAngle => sweepAngle;
+    /// <summary>
+    /// 칼날 끝까지의 거리
+    /// </summary>
+    public float Reach => innerRadius + bladeLength;
+    /// <summary>
+    /// 휘두르기 진행도 (0 ~ 1, easeOut 적용 후)
+    /// </summary>
+    public float Progress => currentProgress;
+
     public void Initialize(BlackBoard _data)
     {
         center = _data.GetTransform(DATA_TYPE.startPosition);
@@ -129,6 +154,8 @@ public class SweepMovement
     /// </summary>
     private void Apply(Vector3 _origin, float _t)
     {
+        currentOrigin = _origin;
+        currentProgress = _t;
         float angle = startAngle + sweepAngle * _t;
         float rad = angle * Mathf.Deg2Rad;
         Vector3 dir = new Vector3(Mathf.Cos(rad), Mathf.Sin(rad), 0f);

@@ -133,6 +133,28 @@ public class TornadoProjectile
         }
     }
 
+    /// <summary>
+    /// 남은 수명 (초). 영구 상태면 무한대 (연출이 사라지기 직전 흐려질 때 쓴다)
+    /// </summary>
+    public float RemainTime
+    {
+        get
+        {
+            if (null == weapon || true == IsPermanent)
+            {
+                return float.PositiveInfinity;
+            }
+            return Mathf.Max(0f, FinalLifetime - elapsed);
+        }
+    }
+
+    /// <summary>
+    /// 마지막으로 타격 판정을 한 시각 (Time.time). 아직 없으면 음수 (연출이 타격 순간에 맞춰 번개를 띄울 때 쓴다)
+    /// </summary>
+    public float LastTickTime => lastTickTime;
+
+    private float lastTickTime = -1f;
+
     private bool IsPermanent => null != weapon && true == weapon.HasFlag(WeaponParam.FlagTornadoPermanent);
 
     private float FinalLifetime => null != weapon && weapon.FinalLifetime > 0f ? weapon.FinalLifetime : defaultLifetime;
@@ -210,6 +232,7 @@ public class TornadoProjectile
             // 데미지 업그레이드 / 플레이어 패시브를 살아 있는 회오리에도 반영한다
             RefreshDamage();
             ApplyAreaDamage(transform.position, CurrentHitRadius);
+            lastTickTime = Time.time;
             nextTickTime = Time.time + tickInterval;
         }
     }
@@ -340,6 +363,7 @@ public class TornadoProjectile
         isLeashing = false;
         nextWanderTime = 0f;
         nextTickTime = 0f;
+        lastTickTime = -1f;
         appliedUpgradeVersion = -1;
         pullBuffer.Clear();
         brainCache.Clear();

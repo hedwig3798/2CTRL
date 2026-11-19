@@ -610,7 +610,7 @@ namespace Builders
                 S("크기 +20%", M(WeaponParam.ProjectileScale, MUL, 0.2f)),
                 S("수명 +1초", M(WeaponParam.Lifetime, ADD, 1f)),
                 Dmg(),
-                Star("회오리 +1 (2개)", M(WeaponParam.FireCount, ADD, 1f)),
+                Star("소용돌이 +1 (2개)", M(WeaponParam.FireCount, ADD, 1f)),
                 Dmg(),
                 S("끌어당김 +30%", M(WeaponParam.PullForce, MUL, 0.3f)),
                 Dmg(), Dmg(),

@@ -53,6 +53,7 @@ MonoBehaviour:
   unitRadius: 0.5
   minHitRadius: 0.2
   landMovement: {fileID: 0}
+  hitEndRate: 1
   slowRate: 0.3
   slowLinger: 0.15
   segmentSpacing: 0.7
@@ -139,6 +140,7 @@ GameObject:
   m_Component:
   - component: {fileID: 5785606474807377746}
   - component: {fileID: 192543146813892240}
+  - component: {fileID: 1842763100501156072}
   m_Layer: 0
   m_Name: visual
   m_TagString: Untagged
@@ -210,7 +212,7 @@ SpriteRenderer:
   m_SortingLayer: 4
   m_SortingOrder: 0
   m_MaskInteraction: 0
-  m_Sprite: {fileID: 21300000, guid: 073b71ea7556b9a488df2fba8f7b2e29, type: 3}
+  m_Sprite: {fileID: 2055941356284634553, guid: a20efbbd0e2a8e34ea64bb3e2d5c88d3, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
   m_FlipY: 0
@@ -221,3 +223,38 @@ SpriteRenderer:
   m_WasSpriteAssigned: 1
   m_SpriteSortPoint: 0
   m_BlendShapeWeights: []
+--- !u!114 &1842763100501156072
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8971585772051564067}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ad0b2ceebf3a12345ad9bf6974bb3149, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Game.Runtime::LifetimePhaseAnimator
+  target: {fileID: 192543146813892240}
+  lifetime: {fileID: 0}
+  introFrames:
+  - {fileID: -8157066985077109994, guid: a20efbbd0e2a8e34ea64bb3e2d5c88d3, type: 3}
+  - {fileID: -4508149742760251160, guid: a20efbbd0e2a8e34ea64bb3e2d5c88d3, type: 3}
+  - {fileID: 7574571995199624584, guid: a20efbbd0e2a8e34ea64bb3e2d5c88d3, type: 3}
+  - {fileID: 3868005163962483748, guid: a20efbbd0e2a8e34ea64bb3e2d5c88d3, type: 3}
+  - {fileID: -6275323589779429946, guid: a20efbbd0e2a8e34ea64bb3e2d5c88d3, type: 3}
+  - {fileID: -3000058845880963390, guid: a20efbbd0e2a8e34ea64bb3e2d5c88d3, type: 3}
+  - {fileID: 2055941356284634553, guid: a20efbbd0e2a8e34ea64bb3e2d5c88d3, type: 3}
+  loopFrames:
+  - {fileID: -5200398912892072735, guid: a20efbbd0e2a8e34ea64bb3e2d5c88d3, type: 3}
+  - {fileID: 5313512174002009536, guid: a20efbbd0e2a8e34ea64bb3e2d5c88d3, type: 3}
+  - {fileID: 4855723103029341379, guid: a20efbbd0e2a8e34ea64bb3e2d5c88d3, type: 3}
+  - {fileID: 2510136226568092284, guid: a20efbbd0e2a8e34ea64bb3e2d5c88d3, type: 3}
+  outroFrames:
+  - {fileID: -5464402802596307710, guid: a20efbbd0e2a8e34ea64bb3e2d5c88d3, type: 3}
+  - {fileID: 7095955536525804662, guid: a20efbbd0e2a8e34ea64bb3e2d5c88d3, type: 3}
+  - {fileID: 6943853144830319325, guid: a20efbbd0e2a8e34ea64bb3e2d5c88d3, type: 3}
+  introDuration: 0.35
+  loopFps: 4
+  outroDuration: 0.3
+  randomFlip: 1

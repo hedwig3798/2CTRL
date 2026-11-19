@@ -11,6 +11,7 @@ GameObject:
   - component: {fileID: 7013469011024515572}
   - component: {fileID: 1024428830092838565}
   - component: {fileID: 2634132709313325290}
+  - component: {fileID: 8521378929816116504}
   m_Layer: 0
   m_Name: SpiritProjectile
   m_TagString: Untagged
@@ -58,7 +59,7 @@ MonoBehaviour:
   tickInterval: 0.4
   spiritRenderer: {fileID: 2634132709313325290}
   sortingLayerName: attack
-  flipByDirection: 1
+  flipByDirection: 0
 --- !u!212 &2634132709313325290
 SpriteRenderer:
   serializedVersion: 3
@@ -108,7 +109,7 @@ SpriteRenderer:
   m_SortingLayer: 4
   m_SortingOrder: 1
   m_MaskInteraction: 0
-  m_Sprite: {fileID: 21300000, guid: f96e79d67f7c0854c8b29b11d2261d83, type: 3}
+  m_Sprite: {fileID: 510833055863926998, guid: 60ea253a5506cfa4eaae8879dc469e7e, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
   m_FlipY: 0
@@ -119,3 +120,36 @@ SpriteRenderer:
   m_WasSpriteAssigned: 1
   m_SpriteSortPoint: 0
   m_BlendShapeWeights: []
+--- !u!114 &8521378929816116504
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5285612588191571891}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0d3170cafe4528046a023c557de4f337, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Game.Runtime::SpiritVisual
+  target: {fileID: 2634132709313325290}
+  frames:
+  - {fileID: 510833055863926998, guid: 60ea253a5506cfa4eaae8879dc469e7e, type: 3}
+  - {fileID: -4568725395636033390, guid: 60ea253a5506cfa4eaae8879dc469e7e, type: 3}
+  - {fileID: 1090891871046600113, guid: 60ea253a5506cfa4eaae8879dc469e7e, type: 3}
+  - {fileID: 3082049163314910326, guid: 60ea253a5506cfa4eaae8879dc469e7e, type: 3}
+  - {fileID: 9198944690724372143, guid: 60ea253a5506cfa4eaae8879dc469e7e, type: 3}
+  - {fileID: -195753875088696932, guid: 60ea253a5506cfa4eaae8879dc469e7e, type: 3}
+  - {fileID: 1559830292529592520, guid: 60ea253a5506cfa4eaae8879dc469e7e, type: 3}
+  - {fileID: 2512958426930808908, guid: 60ea253a5506cfa4eaae8879dc469e7e, type: 3}
+  - {fileID: 3474123879790977655, guid: 60ea253a5506cfa4eaae8879dc469e7e, type: 3}
+  - {fileID: -8334224715004462707, guid: 60ea253a5506cfa4eaae8879dc469e7e, type: 3}
+  - {fileID: 3628580379806238312, guid: 60ea253a5506cfa4eaae8879dc469e7e, type: 3}
+  - {fileID: 5293753023392398564, guid: 60ea253a5506cfa4eaae8879dc469e7e, type: 3}
+  - {fileID: -1208078197742775378, guid: 60ea253a5506cfa4eaae8879dc469e7e, type: 3}
+  - {fileID: 3738886178357978702, guid: 60ea253a5506cfa4eaae8879dc469e7e, type: 3}
+  - {fileID: -3441095580077303, guid: 60ea253a5506cfa4eaae8879dc469e7e, type: 3}
+  - {fileID: -4264270804439786469, guid: 60ea253a5506cfa4eaae8879dc469e7e, type: 3}
+  framesPerDirection: 4
+  fps: 8
+  minTurnSpeed: 0.3
