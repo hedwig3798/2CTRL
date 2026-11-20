@@ -15,8 +15,8 @@ namespace Builders
     /// <summary>
     /// Assets/Scenes/TitleScene.unity 를 새로 만든다 (멱등, 매번 빈 씬으로 재생성)
     /// - Main Camera, EventSystem, Canvas(배경 / "2CTRL" 로고 / 버튼 목록) + TitleMenu
-    /// - 버튼: 게임 시작 / 차원 강화 / 설정 (MenuButtons 세로 레이아웃)
-    /// - 별도 캔버스: UpgradeCanvas(PermanentUpgradePanel, 꺼짐), SettingsCanvas(SettingsPanel)
+    /// - 버튼: 게임 시작 / 차원 강화 / 설정 / 게임 종료 (MenuButtons 세로 레이아웃)
+    /// - 별도 캔버스: UpgradeCanvas(PermanentUpgradePanel, 꺼짐), SettingsCanvas(SettingsPanel), QuitCanvas(QuitConfirmPanel, 꺼짐)
     /// - internal SettingsUIKit 을 쓰므로 script eval "return Builders.TitleSceneBuilder.Build();" 로 실행
     /// - Build Settings: TitleScene(0), DimensionSelectScene(1), GameScene(2) (DimensionSelectSceneBuilder.RegisterBuildScenes)
     /// - 확인용으로 .claude/tmp/titlescene.png 캡처
@@ -33,6 +33,8 @@ namespace Builders
         private const int SETTINGS_SORTING_ORDER = 50;
         // TitleCanvas 위, 설정 창 아래 (둘은 동시에 열리지 않는다)
         private const int UPGRADE_SORTING_ORDER = 40;
+        // 다른 창과 동시에 열리지 않는다. 가장 위
+        private const int QUIT_SORTING_ORDER = 60;
         // 차원 강화 창 크기 (9줄이 1080 안에 들어가도록)
         private const float UPGRADE_WINDOW_WIDTH = 1240f;
         private const float UPGRADE_ROW_HEIGHT = 72f;
@@ -119,7 +121,7 @@ namespace Builders
             menuRt.anchorMin = menuRt.anchorMax = new Vector2(0.5f, 0.5f);
             menuRt.pivot = new Vector2(0.5f, 1f);
             menuRt.anchoredPosition = new Vector2(0f, -80f);
-            menuRt.sizeDelta = new Vector2(400f, 300f);
+            menuRt.sizeDelta = new Vector2(400f, 400f);
             var vlg = menuGo.GetComponent<VerticalLayoutGroup>();
             vlg.spacing = 16f;
             vlg.childAlignment = TextAnchor.UpperCenter;
@@ -132,9 +134,11 @@ namespace Builders
             Button startButton = CreateButton("StartButton", menuRt, string.Empty, 360f, 80f);
             Button upgradeButton = CreateButton("UpgradeButton", menuRt, string.Empty, 360f, 80f);
             Button settingsButton = CreateButton("SettingsButton", menuRt, string.Empty, 360f, 80f);
+            Button quitButton = CreateButton("QuitButton", menuRt, string.Empty, 360f, 80f);
             LocalizationBuilderUtil.BindChildLabel(startButton, "ui.title.start");
             LocalizationBuilderUtil.BindChildLabel(upgradeButton, "ui.title.upgrade");
             LocalizationBuilderUtil.BindChildLabel(settingsButton, "ui.title.settings");
+            LocalizationBuilderUtil.BindChildLabel(quitButton, "ui.title.quit");
 
             // 설정 창 : ArtResourceBuilder 가 TitleCanvas 에 이미지를 뒤에 추가해도 가리지 않도록 별도 캔버스(위 순서)
             var settingsCanvasGo = new GameObject("SettingsCanvas", typeof(RectTransform), typeof(Canvas), typeof(CanvasScaler), typeof(GraphicRaycaster));
@@ -153,6 +157,10 @@ namespace Builders
             PermanentUpgradePanel upgradePanel = BuildUpgradePanel(canvasGo.layer);
             sb.AppendLine("차원 강화 창: " + (null != upgradePanel ? "UpgradeCanvas/PermanentUpgradePanel" : "생성 실패"));
 
+            // 게임 종료 확인 팝업 : 별도 캔버스 (꺼진 상태)
+            QuitConfirmPanel quitPanel = BuildQuitPanel(canvasGo.layer);
+            sb.AppendLine("종료 확인 팝업: " + (null != quitPanel ? "QuitCanvas/QuitConfirmPanel" : "생성 실패"));
+
             // 4. TitleMenu
             var menu = canvasGo.AddComponent<TitleMenu>();
             var so = new SerializedObject(menu);
@@ -162,6 +170,8 @@ namespace Builders
             so.FindProperty("settingsPanel").objectReferenceValue = settingsPanel;
             so.FindProperty("upgradeButton").objectReferenceValue = upgradeButton;
             so.FindProperty("upgradePanel").objectReferenceValue = upgradePanel;
+            so.FindProperty("quitButton").objectReferenceValue = quitButton;
+            so.FindProperty("quitPanel").objectReferenceValue = quitPanel;
             so.ApplyModifiedPropertiesWithoutUndo();
 
             EditorSceneManager.SaveScene(scene, SCENE_PATH);
@@ -235,6 +245,66 @@ namespace Builders
             so.FindProperty("rowParent").objectReferenceValue = list;
             so.FindProperty("rowTemplate").objectReferenceValue = rowTemplate;
             so.FindProperty("closeButton").objectReferenceValue = close;
+            so.ApplyModifiedPropertiesWithoutUndo();
+
+            SettingsUIKit.SetLayerRecursive(canvasGo, _layer);
+            root.SetActive(false);
+            return panel;
+        }
+
+        /// <summary>
+        /// QuitCanvas ─ QuitConfirmPanel(꺼짐, 전체 화면 Dim) ─ Window ─ Message / Buttons(ConfirmButton, CancelButton)
+        /// 스타일은 SettingsUIKit (설정 창·차원 강화 창과 같음)
+        /// </summary>
+        private static QuitConfirmPanel BuildQuitPanel(int _layer)
+        {
+            var canvasGo = new GameObject("QuitCanvas", typeof(RectTransform), typeof(Canvas), typeof(CanvasScaler), typeof(GraphicRaycaster));
+            canvasGo.layer = _layer;
+            var canvas = canvasGo.GetComponent<Canvas>();
+            canvas.renderMode = RenderMode.ScreenSpaceOverlay;
+            canvas.sortingOrder = QUIT_SORTING_ORDER;
+            var scaler = canvasGo.GetComponent<CanvasScaler>();
+            scaler.uiScaleMode = CanvasScaler.ScaleMode.ScaleWithScreenSize;
+            scaler.referenceResolution = new Vector2(1920f, 1080f);
+            scaler.matchWidthOrHeight = 0.5f;
+
+            // 루트 = 전체 화면 Dim (뒤쪽 메뉴 클릭 차단)
+            Image dim = SettingsUIKit.MakeImage("QuitConfirmPanel", canvasGo.transform, SettingsUIKit.DIM_COLOR, true);
+            SettingsUIKit.Stretch(dim.rectTransform);
+            GameObject root = dim.gameObject;
+
+            const float WIDTH = 640f, PAD = 32f, SPACING = 28f, MESSAGE_H = 80f, BUTTON_W = 220f, BUTTON_H = 72f, TEXT_SIZE = 36f;
+            float inner = WIDTH - PAD * 2f;
+            float height = PAD * 2f + MESSAGE_H + SPACING + BUTTON_H;
+
+            Image window = SettingsUIKit.MakeImage("Window", root.transform, SettingsUIKit.WINDOW_COLOR, true);
+            window.sprite = SettingsUIKit.BuiltinSprite("UISprite.psd");
+            window.type = Image.Type.Sliced;
+            SettingsUIKit.Slice(window, "PanelDark", Color.white);
+            SettingsUIKit.Center(window.rectTransform, new Vector2(WIDTH, height), Vector2.zero);
+            VerticalLayoutGroup wvlg = SettingsUIKit.AddVertical(window.gameObject, SPACING, TextAnchor.UpperCenter);
+            wvlg.padding = new RectOffset((int)PAD, (int)PAD, (int)PAD, (int)PAD);
+
+            TextMeshProUGUI message = SettingsUIKit.MakeLabel("Message", window.transform, string.Empty, 40f, TextAlignmentOptions.Center);
+            SettingsUIKit.SetLayoutSize(message.gameObject, inner, MESSAGE_H);
+            LocalizationBuilderUtil.Bind(message, "ui.quit.message");
+
+            RectTransform buttons = SettingsUIKit.MakeRect("Buttons", window.transform);
+            SettingsUIKit.SetLayoutSize(buttons.gameObject, inner, BUTTON_H);
+            SettingsUIKit.AddHorizontal(buttons.gameObject, 32f, TextAnchor.MiddleCenter);
+
+            Button confirm = SettingsUIKit.MakeButton("ConfirmButton", buttons, string.Empty, BUTTON_W, BUTTON_H, TEXT_SIZE);
+            LocalizationBuilderUtil.BindChildLabel(confirm, "ui.quit.confirm");
+            SettingsUIKit.StyleButton(confirm);
+
+            Button cancel = SettingsUIKit.MakeButton("CancelButton", buttons, string.Empty, BUTTON_W, BUTTON_H, TEXT_SIZE);
+            LocalizationBuilderUtil.BindChildLabel(cancel, "ui.quit.cancel");
+            SettingsUIKit.StyleButton(cancel);
+
+            var panel = root.AddComponent<QuitConfirmPanel>();
+            var so = new SerializedObject(panel);
+            so.FindProperty("confirmButton").objectReferenceValue = confirm;
+            so.FindProperty("cancelButton").objectReferenceValue = cancel;
             so.ApplyModifiedPropertiesWithoutUndo();
 
             SettingsUIKit.SetLayerRecursive(canvasGo, _layer);

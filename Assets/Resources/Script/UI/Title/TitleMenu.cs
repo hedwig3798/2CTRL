@@ -8,6 +8,7 @@ using UnityEngine.UI;
 /// - 게임 시작 버튼 : 차원 선택 씬(DimensionSelectScene) 으로 이동
 /// - 설정 버튼 : 설정 창(SettingsPanel) 열기. ESC 로 닫는다.
 /// - 차원 강화 버튼 : 영구 강화 창(PermanentUpgradePanel) 열기. ESC 로 닫는다.
+/// - 게임 종료 버튼 : 종료 확인 팝업(QuitConfirmPanel) 열기. 확인 시 종료, ESC 로 닫는다.
 /// - 창이 하나라도 열려 있으면 시작 버튼과 다른 창 열기를 막는다.
 /// 씬 이름은 Build Settings 에 등록되어 있어야 한다.
 /// </summary>
@@ -29,8 +30,15 @@ public class TitleMenu
     [Tooltip("영구 강화 창 (꺼진 상태로 두기)")]
     [SerializeField] private PermanentUpgradePanel upgradePanel;
 
+    [Header("게임 종료")]
+    [SerializeField] private Button quitButton;
+    [Tooltip("종료 확인 팝업 (꺼진 상태로 두기)")]
+    [SerializeField] private QuitConfirmPanel quitPanel;
+
     private bool IsSettingsOpen => null != settingsPanel && true == settingsPanel.IsOpen;
     private bool IsUpgradeOpen => null != upgradePanel && true == upgradePanel.IsOpen;
+    private bool IsQuitOpen => null != quitPanel && true == quitPanel.IsOpen;
+    private bool IsAnyOpen => true == IsSettingsOpen || true == IsUpgradeOpen || true == IsQuitOpen;
 
     private void Awake()
     {
@@ -56,6 +64,14 @@ public class TitleMenu
         {
             upgradePanel.gameObject.SetActive(false);
         }
+        if (null != quitButton)
+        {
+            quitButton.onClick.AddListener(OnClickQuit);
+        }
+        if (null != quitPanel)
+        {
+            quitPanel.gameObject.SetActive(false);
+        }
     }
 
     private void OnDestroy()
@@ -72,6 +88,10 @@ public class TitleMenu
         {
             upgradeButton.onClick.RemoveListener(OnClickUpgrade);
         }
+        if (null != quitButton)
+        {
+            quitButton.onClick.RemoveListener(OnClickQuit);
+        }
     }
 
     private void Update()
@@ -82,7 +102,11 @@ public class TitleMenu
             return;
         }
 
-        if (true == IsSettingsOpen)
+        if (true == IsQuitOpen)
+        {
+            quitPanel.Close();
+        }
+        else if (true == IsSettingsOpen)
         {
             settingsPanel.Close();
         }
@@ -94,7 +118,7 @@ public class TitleMenu
 
     public void OnClickStart()
     {
-        if (true == IsSettingsOpen || true == IsUpgradeOpen)
+        if (true == IsAnyOpen)
         {
             return;
         }
@@ -103,7 +127,7 @@ public class TitleMenu
 
     public void OnClickSettings()
     {
-        if (null != settingsPanel && false == IsUpgradeOpen)
+        if (null != settingsPanel && false == IsAnyOpen)
         {
             settingsPanel.Open();
         }
@@ -111,9 +135,17 @@ public class TitleMenu
 
     public void OnClickUpgrade()
     {
-        if (null != upgradePanel && false == IsSettingsOpen)
+        if (null != upgradePanel && false == IsAnyOpen)
         {
             upgradePanel.Open();
+        }
+    }
+
+    public void OnClickQuit()
+    {
+        if (null != quitPanel && false == IsAnyOpen)
+        {
+            quitPanel.Open();
         }
     }
 }

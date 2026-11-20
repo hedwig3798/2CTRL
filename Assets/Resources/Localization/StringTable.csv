@@ -3,6 +3,10 @@ key,ko,en
 ui.title.start,게임 시작,Start Game
 ui.title.settings,설정,Settings
 ui.title.upgrade,차원 강화,Upgrades
+ui.title.quit,게임 종료,Quit Game
+ui.quit.message,게임을 종료하시겠습니까?,Quit the game?
+ui.quit.confirm,종료,Quit
+ui.quit.cancel,취소,Cancel
 # 일시정지
 ui.pause.title,일시정지,Paused
 ui.pause.resume,계속하기,Resume
