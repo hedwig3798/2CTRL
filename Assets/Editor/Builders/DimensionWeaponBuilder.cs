@@ -70,7 +70,8 @@ namespace Builders
             new Def { name = "PlagueMine", type = typeof(PlagueMine), snake = "plague_mine", matA = "PoisonZone", matB = "Mine",
                 damage = 234f, attackSpeed = 0.5f, fireCount = 2, range = 20f, lifetime = 3f, areaRadius = 1.5f },
             new Def { name = "BlazeBoomerang", type = typeof(BlazeBoomerang), snake = "blaze_boomerang", matA = "Boomerang", matB = "Flame",
-                damage = 46.8f, attackSpeed = 0.5f, fireCount = 1, range = 12f, lifetime = 2f, areaRadius = 1.2f },
+                // lifetime 0 → 부메랑 수명은 defaultFlightLifetime(5초, 원본 BoomerangProjectile Lifetime 과 같음)
+                damage = 46.8f, attackSpeed = 0.5f, fireCount = 1, range = 12f, lifetime = 0f, areaRadius = 1.2f },
         };
 
         [MenuItem("Tools/Builders/DimensionWeapon")]

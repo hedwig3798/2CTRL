@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using System.IO;
 using System.Text;
 using TMPro;
@@ -182,6 +183,65 @@ namespace Builders.Visual
             });
         }
 
+        private const int BLAZE_JET_COUNT = 4;
+
+        /// <summary>
+        /// 화염 분출구 하나. _parent(회전하는 visual) 기준 _angle 방향 끝에 두고 그 방향으로 원뿔 분출
+        /// </summary>
+        private static ParticleSystem CreateBlazeJet(Transform _parent, int _index, float _angle, Material _mat)
+        {
+            var go = new GameObject("jet_" + _index);
+            go.transform.SetParent(_parent, false);
+            go.transform.localRotation = Quaternion.Euler(0f, 0f, _angle);
+            go.transform.localPosition = go.transform.localRotation * new Vector3(0f, 0.35f, 0f);
+
+            var ps = go.AddComponent<ParticleSystem>();
+            var main = ps.main;
+            main.loop = true;
+            main.playOnAwake = false;
+            main.simulationSpace = ParticleSystemSimulationSpace.World;
+            main.startLifetime = new ParticleSystem.MinMaxCurve(0.3f, 0.45f);
+            main.startSpeed = new ParticleSystem.MinMaxCurve(2.2f, 3.2f);
+            main.startSize = new ParticleSystem.MinMaxCurve(0.3f, 0.5f);
+            main.startRotation = new ParticleSystem.MinMaxCurve(0f, Mathf.PI * 2f);
+            main.startColor = new ParticleSystem.MinMaxGradient(new Color(1f, 0.45f, 0.1f, 0.95f), new Color(1f, 0.85f, 0.3f, 0.95f));
+            main.maxParticles = 60;
+
+            var em = ps.emission;
+            em.rateOverTime = 45f;
+
+            // 원뿔 기본 축(+Z)을 로컬 +Y(분출구 바깥쪽)로 돌린다
+            var shape = ps.shape;
+            shape.shapeType = ParticleSystemShapeType.Cone;
+            shape.angle = 14f;
+            shape.radius = 0.05f;
+            shape.rotation = new Vector3(-90f, 0f, 0f);
+
+            // 뿜어진 뒤 감속하며 퍼진다
+            var limit = ps.limitVelocityOverLifetime;
+            limit.enabled = true;
+            limit.limit = new ParticleSystem.MinMaxCurve(1f, AnimationCurve.Linear(0f, 3.2f, 1f, 0.6f));
+            limit.dampen = 0.15f;
+
+            var col = ps.colorOverLifetime;
+            col.enabled = true;
+            var grad = new Gradient();
+            grad.SetKeys(
+                new[] { new GradientColorKey(new Color(1f, 0.95f, 0.6f), 0f), new GradientColorKey(new Color(1f, 0.5f, 0.15f), 0.5f), new GradientColorKey(new Color(0.6f, 0.15f, 0.05f), 1f) },
+                new[] { new GradientAlphaKey(1f, 0f), new GradientAlphaKey(0.8f, 0.5f), new GradientAlphaKey(0f, 1f) });
+            col.color = grad;
+
+            var sz = ps.sizeOverLifetime;
+            sz.enabled = true;
+            sz.size = new ParticleSystem.MinMaxCurve(1f, AnimationCurve.Linear(0f, 0.7f, 1f, 1.6f));
+
+            var pr = go.GetComponent<ParticleSystemRenderer>();
+            pr.sharedMaterial = _mat;
+            pr.sortingLayerName = "attack";
+            pr.sortingOrder = 8;
+            return ps;
+        }
+
         private static void BuildBlazeBoomerang()
         {
             string matPath = MAT + "/M_DimFlame.mat";
@@ -237,13 +297,25 @@ namespace Builders.Visual
                 pr.sortingLayerName = "attack";
                 pr.sortingOrder = 7;
 
+                // 사방 화염 분출: 회전하는 visual 의 자식으로 분출구 BLAZE_JET_COUNT 개(등간격)를 두고 바깥쪽으로 뿜는다
+                // 월드 시뮬레이션이라 분출 순간의 방향으로 날아가 회전에 따라 나선형으로 퍼진다
+                // 도달 거리 ≈ 분출구 위치 0.35 + 속도 × 수명(≈ 2.8 × 0.38 ≈ 1.06) → 화염 데미지 반지름(1.2) 근처
+                var particleList = new List<ParticleSystem> { ps };
+                for (int j = 0; j < BLAZE_JET_COUNT; ++j)
+                {
+                    particleList.Add(CreateBlazeJet(spin.transform, j, 360f / BLAZE_JET_COUNT * j, mat));
+                }
+
                 var p = root.GetComponent<BlazeBoomerangProjectile>();
                 SetObj(p, "spinTransform", spin.transform);
                 SetStr(p, "sortingLayerName", "attack");
                 var so = new SerializedObject(p);
                 SerializedProperty arr = so.FindProperty("particles");
-                arr.arraySize = 1;
-                arr.GetArrayElementAtIndex(0).objectReferenceValue = ps;
+                arr.arraySize = particleList.Count;
+                for (int j = 0; j < particleList.Count; ++j)
+                {
+                    arr.GetArrayElementAtIndex(j).objectReferenceValue = particleList[j];
+                }
                 so.ApplyModifiedPropertiesWithoutUndo();
                 SetLayer(root);
             });

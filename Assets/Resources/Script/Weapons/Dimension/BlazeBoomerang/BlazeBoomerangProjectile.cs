@@ -5,7 +5,8 @@ using UnityEngine;
 /// 화염 부메랑 한 개 (BlazeBoomerang 이 풀에서 꺼내 쓴다)
 /// - 이동은 BoomerangFlight (ReturnMovement 와 같은 규칙). 되돌아서는 순간 발사한 플레이어의 현재 화면 위치로 귀환 방향을 정한다
 /// - 1회 타격 없음. 비행 중 틱 간격마다 주변 원(BlazeBoomerang.FlameRadius) 안의 모든 적(양 진영)에게 화염 데미지. 첫 틱은 발사 직후
-/// - 수명(BlazeBoomerang.FlightLifetime)이 끝나면 풀로 돌아간다 (원본처럼 플레이어에게 닿아도 사라지지 않음)
+/// - 수명(BlazeBoomerang.FlightLifetime, 기본 5초 = 원본 부메랑 Lifetime)이 끝나면 풀로 돌아간다
+///   (원본처럼 플레이어에게 닿아도 사라지지 않고 귀환 방향으로 계속 날아가 화면 밖에서 사라진다)
 /// - 시간은 Time.deltaTime (일시정지 시 멈춤). 렌더러가 없어도 동작한다
 /// </summary>
 public class BlazeBoomerangProjectile

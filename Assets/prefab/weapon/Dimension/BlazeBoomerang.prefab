@@ -48,7 +48,7 @@ MonoBehaviour:
   attackSpeed: 0.5
   range: 12
   fireCount: 1
-  lifetime: 2
+  lifetime: 0
   areaRadius: 1.2
   statTags: 31
   minAttackSpeed: 0.1
@@ -59,7 +59,7 @@ MonoBehaviour:
   returnSpeedRate: 1.5
   noTargetDistance: 4
   spreadAngle: 20
-  defaultFlightLifetime: 2
+  defaultFlightLifetime: 5
   flameTickInterval: 0.2
   flameTickDamageRate: 1
   defaultFlameRadius: 1.2

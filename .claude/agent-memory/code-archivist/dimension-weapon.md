@@ -16,7 +16,7 @@
 - WeaponParam.cs, PoisonZoneProjectile.cs 소폭 수정.
 
 ## 6종 (S/Weapons/Dimension/<Name>/, 모두 DimensionWeapon 파생)
-SpiritSquadron(정령 추격+드론 사격), ThornSaw(톱날 3배+덩굴 장판), PhantomWhirl(회전검+주기 잔상 즉사), PrismLaser(+PrismBranchPlanner<T>/PrismLink/IPrismTargetSource, 레이저 분기), PlagueMine(+PlagueMineBomb/PlagueMineMath/PlagueZone, 지뢰 추적·끌어당김·독 장판), BlazeBoomerang(+BlazeBoomerangProjectile/BoomerangFlight struct, 지속 화염).
+SpiritSquadron(정령 추격+드론 사격; 정령 대상 규칙=일반 SpiritProjectile와 동일: 무기 위치 기준 FinalRange 내 타 정령이 미추적인 최근접 적, 보스 MidBoss/BossHitProxy 공유, 죽거나 FinalRange+spiritLeashMargin(2) 밖까지 고정, 대상 없으면 spiritScanInterval(0.1s)마다 탐색; 공개 GetSpiritTarget(int); PlayMode 테스트 SpiritSquadron_SpiritsPickDistinctTargets_AndKeepThem @DimensionWeaponTestToolPlayTests.cs), ThornSaw(톱날 3배+덩굴 장판), PhantomWhirl(회전검+주기 잔상 즉사), PrismLaser(+PrismBranchPlanner<T>/PrismLink/IPrismTargetSource, 레이저 분기), PlagueMine(+PlagueMineBomb/PlagueMineMath/PlagueZone, 지뢰 추적·끌어당김·독 장판), BlazeBoomerang(+BlazeBoomerangProjectile/BoomerangFlight struct, 지속 화염).
 
 ## 보상·UI·연동
 - S/RewardSystem/Effects/DimensionFusionEffect.cs: RewardEffect 파생. static CreateReward(recipe), Apply: 재료 RemoveWeapon -> 양쪽 AddDimensionWeapon(공유 인스턴스), 보상 풀 정리, IsApplied.
@@ -37,3 +37,6 @@ SpiritSquadron(정령 추격+드론 사격), ThornSaw(톱날 3배+덩굴 장판)
 - Assets/Editor/Builders/DimensionWeaponBuilder.cs (Builders.DimensionWeaponBuilder.Build()): Root(뿌리 속박) 에셋 정리, 레이어 Stage(19번) 등록, 차원 무기 프리팹/DimensionWeaponData SO/DimensionFusionRegistry 생성, LevelUpUI 합성 카드 배치, StageSpace 배치.
 - Assets/Editor/Builders/Visual/DimensionWeaponVisual.cs (Build()): 차원 무기 비주얼 적용. ArtResourceBuilder.Build() 끝에서 호출됨(다른 빌더 재실행 후 ArtResourceBuilder 재실행 규칙에 포함).
 - 에셋 위치: Assets/prefab/weapon/Dimension/(+Parts/), Assets/prefab/Upgrade/Dimension/. Stage 레이어=19.
+
+- BlazeBoomerang 수명(2026-11-20): 프리팹 lifetime 0, defaultFlightLifetime 5(코드 기본값도 5, 원본 BoomerangProjectile 과 동일). 무기 lifetime 2초=발사간격 2초라 공중에서 사라지던 문제 수정. 돌아온 뒤에도 계속 날아가 화면 밖에서 종료, 진영당 동시 비행 1개->2~3개. 빌더 DimensionWeaponBuilder Def lifetime 0.
+- BlazeBoomerang 화염 분출구(2026-11-20): DimensionWeaponVisual.BuildBlazeBoomerang 이 CreateBlazeJet x BLAZE_JET_COUNT=4 추가. 회전 visual 의 자식, 90° 간격, 로컬 바깥쪽 원뿔 분출(월드 시뮬레이션 -> 회전 따라 나선형 사방 분출, 도달 ≈ 화염 반지름 1.2). BlazeBoomerangProjectile.particles = 기존 flame 궤적 + jet 4개. 데미지 로직 무변화. ArtResourceBuilder 재실행으로 BlazeBoomerangProjectile.prefab 갱신.

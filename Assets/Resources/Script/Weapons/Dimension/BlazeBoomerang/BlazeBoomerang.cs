@@ -7,8 +7,9 @@ using UnityEngine.Pool;
 /// - 쿨타임마다 양쪽 플레이어 화면 위치에서 각각 FinalFireCount 개 발사 (여러 개면 spreadAngle 간격 부채꼴)
 ///   방향 = 그 위치에서 최근접 적(양 진영, FinalRange 안). 없으면 그 진영의 마지막 발사 방향, 그것도 없으면 임의 방향
 /// - 이동은 원본 부메랑(ReturnMovement)과 같고 귀환 목표는 발사한 플레이어의 현재 화면 위치. 1회 타격 없이 비행 중 원 범위 틱 화염 데미지
-/// - 수치 근거(목표 468 지속 화염, 권장 프리팹 damage 46.8 · attackSpeed 0.5 · fireCount 1 · lifetime 2 → 진영마다 부메랑 1개 상시 비행):
-///   틱 46.8 / 0.2s = 234 DPS × 2개(좌우) = 468 (닿아 있는 동안 기준, WeaponTest DPS 미터로 실측 보정)
+/// - 수명은 원본 부메랑과 같다: 무기 lifetime 0 → defaultFlightLifetime(5초, 원본 BoomerangProjectile 의 Lifetime). 플레이어에게 닿아도
+///   사라지지 않고 돌아온 방향 그대로 계속 날아가 화면 밖으로 나간 뒤 수명이 끝나 사라진다 (발사 간격 2초보다 길어 여러 개가 겹쳐 난다)
+/// - 수치 근거(권장 프리팹 damage 46.8 · attackSpeed 0.5 · fireCount 1): 틱 46.8 / 0.2s = 234 DPS (부메랑 1개가 닿아 있는 동안)
 /// </summary>
 public class BlazeBoomerang
     : DimensionWeapon
@@ -42,10 +43,10 @@ public class BlazeBoomerang
     [Range(0f, 180f)]
     [SerializeField]
     private float spreadAngle = 20f;
-    [Tooltip("무기 lifetime 이 0 일 때 쓰는 부메랑 수명 (초)")]
+    [Tooltip("무기 lifetime 이 0 일 때 쓰는 부메랑 수명 (초). 원본 BoomerangProjectile 의 Lifetime(5초) 과 같게 둬서 돌아온 뒤 화면 밖으로 날아가 사라지게 한다")]
     [Min(0.1f)]
     [SerializeField]
-    private float defaultFlightLifetime = 2f;
+    private float defaultFlightLifetime = 5f;
 
     [Header("flame")]
     [Tooltip("화염 틱 기본 간격 (초). 실제 = 이 값 × 기본 공격 속도 / 최종 공격 속도")]
