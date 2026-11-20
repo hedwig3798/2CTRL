@@ -30,7 +30,7 @@ Transform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
-  - {fileID: 3966685465229703837}
+  - {fileID: 281580957581365351}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &6575376417791316048
@@ -47,7 +47,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Game.Runtime::PlagueMineBomb
   sortingLayerName: attack
   particles: []
---- !u!1001 &6503148099525656260
+--- !u!1001 &7988204538582914110
 PrefabInstance:
   m_ObjectHideFlags: 0
   serializedVersion: 2
@@ -104,8 +104,8 @@ PrefabInstance:
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 5a7aadc790fcf1d4dbaf6f62c719cb56, type: 3}
---- !u!4 &3966685465229703837 stripped
+--- !u!4 &281580957581365351 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 7868824116151911513, guid: 5a7aadc790fcf1d4dbaf6f62c719cb56, type: 3}
-  m_PrefabInstance: {fileID: 6503148099525656260}
+  m_PrefabInstance: {fileID: 7988204538582914110}
   m_PrefabAsset: {fileID: 0}
