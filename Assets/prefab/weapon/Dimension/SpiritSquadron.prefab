@@ -61,6 +61,8 @@ MonoBehaviour:
   spiritIdleRadius: 1.2
   spiritIdleOrbitSpeed: 60
   spiritIdleSharpness: 5
+  spiritScanInterval: 0.1
+  spiritLeashMargin: 2
   dronesPerSpirit: 1
   droneDamageRate: 1
   droneOrbitRadius: 0.8

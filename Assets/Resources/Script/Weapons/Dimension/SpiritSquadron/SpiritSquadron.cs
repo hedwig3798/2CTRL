@@ -6,7 +6,9 @@ using UnityEngine.Pool;
 /// <summary>
 /// 차원 무기 정령 편대 (정령 + 드론)
 /// - 정령 : 최대 FinalFireCount 마리 (Capped). Fire 마다 모자라면 spawnPerFire 마리를 화면 중앙에 만든다.
-///   쿼드트리 최근접 적(정령 위치 기준, FinalRange 이내)을 추격하고, 닿아 있으면 spiritTickInterval 마다 타격. spiritHitCount 번 타격하면 소멸
+///   대상 규칙은 일반 정령(SpiritProjectile) 과 같다: 화면 중앙(무기 위치) 기준 FinalRange 안에서 다른 정령이 추적 중이지 않은
+///   가장 가까운 적을 골라(보스는 함께 공격) 죽거나 FinalRange + spiritLeashMargin 밖으로 벗어날 때까지 고정 추격.
+///   대상이 없으면 spiritScanInterval 마다 찾는다. 닿아 있으면 spiritTickInterval 마다 타격. spiritHitCount 번 타격하면 소멸
 /// - 드론 : 정령 수 × dronesPerSpirit 기. 정령 주위를 공전하고(정령이 없으면 화면 중앙), Fire 마다
 ///   정령들의 현재 대상이 아닌 최근접 적(드론 위치 기준, FinalRange 이내)에게 탄 1발. 탄은 직선으로 날아가 처음 닿은 적 1명 타격
 /// - 대상이 없으면 정령·드론 모두 화면 중앙(StageCenter) 근처에서 대기
@@ -26,6 +28,7 @@ public class SpiritSquadron
         public float tickTimer;
         public int hitsLeft;
         public float phase;
+        public float scanTimer;
     }
 
     private class Drone
@@ -88,6 +91,16 @@ public class SpiritSquadron
     [Min(0f)]
     [SerializeField]
     private float spiritIdleSharpness = 5f;
+
+    [Tooltip("대상이 없을 때 적을 찾는 간격 (초, 일반 정령 scanInterval 과 같음)")]
+    [Min(0.02f)]
+    [SerializeField]
+    private float spiritScanInterval = 0.1f;
+
+    [Tooltip("추적 대상이 화면 중앙에서 사거리 + 이 값보다 멀어지면 놓친다 (일반 정령 leashMargin 과 같음)")]
+    [Min(0f)]
+    [SerializeField]
+    private float spiritLeashMargin = 2f;
 
     [Header("drone")]
     [Tooltip("정령 1마리당 드론 수 (드론 수 = FinalFireCount × 이 값)")]
@@ -188,10 +201,21 @@ public class SpiritSquadron
     private ObjectPool<Bullet> bulletPool;
     private Predicate<StageTarget> aliveFilter;
     private Predicate<StageTarget> droneFilter;
+    private Predicate<StageTarget> spiritFilter;
+    // 추적 중인 대상의 이번 프레임 위치 조회용 (화면 중앙 기준 사거리 + leash 안)
+    private readonly List<StageTarget> trackBuffer = new List<StageTarget>();
     private float idleAngle;
     private int spiritSerial;
 
     public int SpiritCount => spirits.Count;
+
+    /// <summary>
+    /// _index 정령의 현재 대상 (없거나 범위 밖이면 null, 테스트·디버그용)
+    /// </summary>
+    public HealthSystem GetSpiritTarget(int _index)
+    {
+        return (0 <= _index && _index < spirits.Count) ? spirits[_index].target : null;
+    }
     public int DroneCount => drones.Count;
     public int BulletCount => bullets.Count;
 
@@ -249,6 +273,7 @@ public class SpiritSquadron
     {
         aliveFilter = IsAliveTarget;
         droneFilter = IsDroneTarget;
+        spiritFilter = IsSpiritCandidate;
         spiritPool = new ObjectPool<Spirit>(CreateSpirit, OnGetObject, OnReleaseObject, OnDestroyObject, false, 4, 32);
         dronePool = new ObjectPool<Drone>(CreateDrone, OnGetObject, OnReleaseObject, OnDestroyObject, false, 4, 32);
         bulletPool = new ObjectPool<Bullet>(CreateBullet, OnGetObject, OnReleaseObject, OnDestroyObject, false, 16, 128);
@@ -266,6 +291,7 @@ public class SpiritSquadron
             s.tickTimer = spiritTickInterval;
             s.hitsLeft = spiritHitCount;
             s.phase = (spiritSerial++ % 8) * 45f;
+            s.scanTimer = 0f;
             s.tr.position = ToWorld(center, s.tr.position.z);
             spirits.Add(s);
         }
@@ -324,15 +350,45 @@ public class SpiritSquadron
         float range = FinalRange;
         float damage = FinalDamage * spiritDamageRate;
 
+        // 일반 정령(SpiritProjectile) 과 같은 대상 규칙
+        // - 대상 고정: 죽거나 화면 중앙(= 무기 위치)에서 사거리 + leash 밖으로 벗어날 때까지 바꾸지 않는다
+        // - 고르기: 화면 중앙 기준 사거리 안, 다른 정령이 추적 중이지 않은 가장 가까운 적 (보스는 함께 공격)
+        // - 대상이 없으면 scanInterval 마다 찾는다. 대상을 놓친 프레임에는 바로 다음 대상을 찾는다
+        CollectSpiritTargets();
+        trackBuffer.Clear();
+        if (null != _tree)
+        {
+            _tree.QueryCircle(_center, range + spiritLeashMargin, trackBuffer);
+        }
+
         for (int i = spirits.Count - 1; i >= 0; --i)
         {
             Spirit s = spirits[i];
             Vector2 pos = s.tr.position;
             s.tickTimer = Mathf.Min(spiritTickInterval, s.tickTimer + _dt);
+            s.scanTimer -= _dt;
 
-            if (null != _tree && true == _tree.QueryNearest(pos, range, aliveFilter, out StageTarget target))
+            StageTarget target = default;
+            bool hasTarget = null != s.target && true == TryFindTracked(s.target, pos, out target);
+            if (false == hasTarget && null != s.target)
             {
-                s.target = target.health;
+                ReleaseSpiritTarget(s);
+                s.scanTimer = 0f;
+            }
+
+            if (false == hasTarget && s.scanTimer <= 0f && null != _tree)
+            {
+                s.scanTimer = spiritScanInterval;
+                if (true == _tree.QueryNearest(_center, range, spiritFilter, out target))
+                {
+                    hasTarget = true;
+                    s.target = target.health;
+                    spiritTargets.Add(target.health);
+                }
+            }
+
+            if (true == hasTarget)
+            {
                 Vector2 to = target.stagePos - pos;
                 float stopDist = target.radius + spiritContactRadius * 0.5f;
                 Vector2 next = pos;
@@ -349,13 +405,13 @@ public class SpiritSquadron
                     StageDamage.Apply(target, damage, this);
                     if (--s.hitsLeft <= 0)
                     {
+                        ReleaseSpiritTarget(s);
                         ReleaseSpiritAt(i);
                     }
                 }
                 continue;
             }
 
-            s.target = null;
             float angle = (idleAngle + s.phase) * Mathf.Deg2Rad;
             Vector2 idlePos = _center + new Vector2(Mathf.Cos(angle), Mathf.Sin(angle)) * spiritIdleRadius;
             MoveSpirit(s, pos, Vector2.Lerp(pos, idlePos, 1f - Mathf.Exp(-spiritIdleSharpness * _dt)));
@@ -383,6 +439,54 @@ public class SpiritSquadron
         spirits.RemoveAt(last);
         s.target = null;
         spiritPool.Release(s);
+    }
+
+    /// <summary>
+    /// _health 의 이번 프레임 화면 위치 (화면 중앙 기준 사거리 + leash 안에 살아 있을 때만)
+    /// 보스처럼 항목이 여럿이면 _from 에 가장 가까운 것
+    /// </summary>
+    private bool TryFindTracked(HealthSystem _health, Vector2 _from, out StageTarget _found)
+    {
+        _found = default;
+        float bestSq = float.MaxValue;
+        bool found = false;
+        for (int i = 0; i < trackBuffer.Count; ++i)
+        {
+            StageTarget t = trackBuffer[i];
+            if (t.health != _health || false == t.IsAlive)
+            {
+                continue;
+            }
+            float sq = (t.stagePos - _from).sqrMagnitude;
+            if (sq < bestSq)
+            {
+                bestSq = sq;
+                _found = t;
+                found = true;
+            }
+        }
+        return found;
+    }
+
+    /// <summary>
+    /// 정령의 대상을 비우고 독점 표시를 푼다 (보스는 다른 정령도 공격 중일 수 있어 목록에 둔다)
+    /// </summary>
+    private void ReleaseSpiritTarget(Spirit _s)
+    {
+        HealthSystem t = _s.target;
+        _s.target = null;
+        if (null != t && false == IsBossTarget(t))
+        {
+            spiritTargets.Remove(t);
+        }
+    }
+
+    /// <summary>
+    /// 여러 정령이 함께 공격할 수 있는 보스인지 (일반 정령과 같은 기준: MidBoss / BossHitProxy)
+    /// </summary>
+    private static bool IsBossTarget(HealthSystem _health)
+    {
+        return true == _health.TryGetComponent(out MidBoss _) || null != _health.GetComponentInParent<BossHitProxy>();
     }
 
     private void CollectSpiritTargets()
@@ -515,6 +619,18 @@ public class SpiritSquadron
     private bool IsAliveTarget(StageTarget _t)
     {
         return true == _t.IsAlive;
+    }
+
+    /// <summary>
+    /// 정령 대상 후보: 살아 있고, 다른 정령이 추적 중이 아니다 (보스는 예외)
+    /// </summary>
+    private bool IsSpiritCandidate(StageTarget _t)
+    {
+        if (false == _t.IsAlive)
+        {
+            return false;
+        }
+        return false == spiritTargets.Contains(_t.health) || true == IsBossTarget(_t.health);
     }
 
     private bool IsDroneTarget(StageTarget _t)
